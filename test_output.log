@@ -1,0 +1,19 @@
+$ hardhat test --config hardhat.config.cjs
+WARNING: You are currently using Node.js v25.0.0, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+An unexpected error occurred:
+
+ReferenceError: require is not defined in ES module scope, you can use import instead
+This file is being treated as an ES module because it has a '.js' file extension and 'D:\Github\proofexistence\package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+    at file:///D:/Github/proofexistence/test/ProofOfExistence.test.js:2:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:377:25)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:691:26)
+    at formattedImport (D:\Github\proofexistence\node_modules\mocha\lib\nodejs\esm-utils.js:9:14)
+    at Object.exports.requireOrImport (D:\Github\proofexistence\node_modules\mocha\lib\nodejs\esm-utils.js:42:28)
+    at Object.exports.loadFilesAsync (D:\Github\proofexistence\node_modules\mocha\lib\nodejs\esm-utils.js:100:20)
+    at SimpleTaskDefinition.action (D:\Github\proofexistence\node_modules\hardhat\src\builtin-tasks\test.ts:132:9)
+    at Environment._runTaskDefinition (D:\Github\proofexistence\node_modules\hardhat\src\internal\core\runtime-environment.ts:351:14)
+    at Environment.run (D:\Github\proofexistence\node_modules\hardhat\src\internal\core\runtime-environment.ts:184:14)
+    at SimpleTaskDefinition.action (D:\Github\proofexistence\node_modules\hardhat\src\builtin-tasks\test.ts:196:28)
+error: script "test:contracts" exited with code 1
