@@ -49,13 +49,13 @@ export function ReferralDialog({ open, onOpenChange }: ReferralDialogProps) {
       }
     };
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoadingCount(true);
     fetchReferrals();
 
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, profile?.clerkId]);
 
   const handleCopy = async () => {

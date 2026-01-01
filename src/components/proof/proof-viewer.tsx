@@ -7,7 +7,16 @@ import { useRouter } from 'next/navigation';
 
 import { ReplayCanvasRef } from '@/components/canvas/replay-canvas';
 import { TrailPoint } from '@/types/session';
-import { Camera, Pause, Play, Download, X } from 'lucide-react';
+import {
+  Camera,
+  Pause,
+  Play,
+  Download,
+  X,
+  Share2,
+  Link2,
+  Check,
+} from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useRecordView } from '@/hooks/use-record-view';
 
@@ -56,7 +65,15 @@ export function ProofViewer({
   const canvasRef = useRef<ReplayCanvasRef>(null);
   const [isSpinning, setIsSpinning] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const { recordView } = useRecordView();
+
+  // Share URL for this proof
+  const shareUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/proof/${session.id}`
+      : `https://proofexistence.com/proof/${session.id}`;
 
   // Increment view count on mount
   useEffect(() => {
@@ -268,6 +285,50 @@ export function ProofViewer({
     link.click();
   };
 
+  const handleShare = async (
+    mode: 'native' | 'copy' | 'twitter' | 'download'
+  ) => {
+    setShowShareMenu(false);
+    const displayTitle = session.title || `Proof #${session.id.slice(0, 8)}`;
+    const shareText = `Check out my proof of existence: "${displayTitle}" on POE 2026`;
+
+    switch (mode) {
+      case 'native':
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: displayTitle,
+              text: shareText,
+              url: shareUrl,
+            });
+          } catch (err) {
+            // User cancelled or error - fall back to copy
+            if ((err as Error).name !== 'AbortError') {
+              handleShare('copy');
+            }
+          }
+        } else {
+          handleShare('copy');
+        }
+        break;
+
+      case 'copy':
+        await navigator.clipboard.writeText(shareUrl);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+        break;
+
+      case 'twitter':
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+        window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+        break;
+
+      case 'download':
+        handleScreenshot('with-title');
+        break;
+    }
+  };
+
   // Author Display Name
   const authorName =
     session.user?.name || session.user?.username || 'Anonymous';
@@ -397,10 +458,70 @@ export function ProofViewer({
           )}
         </button>
 
+        {/* Share Button */}
+        <div className="relative">
+          <button
+            onClick={() => {
+              setShowShareMenu(!showShareMenu);
+              setShowMenu(false);
+            }}
+            className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full shadow-lg shadow-purple-500/30 transition-all hover:scale-105 active:scale-95"
+            title="Share"
+          >
+            {linkCopied ? <Check size={24} /> : <Share2 size={24} />}
+          </button>
+
+          {showShareMenu && (
+            <div className="absolute bottom-full right-0 mb-3 w-52 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-200">
+              <button
+                onClick={() => handleShare('native')}
+                className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+              >
+                <Share2 size={16} />
+                Share
+              </button>
+              <div className="h-px bg-white/10" />
+              <button
+                onClick={() => handleShare('copy')}
+                className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+              >
+                <Link2 size={16} />
+                Copy Link
+              </button>
+              <div className="h-px bg-white/10" />
+              <button
+                onClick={() => handleShare('twitter')}
+                className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Post on X
+              </button>
+              <div className="h-px bg-white/10" />
+              <button
+                onClick={() => handleShare('download')}
+                className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+              >
+                <Download size={16} />
+                Download Image
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Screenshot Menu */}
         <div className="relative">
           <button
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={() => {
+              setShowMenu(!showMenu);
+              setShowShareMenu(false);
+            }}
             className="p-3 bg-white text-black hover:bg-zinc-200 rounded-full shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95"
             title="Take Screenshot"
           >
