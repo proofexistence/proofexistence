@@ -67,3 +67,7 @@ docs/
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Hardhat (generated files)
+/artifacts/
+/cache/
