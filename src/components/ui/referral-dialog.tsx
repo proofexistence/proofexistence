@@ -29,7 +29,7 @@ export function ReferralDialog({ open, onOpenChange }: ReferralDialogProps) {
 
   // Fetch referral count when dialog opens
   useEffect(() => {
-    if (!open || !profile?.id) return;
+    if (!open || !profile) return;
 
     let cancelled = false;
 
@@ -56,7 +56,7 @@ export function ReferralDialog({ open, onOpenChange }: ReferralDialogProps) {
     return () => {
       cancelled = true;
     };
-  }, [open, profile?.id]);
+  }, [open, profile?.clerkId]);
 
   const handleCopy = async () => {
     if (!referralLink) return;
