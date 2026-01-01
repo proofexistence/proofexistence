@@ -202,6 +202,42 @@ export async function syncUserToDatabase(params: SyncUserParams) {
   // Handle potential duplicate username by appending random slice if needed?
   // For now simple logic.
 
+  // Check if wallet address already exists (account recovery case)
+  const existingWalletUser = await db.query.users.findFirst({
+    where: eq(users.walletAddress, finalWalletAddress),
+  });
+
+  if (existingWalletUser) {
+    // Wallet already exists with different clerkId - update to new clerkId (account recovery)
+    console.log(
+      `[Sync] Wallet ${finalWalletAddress} already exists, updating clerkId from ${existingWalletUser.clerkId} to ${userId}`
+    );
+    await db
+      .update(users)
+      .set({
+        clerkId: userId,
+        email: email || existingWalletUser.email,
+        lastSeenAt: new Date(),
+      })
+      .where(eq(users.walletAddress, finalWalletAddress));
+
+    // Update Clerk Metadata
+    const client = await clerkClient();
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        openfortPlayerId: openfortPlayerId,
+        walletAddress: finalWalletAddress,
+        isExternalWallet: isExternalWallet,
+      },
+    });
+
+    return {
+      success: true,
+      status: 'recovered',
+      walletAddress: finalWalletAddress,
+    };
+  }
+
   await db.insert(users).values({
     clerkId: userId,
     walletAddress: finalWalletAddress,

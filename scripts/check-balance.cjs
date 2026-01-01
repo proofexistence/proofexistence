@@ -1,19 +1,25 @@
-const hre = require('hardhat');
+const { ethers } = require('hardhat');
 
 async function main() {
-  const time26Address = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'; // From previous deployment
-  const userAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+  const TIME26_ADDRESS = '0x823a4680b90c6Ae215b5A03456B0FD38d1131c8c';
+  const PROOF_RECORDER = '0xAd277E9f0f41237AEB9Cc8A6F10606b8978b9920';
+  const TREASURY = '0xc7b9ED3e985706efeb951462d4281f4Ac8fc99B2';
 
-  const Time26 = await hre.ethers.getContractFactory('Time26');
-  const time26 = await Time26.attach(time26Address);
+  const time26 = await ethers.getContractAt('Time26', TIME26_ADDRESS);
 
-  const balance = await time26.balanceOf(userAddress);
+  const recorderBalance = await time26.balanceOf(PROOF_RECORDER);
+  const treasuryBalance = await time26.balanceOf(TREASURY);
+
   console.log(
-    `Balance of ${userAddress}: ${hre.ethers.utils.formatEther(balance)} TIME26`
+    'ProofRecorder balance:',
+    ethers.formatEther(recorderBalance),
+    'TIME26'
+  );
+  console.log(
+    'Treasury balance:',
+    ethers.formatEther(treasuryBalance),
+    'TIME26'
   );
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main().catch(console.error);

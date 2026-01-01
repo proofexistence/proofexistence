@@ -121,7 +121,8 @@ export async function POST(req: NextRequest) {
         } catch (imgError: unknown) {
           console.error('Image upload failed:', imgError);
           throw new Error(
-            `Image upload failed: ${imgError instanceof Error ? imgError.message : String(imgError)
+            `Image upload failed: ${
+              imgError instanceof Error ? imgError.message : String(imgError)
             }`
           );
         }

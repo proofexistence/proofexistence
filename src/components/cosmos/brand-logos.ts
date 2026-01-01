@@ -127,8 +127,6 @@ function generateClerkLogo(): BrandLogoGeometry {
     const u = i / tubeSegments;
     const theta = startAngle + (endAngle - startAngle) * u; // Angle along major circle
 
-
-
     // Create ring at this position
     const ringStartIdx = p.length;
     for (let j = 0; j < crossSegments; j++) {
@@ -167,7 +165,6 @@ function generateClerkLogo(): BrandLogoGeometry {
       const prevRingStart = ringStartIdx - crossSegments;
       for (let j = 0; j < crossSegments; j++) {
         const curr = ringStartIdx + j;
-
 
         const prev = prevRingStart + j;
 

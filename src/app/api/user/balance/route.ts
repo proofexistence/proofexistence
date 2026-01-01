@@ -55,7 +55,10 @@ export async function GET() {
       return sum + BigInt(r.totalReward);
     }, BigInt(0));
 
-    const totalSeconds = recentRewards.reduce((sum, r) => sum + r.totalSeconds, 0);
+    const totalSeconds = recentRewards.reduce(
+      (sum, r) => sum + r.totalSeconds,
+      0
+    );
 
     return NextResponse.json({
       balance: {

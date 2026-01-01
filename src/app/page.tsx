@@ -4,8 +4,6 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { ScrollDrawingCanvas } from '@/components/home/scroll-drawing-canvas';
 import { TrailPoint } from '@/types/session';
-import { LaunchCountdown } from '@/components/home/launch-countdown';
-import { isLaunchTime } from '@/lib/launch-config';
 
 // Lazy load heavy GSAP components
 const AnimatedHero = dynamic(
@@ -35,17 +33,8 @@ interface Session {
 }
 
 export default function Home() {
-  const [launched, setLaunched] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [drawingSession, setDrawingSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    // Check launch status on mount
-    // eslint-disable-next-line
-    setLaunched(isLaunchTime());
-    setIsChecking(false);
-  }, []);
 
   // Fetch random sessions for both Hero (images) and Background (drawing)
   useEffect(() => {
@@ -75,12 +64,6 @@ export default function Home() {
     fetchSession();
     return () => controller.abort();
   }, []);
-
-  if (isChecking) return null; // Avoid hydration mismatch flash
-
-  if (!launched) {
-    return <LaunchCountdown onFinished={() => setLaunched(true)} />;
-  }
 
   return (
     <div className="relative w-full min-h-screen bg-transparent text-white overflow-x-hidden selection:bg-purple-500/30">

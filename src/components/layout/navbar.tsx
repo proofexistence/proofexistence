@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useClerk, SignInButton } from '@clerk/nextjs';
+import { useClerk } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 import VariableFontHoverByRandomLetter from '@/components/fancy/text/variable-font-hover-by-random-letter';
 import { Menu, X, Globe, LineSquiggle, Settings, User } from 'lucide-react';
@@ -11,6 +11,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { isLaunchTime } from '@/lib/launch-config';
+import { NavbarCountdown } from './navbar-countdown';
+import { MobileConnectButton } from '@/components/auth/mobile-connect-button';
 
 export function Navbar() {
   const { profile, isLoading, isAuthenticated } = useUserProfile();
@@ -137,7 +139,7 @@ export function Navbar() {
     <>
       <nav className="fixed top-6 left-0 w-full p-6 flex justify-between items-center z-50 pointer-events-none">
         {/* ------------------- DESKTOP VIEW (md:flex) ------------------- */}
-        <div className="hidden md:flex w-full items-center justify-between">
+        <div className="hidden md:flex w-full items-center justify-between relative">
           {/* Left Side Wrapper: Nav Pill + Independent Proof Button */}
           <div className="pointer-events-auto flex items-center gap-4">
             {/* Navigation Pill */}
@@ -187,6 +189,11 @@ export function Navbar() {
                 />
               </Link>
             )}
+          </div>
+
+          {/* Centered Countdown */}
+          <div className="absolute left-1/2 -translate-x-1/2 pointer-events-auto">
+            {!pathname?.startsWith('/cosmos') && <NavbarCountdown />}
           </div>
 
           {/* Right Pill: Auth Actions & Right Nav Links */}
@@ -273,11 +280,11 @@ export function Navbar() {
                 </div>
               </div>
             ) : (
-              <SignInButton mode="modal" forceRedirectUrl="/">
+              <MobileConnectButton>
                 <button className="px-5 py-2.5 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-200 hover:scale-105 transition-all shadow-lg shadow-white/10">
                   Login
                 </button>
-              </SignInButton>
+              </MobileConnectButton>
             )}
           </div>
         </div>
@@ -408,16 +415,29 @@ export function Navbar() {
                   </button>
                 </div>
               ) : (
-                <SignInButton mode="modal" forceRedirectUrl="/">
+                <MobileConnectButton
+                  className="w-full"
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      // Optional logic if needed when dialog closes
+                    }
+                  }}
+                >
                   <button
                     onClick={() => {
+                      // We don't close the menu immediately if it's going to open the dialog
+                      // But MobileConnectButton stops propagation if it opens dialog.
+                      // If it's standard sign in, it opens Clerk modal.
+                      // We might want to close the mobile menu ONLY if we are NOT showing the dialog?
+                      // Actually MobileConnectButton children onClick is wrapped.
+                      // Let's just close the menu? No, if we close menu, verify dialog z-index.
                       setIsMobileMenuOpen(false);
                     }}
                     className="w-full py-4 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-colors"
                   >
                     Connect Wallet
                   </button>
-                </SignInButton>
+                </MobileConnectButton>
               )}
             </div>
           </motion.div>

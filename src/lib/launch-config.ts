@@ -1,6 +1,9 @@
 export const LAUNCH_DATE_ISO =
   process.env.NEXT_PUBLIC_LAUNCH_DATE || '2026-01-01T00:00:00Z';
 
+// End of POE 2026 - countdown to this date
+export const END_DATE_ISO = '2027-01-01T00:00:00Z';
+
 export function isLaunchTime() {
   if (typeof window !== 'undefined') {
     if (window.localStorage.getItem('bypass_launch') === 'true') return true;
@@ -13,10 +16,10 @@ export function isLaunchTime() {
   return now >= launch;
 }
 
-export function getTimeUntilLaunch() {
+export function getTimeUntilEnd() {
   const now = new Date();
-  const launch = new Date(LAUNCH_DATE_ISO);
-  const diff = launch.getTime() - now.getTime();
+  const end = new Date(END_DATE_ISO);
+  const diff = end.getTime() - now.getTime();
 
   if (diff <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0, finished: true };

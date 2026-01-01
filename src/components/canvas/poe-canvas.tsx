@@ -400,6 +400,7 @@ export function POECanvas() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentTheme]);
+
   // ... existing hooks ...
 
   const {
@@ -1093,6 +1094,14 @@ export function POECanvas() {
         let errorMessage = rawMessage;
         if (rawMessage.includes('user rejected transaction')) {
           errorMessage = 'User rejected transaction';
+        } else if (rawMessage.includes('STORAGE_UNAVAILABLE')) {
+          errorMessage =
+            'Storage service temporarily unavailable. Please try again later.';
+        } else if (
+          rawMessage.includes('intrinsic gas too low') ||
+          rawMessage.includes('gas')
+        ) {
+          errorMessage = 'Network congestion detected. Please try again.';
         } else if (rawMessage.includes('Internal JSON-RPC error')) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const errorObj = err as any;
@@ -1114,9 +1123,12 @@ export function POECanvas() {
           isOpen: true,
           title: 'Submission Failed',
           description: errorMessage || 'An error occurred during submission.',
-          actionLabel: 'OK',
-          onAction: () =>
-            setDialogState((prev) => ({ ...prev, isOpen: false })),
+          actionLabel: 'Close',
+          onAction: () => {
+            setDialogState((prev) => ({ ...prev, isOpen: false }));
+          },
+          cancelLabel: undefined,
+          onCancel: undefined,
           isError: true,
         });
       } finally {
@@ -1299,7 +1311,7 @@ export function POECanvas() {
       )}
 
       <div className="absolute top-4 left-4 z-50 text-xs text-white/30 font-mono pointer-events-none">
-        Theme: {currentTheme.name} (Ctrl+B to cycle)
+        Theme: {currentTheme.name}
       </div>
 
       <div className="absolute inset-0 pointer-events-none">
@@ -1313,7 +1325,7 @@ export function POECanvas() {
           isValid={isValid}
         />
 
-        <div className="absolute top-12 right-4 md:top-14 md:right-6 flex flex-col md:flex-row gap-3 items-end md:items-center z-40 pointer-events-none">
+        <div className="absolute top-6 right-4 md:top-8 md:right-6 flex flex-col md:flex-row gap-3 items-end md:items-center z-40 pointer-events-none">
           {isReady && !isRecording && (
             <div className="hidden md:block">
               <ActionButtons
@@ -1334,6 +1346,7 @@ export function POECanvas() {
           isReady={isReady}
           onClear={() => setShowClearConfirm(true)}
           onSubmit={handleComplete}
+          themeName={currentTheme.name}
         />
 
         <SubmissionModal

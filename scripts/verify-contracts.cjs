@@ -12,7 +12,8 @@ const PROOF_RECORDER_ADDRESS = '0x7FF137359720f01aDcA9C524818E55ed352831DB';
 
 // Constructor arguments (ABI encoded)
 // TIME26: constructor(address initialOwner) - owner is 0xA7D2A0647F1f12455f543Db4CaA350e85C0Eae09
-const TIME26_CONSTRUCTOR_ARGS = '000000000000000000000000a7d2a0647f1f12455f543db4caa350e85c0eae09';
+const TIME26_CONSTRUCTOR_ARGS =
+  '000000000000000000000000a7d2a0647f1f12455f543db4caa350e85c0eae09';
 
 // ProofRecorder: constructor(address _time26Token, address _treasury, address _operator, address initialOwner)
 // time26: 0x56C79b61FFc3D826188DB700791F1A7ECb007FD0
@@ -25,7 +26,12 @@ const PROOF_RECORDER_CONSTRUCTOR_ARGS =
   '00000000000000000000000066f5e775eda013240c26772f79cd7b5a276850c6' +
   '000000000000000000000000a7d2a0647f1f12455f543db4caa350e85c0eae09';
 
-async function verifyContract(contractAddress, contractName, sourceCode, constructorArgs) {
+async function verifyContract(
+  contractAddress,
+  contractName,
+  sourceCode,
+  constructorArgs
+) {
   console.log(`\n=== Verifying ${contractName} at ${contractAddress} ===\n`);
 
   const params = new URLSearchParams({
@@ -57,7 +63,7 @@ async function verifyContract(contractAddress, contractName, sourceCode, constru
     if (result.status === '1') {
       console.log(`✅ Verification submitted! GUID: ${result.result}`);
       console.log('Waiting 30 seconds before checking status...');
-      await new Promise(resolve => setTimeout(resolve, 30000));
+      await new Promise((resolve) => setTimeout(resolve, 30000));
       await checkVerificationStatus(result.result);
     } else {
       console.log(`❌ Verification failed: ${result.result}`);
@@ -92,7 +98,10 @@ async function main() {
 
   // Read flattened source files
   const time26Source = fs.readFileSync('flattened/Time26.clean.sol', 'utf8');
-  const proofRecorderSource = fs.readFileSync('flattened/ProofRecorder.clean.sol', 'utf8');
+  const proofRecorderSource = fs.readFileSync(
+    'flattened/ProofRecorder.clean.sol',
+    'utf8'
+  );
 
   console.log('Starting contract verification...');
   console.log('API Key:', POLYGONSCAN_API_KEY.substring(0, 8) + '...');

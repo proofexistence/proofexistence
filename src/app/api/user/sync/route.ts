@@ -2,6 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { syncUserToDatabase } from '@/lib/auth/sync-logic';
+import { checkRateLimit } from '@/lib/ratelimit';
 
 export async function POST() {
   try {
@@ -10,6 +11,12 @@ export async function POST() {
 
     if (!userId || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate Limiting (Prevent Sync Spam)
+    const rateLimit = await checkRateLimit(`sync:${userId}`);
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
     // Logic to extract Primary Web3 Wallet if exists

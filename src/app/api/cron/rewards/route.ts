@@ -19,7 +19,11 @@ import {
   type DrawingPeriod,
 } from '@/lib/rewards/calculate';
 import { ethers } from 'ethers';
-import { TIME26_ADDRESS, TIME26_ABI, PROOF_RECORDER_ADDRESS } from '@/lib/contracts';
+import {
+  TIME26_ADDRESS,
+  TIME26_ABI,
+  PROOF_RECORDER_ADDRESS,
+} from '@/lib/contracts';
 import { createPolygonProvider } from '@/lib/provider';
 
 // Force dynamic to avoid caching
@@ -66,11 +70,11 @@ export async function GET(req: NextRequest) {
         duration: sessions.duration,
       })
       .from(sessions)
-      .where(
-        and(gte(sessions.startTime, start), lte(sessions.startTime, end))
-      );
+      .where(and(gte(sessions.startTime, start), lte(sessions.startTime, end)));
 
-    console.log(`[Rewards Cron] Found ${daySessions.length} sessions for ${dayId}`);
+    console.log(
+      `[Rewards Cron] Found ${daySessions.length} sessions for ${dayId}`
+    );
 
     // 5. Calculate rewards
     const drawingPeriods: DrawingPeriod[] = daySessions.map((s) => ({

@@ -187,10 +187,19 @@ export const dailyRewards = pgTable('daily_rewards', {
   dayId: varchar('day_id', { length: 10 }).primaryKey(), // Format: "YYYY-MM-DD"
   totalBudget: decimal('total_budget', { precision: 36, scale: 18 }).notNull(), // Total TIME26 available for the day
   totalSeconds: integer('total_seconds').notNull(), // Total drawing seconds across all users
-  totalDistributed: decimal('total_distributed', { precision: 36, scale: 18 }).notNull(), // Actually distributed
+  totalDistributed: decimal('total_distributed', {
+    precision: 36,
+    scale: 18,
+  }).notNull(), // Actually distributed
   participantCount: integer('participant_count').notNull(),
-  contractBalanceBefore: decimal('contract_balance_before', { precision: 36, scale: 18 }), // For auditing
-  contractBalanceAfter: decimal('contract_balance_after', { precision: 36, scale: 18 }), // For auditing
+  contractBalanceBefore: decimal('contract_balance_before', {
+    precision: 36,
+    scale: 18,
+  }), // For auditing
+  contractBalanceAfter: decimal('contract_balance_after', {
+    precision: 36,
+    scale: 18,
+  }), // For auditing
   settledAt: timestamp('settled_at').defaultNow().notNull(),
 });
 
@@ -210,8 +219,14 @@ export const userDailyRewards = pgTable(
     exclusiveSeconds: integer('exclusive_seconds').notNull(), // Seconds drawing alone
     sharedSeconds: integer('shared_seconds').notNull(), // Seconds overlapping with others
     baseReward: decimal('base_reward', { precision: 36, scale: 18 }).notNull(), // From time-weighted distribution
-    bonusReward: decimal('bonus_reward', { precision: 36, scale: 18 }).notNull(), // From leftover pool
-    totalReward: decimal('total_reward', { precision: 36, scale: 18 }).notNull(),
+    bonusReward: decimal('bonus_reward', {
+      precision: 36,
+      scale: 18,
+    }).notNull(), // From leftover pool
+    totalReward: decimal('total_reward', {
+      precision: 36,
+      scale: 18,
+    }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [

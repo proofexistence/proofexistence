@@ -6,27 +6,18 @@ import { useEffect, useRef } from 'react';
 export function UserSync() {
   const { user, isSignedIn, isLoaded } = useUser();
   const hasSyncedRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 3;
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return;
-
-    // Check if we already have the metadata.
-    // We used to skip if walletAddress existed, but we need to sync
-    // profile updates (images/names) too.
-    // So we run this once per mount regardless.
-    // const metadata = user.publicMetadata;
-    // if (metadata?.walletAddress && hasSyncedRef.current) return;
 
     // Debounce/Prevent double firing in React Strict Mode
     if (hasSyncedRef.current) return;
     hasSyncedRef.current = true;
 
-    const syncUser = async () => {
+    const syncUser = async (): Promise<boolean> => {
       try {
-        // If we already have wallet address, maybe skip?
-        // But the user might be missing in local DB (if cloned fresh).
-        // So let's fire it once per session/mount comfortably.
-
         const res = await fetch('/api/user/sync', {
           method: 'POST',
         });
@@ -40,13 +31,34 @@ export function UserSync() {
           ) {
             await user.reload();
           }
+          return true;
+        } else {
+          // Log non-OK responses (rate limit, server error, etc.)
+          const errorData = await res.json().catch(() => ({}));
+          console.error('[UserSync] Sync failed:', res.status, errorData);
+          return false;
         }
       } catch (err) {
-        console.error('[UserSync] Failed to sync user:', err);
+        console.error('[UserSync] Network error:', err);
+        return false;
       }
     };
 
-    syncUser();
+    const attemptSync = async () => {
+      const success = await syncUser();
+
+      // Retry on failure (with exponential backoff)
+      if (!success && retryCountRef.current < MAX_RETRIES) {
+        retryCountRef.current++;
+        const delay = Math.pow(2, retryCountRef.current) * 1000; // 2s, 4s, 8s
+        console.log(
+          `[UserSync] Retrying in ${delay / 1000}s (attempt ${retryCountRef.current}/${MAX_RETRIES})`
+        );
+        setTimeout(attemptSync, delay);
+      }
+    };
+
+    attemptSync();
   }, [isLoaded, isSignedIn, user]);
 
   return null;

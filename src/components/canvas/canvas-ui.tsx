@@ -39,7 +39,7 @@ export function TimerDisplay({
   };
 
   return (
-    <div className="absolute top-12 md:top-14 left-1/2 -translate-x-1/2 pointer-events-none">
+    <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 pointer-events-none">
       <div className="bg-black/20 backdrop-blur-xl rounded-full px-3 py-1.5 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 border border-white/10 shadow-lg shadow-black/20 transition-all duration-300">
         <div
           className={`w-3 h-3 rounded-full border border-white/30 transition-colors duration-300 ${getIndicatorClass()}`}
@@ -187,7 +187,7 @@ interface ExitControlsProps {
 
 export function ExitControls({ onExit }: ExitControlsProps) {
   return (
-    <div className="absolute top-12 left-4 md:top-14 md:left-6 pointer-events-auto animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
+    <div className="absolute top-6 left-4 md:top-8 md:left-6 pointer-events-auto animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
       <button
         onClick={onExit}
         className="flex items-center gap-2 bg-black/20 hover:bg-black/40 backdrop-blur-xl text-white/80 hover:text-white font-medium px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base rounded-xl transition-all border border-white/10 hover:border-white/20 active:scale-95 shadow-lg shadow-black/20 group"
@@ -217,6 +217,7 @@ interface InstructionsProps {
   isReady: boolean;
   onClear?: () => void;
   onSubmit?: () => void;
+  themeName?: string;
 }
 
 export function Instructions({
@@ -224,6 +225,7 @@ export function Instructions({
   isReady,
   onClear,
   onSubmit,
+  themeName,
 }: InstructionsProps) {
   const positionClass = isRecording
     ? 'absolute top-24 md:top-32 left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-4 w-full px-4'
@@ -248,7 +250,7 @@ export function Instructions({
           </p>
           <div className="mt-4 pt-4 border-t border-white/10">
             <p className="text-white/40 text-xs font-mono">
-              (Ctrl + B to cycle themes)
+              Theme: {themeName || 'Default'} (Ctrl + B to cycle)
             </p>
           </div>
         </div>

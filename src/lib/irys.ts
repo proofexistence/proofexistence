@@ -1,4 +1,5 @@
 import Irys from '@irys/sdk';
+import * as Sentry from '@sentry/nextjs';
 
 // Initialize Irys on the server (Polygon/Matic)
 export const getIrys = async () => {
@@ -56,17 +57,33 @@ export const uploadToIrys = async (
     dataToUpload = JSON.stringify(data);
   }
 
+  const size = Buffer.isBuffer(dataToUpload)
+    ? dataToUpload.length
+    : Buffer.from(dataToUpload as string).length;
+  const price = await irys.getPrice(size);
+  const balance = await irys.getLoadedBalance();
+
+  // Alert threshold: 0.01 MATIC
+  const alertThreshold = irys.utils.toAtomic(0.01);
+  if (balance.lt(alertThreshold)) {
+    Sentry.captureMessage('Irys balance critically low', {
+      level: 'warning',
+      extra: {
+        balance: irys.utils.fromAtomic(balance).toString(),
+        threshold: '0.01 MATIC',
+        requiredForUpload: irys.utils.fromAtomic(price).toString(),
+      },
+    });
+  }
+
+  if (balance.lt(price)) {
+    const detailedError = `Insufficient Irys balance. Current: ${irys.utils.fromAtomic(balance)} MATIC, Required: ${irys.utils.fromAtomic(price)} MATIC`;
+    Sentry.captureException(new Error(detailedError));
+    // User-friendly error
+    throw new Error('STORAGE_UNAVAILABLE');
+  }
+
   try {
-    const size = Buffer.isBuffer(dataToUpload)
-      ? dataToUpload.length
-      : Buffer.from(dataToUpload as string).length;
-    const price = await irys.getPrice(size);
-    const balance = await irys.getLoadedBalance();
-
-    if (balance.lt(price)) {
-      await irys.fund(price);
-    }
-
     const receipt = await irys.upload(dataToUpload as string | Buffer, {
       tags,
     });

@@ -9,6 +9,17 @@ import {
   TIME26_ADDRESS,
   TIME26_ABI,
 } from '@/lib/contracts';
+import { checkRateLimit } from '@/lib/ratelimit';
+import { z } from 'zod';
+
+// Validation Schema
+const MintRequestSchema = z.object({
+  arweaveTxId: z.string().min(40, 'Invalid Arweave Transaction ID'), // Basic length check
+  duration: z.number().int().min(10, 'Duration must be at least 10 seconds'),
+  paymentMethod: z.enum(['NATIVE', 'TIME26']),
+  username: z.string().min(1).max(30).optional().or(z.literal('')),
+  message: z.string().max(280).optional(),
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,8 +28,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 0. Rate Limiting
+    const rateLimit = await checkRateLimit(`mint:${userId}`);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // Parse Body
+    const body = await req.json();
+
+    // 1. Input Validation
+    const validation = MintRequestSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
     const { arweaveTxId, duration, paymentMethod, username, message } =
-      await req.json();
+      validation.data;
 
     // 1. Get Clerk metadata (already verified via auth)
     const client = await clerkClient();

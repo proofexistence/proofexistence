@@ -126,10 +126,9 @@ export function calculateDailyRewards(
     const sharedSeconds = userSharedSeconds.get(userId) || 0;
 
     // Base reward: (user's weighted seconds / total weighted seconds) * daily budget
-    const baseReward =
-      totalWeightedSeconds.gt(0)
-        ? weightedSeconds.div(totalWeightedSeconds).times(DAILY_BUDGET)
-        : new Decimal(0);
+    const baseReward = totalWeightedSeconds.gt(0)
+      ? weightedSeconds.div(totalWeightedSeconds).times(DAILY_BUDGET)
+      : new Decimal(0);
 
     // For now, no bonus distribution (could be implemented for streak rewards etc.)
     const bonusReward = new Decimal(0);
