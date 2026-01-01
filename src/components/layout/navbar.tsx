@@ -6,13 +6,22 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 import VariableFontHoverByRandomLetter from '@/components/fancy/text/variable-font-hover-by-random-letter';
-import { Menu, X, Globe, LineSquiggle, Settings, User } from 'lucide-react';
+import {
+  Menu,
+  X,
+  Globe,
+  LineSquiggle,
+  Settings,
+  User,
+  Gift,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { isLaunchTime } from '@/lib/launch-config';
 import { NavbarCountdown } from './navbar-countdown';
 import { MobileConnectButton } from '@/components/auth/mobile-connect-button';
+import { ReferralDialog } from '@/components/ui/referral-dialog';
 
 export function Navbar() {
   const { profile, isLoading, isAuthenticated } = useUserProfile();
@@ -25,6 +34,7 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [launched, setLaunched] = useState(false);
+  const [isReferralOpen, setIsReferralOpen] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -247,6 +257,13 @@ export function Navbar() {
                     </div>
                   </div>
 
+                  <button
+                    onClick={() => setIsReferralOpen(true)}
+                    className="w-full text-left px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                  >
+                    <Gift className="w-3.5 h-3.5" />
+                    Invite Friends
+                  </button>
                   <Link
                     href="/settings"
                     className="w-full text-left px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
@@ -443,6 +460,9 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Referral Dialog */}
+      <ReferralDialog open={isReferralOpen} onOpenChange={setIsReferralOpen} />
     </>
   );
 }

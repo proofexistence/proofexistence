@@ -258,6 +258,18 @@ export function ProfileSettingsForm() {
           <p className="text-xs text-zinc-500">
             Click the avatar to upload a new photo.
           </p>
+          {profile?.walletAddress && (
+            <a
+              href={`https://polygonscan.com/address/${profile.walletAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-2 text-xs font-mono text-zinc-400 hover:text-purple-400 transition-colors"
+            >
+              {profile.walletAddress.slice(0, 6)}...
+              {profile.walletAddress.slice(-4)}
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          )}
         </div>
       </div>
 
@@ -294,7 +306,7 @@ export function ProfileSettingsForm() {
             htmlFor="firstName"
             className="block text-sm font-medium text-zinc-400"
           >
-            First Name
+            First Name (Optional)
           </label>
           <input
             id="firstName"
@@ -315,7 +327,7 @@ export function ProfileSettingsForm() {
             htmlFor="lastName"
             className="block text-sm font-medium text-zinc-400"
           >
-            Last Name
+            Last Name (Optional)
           </label>
           <input
             id="lastName"
@@ -415,77 +427,6 @@ export function ProfileSettingsForm() {
           </>
         )}
       </button>
-
-      {/* Wallet Info */}
-      {profile?.walletAddress && (
-        <div className="pt-6 border-t border-white/10 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-zinc-500 mb-1">Connected Wallet</p>
-              <p className="font-mono text-sm text-zinc-300">
-                {profile.walletAddress}
-              </p>
-            </div>
-            <a
-              href={`https://polygonscan.com/address/${profile.walletAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-purple-400 hover:text-purple-300 transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          </div>
-
-          {/* Referral Link */}
-          <div className="pt-4 border-t border-white/5">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-zinc-400">
-                Your Referral Link
-              </label>
-              {profile.referralCode ? (
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      readOnly
-                      value={
-                        typeof window !== 'undefined'
-                          ? `${window.location.origin}/?ref=${profile.referralCode}`
-                          : ''
-                      }
-                      className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-zinc-300 font-mono text-sm focus:ring-0 outline-none"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (typeof window !== 'undefined') {
-                        const link = `${window.location.origin}/?ref=${profile.referralCode}`;
-                        navigator.clipboard.writeText(link);
-                        setSuccess(true);
-                        setTimeout(() => setSuccess(false), 2000);
-                      }
-                    }}
-                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors text-sm font-medium"
-                  >
-                    Copy
-                  </button>
-                </div>
-              ) : (
-                <div className="p-3 bg-white/5 rounded-lg text-sm text-zinc-400">
-                  Referral code not generated yet. <br />
-                  <span className="text-xs text-zinc-500">
-                    Please sign out and sign back in to generate one.
-                  </span>
-                </div>
-              )}
-              <p className="text-xs text-zinc-500">
-                Share this link to invite friends. You&apos;ll be marked as
-                their referrer.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </form>
   );
 }
