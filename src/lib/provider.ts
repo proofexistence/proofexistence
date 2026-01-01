@@ -115,6 +115,14 @@ export function createAmoyWallet(): ethers.Wallet {
 }
 
 /**
+ * Create a provider for Polygon mainnet
+ * Alias for createProvider() when explicitly targeting mainnet
+ */
+export function createPolygonProvider(): NativeFetchProvider {
+  return createProvider();
+}
+
+/**
  * Wait for a transaction to be confirmed using native fetch polling
  * This replaces tx.wait() which has issues in Next.js
  */

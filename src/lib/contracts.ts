@@ -11,12 +11,12 @@ export const isTestnet =
 // Time26 Token (ERC-20)
 export const TIME26_ADDRESS = isTestnet
   ? '0xdb1f87083952FF0267270E209567e52fdcC06A63' // Amoy testnet
-  : '0x823a4680b90c6Ae215b5A03456B0FD38d1131c8c'; // Polygon mainnet (v2 - secured)
+  : '0x56C79b61FFc3D826188DB700791F1A7ECb007FD0'; // Polygon mainnet (v3 - with rewards)
 
 // ProofRecorder (Core Logic - replaces old ProofOfExistence)
 export const PROOF_RECORDER_ADDRESS = isTestnet
   ? '0xd8ec22eaed3DA06592b31c3F7e95a68a2d96e78A' // Amoy testnet
-  : '0xAd277E9f0f41237AEB9Cc8A6F10606b8978b9920'; // Polygon mainnet (v2 - secured)
+  : '0x7FF137359720f01aDcA9C524818E55ed352831DB'; // Polygon mainnet (v3 - with rewards)
 
 // TrailNFT (User's Personal Trails - ERC-721)
 export const TRAIL_NFT_ADDRESS = isTestnet
@@ -58,9 +58,21 @@ export const PROOF_RECORDER_ABI = [
   // Batch proof (for cron settle)
   'function emitBatchProof(bytes32 merkleRoot, string memory arweaveCid) external',
   'function storeMerkleRoot(uint256 day, bytes32 root) external',
+  // Reward distribution
+  'function setRewardsMerkleRoot(bytes32 newRoot) external',
+  'function burnForRewards(uint256 amount, string calldata reason) external',
+  'function claimRewards(uint256 cumulativeAmount, bytes32[] calldata proof) external',
+  'function getClaimableRewards(address user, uint256 cumulativeAmount) external view returns (uint256)',
+  'function totalClaimed(address user) external view returns (uint256)',
+  'function rewardsMerkleRoot() external view returns (bytes32)',
+  // Emergency
+  'function emergencyWithdrawERC20(address token, address to, uint256 amount) external',
   // Events
   'event ExistenceMinted(uint256 indexed id, address indexed owner, uint256 duration, string metadataURI, string displayName, string message, uint256 nftTokenId)',
   'event BatchProofEmitted(bytes32 indexed merkleRoot, string arweaveCid)',
+  'event RewardsClaimedV2(address indexed user, uint256 amount, uint256 totalClaimed)',
+  'event RewardsBurned(uint256 amount, string reason)',
+  'event RewardsMerkleRootUpdated(bytes32 oldRoot, bytes32 newRoot)',
 ];
 
 // Legacy alias

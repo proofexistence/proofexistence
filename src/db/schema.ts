@@ -33,6 +33,11 @@ export const users = pgTable(
     referralCode: varchar('referral_code', { length: 10 }).unique(), // Short hash of wallet
     referredBy: uuid('referred_by'), // ID of the user who referred this user
 
+    // TIME26 Token Balance (off-chain tracking for rewards)
+    time26Balance: decimal('time26_balance', { precision: 36, scale: 18 })
+      .default('0')
+      .notNull(),
+
     createdAt: timestamp('created_at').defaultNow().notNull(),
     lastSeenAt: timestamp('last_seen_at'),
   },
@@ -175,6 +180,74 @@ export const dailySnapshots = pgTable('daily_snapshots', {
 });
 
 // ============================================================================
+// DAILY REWARDS TABLE
+// Stores TIME26 reward settlement records per day
+// ============================================================================
+export const dailyRewards = pgTable('daily_rewards', {
+  dayId: varchar('day_id', { length: 10 }).primaryKey(), // Format: "YYYY-MM-DD"
+  totalBudget: decimal('total_budget', { precision: 36, scale: 18 }).notNull(), // Total TIME26 available for the day
+  totalSeconds: integer('total_seconds').notNull(), // Total drawing seconds across all users
+  totalDistributed: decimal('total_distributed', { precision: 36, scale: 18 }).notNull(), // Actually distributed
+  participantCount: integer('participant_count').notNull(),
+  contractBalanceBefore: decimal('contract_balance_before', { precision: 36, scale: 18 }), // For auditing
+  contractBalanceAfter: decimal('contract_balance_after', { precision: 36, scale: 18 }), // For auditing
+  settledAt: timestamp('settled_at').defaultNow().notNull(),
+});
+
+// ============================================================================
+// USER DAILY REWARDS TABLE
+// Stores per-user reward breakdown for each day
+// ============================================================================
+export const userDailyRewards = pgTable(
+  'user_daily_rewards',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    dayId: varchar('day_id', { length: 10 }).notNull(), // Format: "YYYY-MM-DD"
+    totalSeconds: integer('total_seconds').notNull(), // User's drawing seconds
+    exclusiveSeconds: integer('exclusive_seconds').notNull(), // Seconds drawing alone
+    sharedSeconds: integer('shared_seconds').notNull(), // Seconds overlapping with others
+    baseReward: decimal('base_reward', { precision: 36, scale: 18 }).notNull(), // From time-weighted distribution
+    bonusReward: decimal('bonus_reward', { precision: 36, scale: 18 }).notNull(), // From leftover pool
+    totalReward: decimal('total_reward', { precision: 36, scale: 18 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('user_daily_rewards_user_id_idx').on(table.userId),
+    index('user_daily_rewards_day_id_idx').on(table.dayId),
+  ]
+);
+
+// ============================================================================
+// BONUS REWARDS RECORDS TABLE
+// Tracks manual bonus distributions from Treasury (rankings, referrals, etc.)
+// For audit trail - actual transfers happen via Gnosis Safe
+// ============================================================================
+export const bonusRewards = pgTable(
+  'bonus_rewards',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    amount: decimal('amount', { precision: 36, scale: 18 }).notNull(),
+    type: varchar('type', { length: 50 }).notNull(), // 'ranking' | 'referral' | 'airdrop' | 'contest' | 'kol'
+    description: varchar('description', { length: 500 }),
+    txHash: varchar('tx_hash', { length: 66 }), // Safe transaction hash
+    status: varchar('status', { length: 20 }).default('PENDING').notNull(), // PENDING | APPROVED | SENT
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    approvedAt: timestamp('approved_at'),
+  },
+  (table) => [
+    index('bonus_rewards_user_id_idx').on(table.userId),
+    index('bonus_rewards_type_idx').on(table.type),
+    index('bonus_rewards_status_idx').on(table.status),
+  ]
+);
+
+// ============================================================================
 // BRAND LINES TABLE
 // Sponsored or Artist-curated lines connecting specific points/timeframes
 // ============================================================================
@@ -208,6 +281,15 @@ export type UserBadge = typeof userBadges.$inferSelect;
 
 export type DailySnapshot = typeof dailySnapshots.$inferSelect;
 export type NewDailySnapshot = typeof dailySnapshots.$inferInsert;
+
+export type DailyReward = typeof dailyRewards.$inferSelect;
+export type NewDailyReward = typeof dailyRewards.$inferInsert;
+
+export type UserDailyReward = typeof userDailyRewards.$inferSelect;
+export type NewUserDailyReward = typeof userDailyRewards.$inferInsert;
+
+export type BonusReward = typeof bonusRewards.$inferSelect;
+export type NewBonusReward = typeof bonusRewards.$inferInsert;
 
 // Session status enum for type safety
 export const SESSION_STATUS = {

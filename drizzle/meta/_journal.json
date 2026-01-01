@@ -15,6 +15,20 @@
       "when": 1767161243259,
       "tag": "0001_third_mulholland_black",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767244001351,
+      "tag": "0002_simple_victor_mancha",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1767247561730,
+      "tag": "0003_minor_havok",
+      "breakpoints": true
     }
   ]
 }

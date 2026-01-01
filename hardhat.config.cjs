@@ -1,7 +1,9 @@
 require('@nomiclabs/hardhat-ethers');
+require('@nomicfoundation/hardhat-verify');
 require('dotenv').config({ path: '.env.local' });
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || '';
 const POLYGON_AMOY_RPC_URL =
   process.env.POLYGON_AMOY_RPC_URL || 'https://rpc-amoy.polygon.technology/';
 const POLYGON_MAINNET_RPC_URL =
@@ -9,7 +11,16 @@ const POLYGON_MAINNET_RPC_URL =
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: '0.8.27',
+  solidity: {
+    version: '0.8.27',
+    settings: {
+      evmVersion: 'paris',
+      optimizer: {
+        enabled: false,
+        runs: 200,
+      },
+    },
+  },
   paths: {
     artifacts: './artifacts',
     cache: './cache',
@@ -32,6 +43,11 @@ module.exports = {
       url: POLYGON_MAINNET_RPC_URL,
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
       chainId: 137,
+    },
+  },
+  etherscan: {
+    apiKey: {
+      polygon: POLYGONSCAN_API_KEY,
     },
   },
 };

@@ -55,8 +55,14 @@ contract ProofRecorder is Ownable, ReentrancyGuard {
     // Daily Merkle roots: day number => root
     mapping(uint256 => bytes32) public dailyMerkleRoots;
 
-    // Track claimed rewards: user => day => amount
+    // Track claimed rewards: user => day => amount (legacy)
     mapping(address => mapping(uint256 => uint256)) public claimedAmounts;
+
+    // Total claimed by each user (for cumulative Merkle claims)
+    mapping(address => uint256) public totalClaimed;
+
+    // Rewards Merkle root (updated by operator after daily settlement)
+    bytes32 public rewardsMerkleRoot;
 
     // Existence counter (for legacy compatibility)
     uint256 public nextExistenceId;
@@ -87,6 +93,9 @@ contract ProofRecorder is Ownable, ReentrancyGuard {
     event BatchProofEmitted(bytes32 indexed merkleRoot, string arweaveCid);
     event MerkleRootStored(uint256 indexed day, bytes32 root);
     event RewardsClaimed(address indexed user, uint256 indexed day, uint256 amount);
+    event RewardsClaimedV2(address indexed user, uint256 amount, uint256 totalClaimed);
+    event RewardsBurned(uint256 amount, string reason);
+    event RewardsMerkleRootUpdated(bytes32 oldRoot, bytes32 newRoot);
     event PricingUpdated(uint256 baseNative, uint256 rateNative, uint256 baseTime26, uint256 rateTime26);
     event OperatorUpdated(address indexed oldOperator, address indexed newOperator);
     event Paused(address account);
@@ -140,6 +149,102 @@ contract ProofRecorder is Ownable, ReentrancyGuard {
      */
     function emitBatchProof(bytes32 merkleRoot, string memory arweaveCid) external onlyOperator whenNotPaused {
         emit BatchProofEmitted(merkleRoot, arweaveCid);
+    }
+
+    // --- Reward Distribution ---
+
+    /**
+     * @notice Update the rewards Merkle root (called by operator after daily settlement)
+     * @param newRoot New Merkle root containing cumulative rewards for all users
+     */
+    function setRewardsMerkleRoot(bytes32 newRoot) external onlyOperator whenNotPaused {
+        bytes32 oldRoot = rewardsMerkleRoot;
+        rewardsMerkleRoot = newRoot;
+        emit RewardsMerkleRootUpdated(oldRoot, newRoot);
+    }
+
+    /**
+     * @notice Burn TIME26 from contract when users spend off-chain balance in-app
+     * @param amount Amount to burn (in wei, 18 decimals)
+     * @param reason Description of why tokens are being burned (for audit trail)
+     */
+    function burnForRewards(uint256 amount, string calldata reason) external onlyOperator whenNotPaused {
+        require(amount > 0, "ProofRecorder: amount must be > 0");
+        require(time26Token.balanceOf(address(this)) >= amount, "ProofRecorder: insufficient balance");
+
+        time26Token.burn(amount);
+        emit RewardsBurned(amount, reason);
+    }
+
+    /**
+     * @notice Claim TIME26 tokens using Merkle proof
+     * @param cumulativeAmount Total cumulative rewards earned by the user
+     * @param proof Merkle proof for the claim
+     * @dev User can only claim the difference between cumulativeAmount and totalClaimed[user]
+     */
+    function claimRewards(uint256 cumulativeAmount, bytes32[] calldata proof) external whenNotPaused nonReentrant {
+        require(rewardsMerkleRoot != bytes32(0), "ProofRecorder: rewards not initialized");
+
+        // Verify Merkle proof
+        bytes32 leaf = keccak256(abi.encodePacked(msg.sender, cumulativeAmount));
+        require(_verifyMerkleProof(proof, rewardsMerkleRoot, leaf), "ProofRecorder: invalid proof");
+
+        // Calculate claimable amount
+        uint256 alreadyClaimed = totalClaimed[msg.sender];
+        require(cumulativeAmount > alreadyClaimed, "ProofRecorder: nothing to claim");
+        uint256 claimable = cumulativeAmount - alreadyClaimed;
+
+        // Check contract has sufficient balance
+        require(time26Token.balanceOf(address(this)) >= claimable, "ProofRecorder: insufficient contract balance");
+
+        // Update claimed amount before transfer (CEI pattern)
+        totalClaimed[msg.sender] = cumulativeAmount;
+
+        // Transfer tokens
+        time26Token.transfer(msg.sender, claimable);
+
+        emit RewardsClaimedV2(msg.sender, claimable, cumulativeAmount);
+    }
+
+    /**
+     * @notice View function to check claimable amount for a user
+     * @param user Address of the user
+     * @param cumulativeAmount Total cumulative rewards as per Merkle tree
+     * @return claimable Amount the user can claim
+     */
+    function getClaimableRewards(address user, uint256 cumulativeAmount) external view returns (uint256 claimable) {
+        uint256 alreadyClaimed = totalClaimed[user];
+        if (cumulativeAmount > alreadyClaimed) {
+            claimable = cumulativeAmount - alreadyClaimed;
+        }
+    }
+
+    /**
+     * @notice Verify a Merkle proof
+     * @param proof Array of sibling hashes
+     * @param root Merkle root
+     * @param leaf Leaf hash to verify
+     */
+    function _verifyMerkleProof(
+        bytes32[] calldata proof,
+        bytes32 root,
+        bytes32 leaf
+    ) internal pure returns (bool) {
+        bytes32 computedHash = leaf;
+
+        for (uint256 i = 0; i < proof.length; i++) {
+            bytes32 proofElement = proof[i];
+
+            if (computedHash <= proofElement) {
+                // Hash(current, proof) - sorted pair for determinism
+                computedHash = keccak256(abi.encodePacked(computedHash, proofElement));
+            } else {
+                // Hash(proof, current)
+                computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
+            }
+        }
+
+        return computedHash == root;
     }
 
     // --- Track B: Instant Proof (Paid) ---
@@ -297,6 +402,29 @@ contract ProofRecorder is Ownable, ReentrancyGuard {
     function unpause() external onlyOwner {
         paused = false;
         emit Unpaused(msg.sender);
+    }
+
+    // --- Emergency Functions ---
+
+    /**
+     * @notice Emergency withdrawal of ERC20 tokens (owner only)
+     * @param token Address of the ERC20 token
+     * @param to Recipient address
+     * @param amount Amount to withdraw
+     */
+    function emergencyWithdrawERC20(address token, address to, uint256 amount) external onlyOwner {
+        require(to != address(0), "ProofRecorder: invalid recipient");
+        IERC20(token).safeTransfer(to, amount);
+    }
+
+    /**
+     * @notice Emergency withdrawal of native token (owner only)
+     * @param to Recipient address
+     * @param amount Amount to withdraw
+     */
+    function emergencyWithdrawNative(address payable to, uint256 amount) external onlyOwner {
+        require(to != address(0), "ProofRecorder: invalid recipient");
+        to.transfer(amount);
     }
 
     // --- Legacy Compatibility ---
