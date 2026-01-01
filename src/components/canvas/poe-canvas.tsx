@@ -928,7 +928,7 @@ export function POECanvas() {
                 const estimatedGas =
                   await poeContract.estimateGas.mintEternalNative(
                     Math.floor(session.duration),
-                    'ar://' + dataRes.arweaveTxId,
+                    dataRes.arweaveTxId,
                     displayName,
                     data.message || '',
                     { ...overrides }
@@ -942,7 +942,7 @@ export function POECanvas() {
 
               const tx = await poeContract.mintEternalNative(
                 Math.floor(session.duration),
-                'ar://' + dataRes.arweaveTxId,
+                dataRes.arweaveTxId,
                 displayName,
                 data.message || '',
                 overrides
@@ -970,7 +970,7 @@ export function POECanvas() {
               setLoadingStatus('Minting Proof (2/2)...');
               const tx = await poeContract.mintEternalTime26(
                 Math.floor(session.duration),
-                'ar://' + dataRes.arweaveTxId,
+                dataRes.arweaveTxId,
                 displayName,
                 data.message || ''
               );
