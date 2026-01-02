@@ -5,10 +5,11 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { ethers } from 'ethers';
 import { checkRateLimit } from '@/lib/ratelimit';
+import sharp from 'sharp';
 
 /**
  * Avatar upload endpoint for Web3Auth users
- * Accepts base64 image data and uploads to R2 storage
+ * Accepts base64 image data, compresses to WebP, and uploads to R2 storage
  */
 export async function POST(req: Request) {
   try {
@@ -62,7 +63,7 @@ export async function POST(req: Request) {
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // Validate size (5MB max)
+    // Validate size (5MB max for input)
     if (buffer.length > 5 * 1024 * 1024) {
       return NextResponse.json(
         { error: 'Image too large (max 5MB)' },
@@ -70,24 +71,27 @@ export async function POST(req: Request) {
       );
     }
 
-    // Determine file extension from type
-    const extension = imageType.split('/')[1] || 'png';
-    const timestamp = Date.now();
-    const key = `avatars/${walletAddress.toLowerCase()}/${timestamp}.${extension}`;
+    // Compress and convert to WebP using sharp
+    // Resize to max 256x256 for avatars, convert to WebP with quality 80
+    const compressedBuffer = await sharp(buffer)
+      .resize(256, 256, {
+        fit: 'cover',
+        position: 'center',
+      })
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    // Use wallet address as filename (overwrites previous avatar)
+    const key = `avatars/${walletAddress.toLowerCase()}.webp`;
 
     // Upload to R2
-    const publicUrl = await uploadToR2(key, buffer, imageType);
+    const publicUrl = await uploadToR2(key, compressedBuffer, 'image/webp');
 
     // Update user's avatar URL in database
     await db
       .update(users)
       .set({ avatarUrl: publicUrl })
       .where(eq(users.walletAddress, walletAddress));
-
-    // console.log('[Upload Avatar] Success:', {
-    //   walletAddress,
-    //   url: publicUrl,
-    // });
 
     return NextResponse.json({
       success: true,

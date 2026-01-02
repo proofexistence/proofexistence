@@ -277,11 +277,41 @@ export function ProofViewer({
     };
   };
 
-  const downloadImage = (dataUrl: string, filename: string) => {
+  const downloadImage = (url: string, filename: string) => {
     const link = document.createElement('a');
-    link.href = dataUrl;
+    link.href = url;
     link.download = filename;
     link.click();
+  };
+
+  // Download image: NFT image (if MINTED) → previewUrl → screenshot fallback
+  const handleDownload = async () => {
+    // 1. If MINTED with ipfsHash, try to get NFT image from Arweave metadata
+    if (session.status === 'MINTED' && session.ipfsHash) {
+      try {
+        const metadataUrl = `https://gateway.irys.xyz/${session.ipfsHash}`;
+        const res = await fetch(metadataUrl);
+        if (res.ok) {
+          const metadata = await res.json();
+          if (metadata.image) {
+            // Open in new tab (direct download from Arweave may have CORS issues)
+            window.open(metadata.image, '_blank');
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to fetch NFT metadata, falling back:', e);
+      }
+    }
+
+    // 2. Fallback to previewUrl (only for MINTED, as per user request)
+    if (session.status === 'MINTED' && session.previewUrl) {
+      window.open(session.previewUrl, '_blank');
+      return;
+    }
+
+    // 3. Final fallback: generate screenshot
+    handleScreenshot('with-title');
   };
 
   const handleShare = async (
@@ -323,7 +353,7 @@ export function ProofViewer({
         break;
 
       case 'download':
-        handleScreenshot('with-title');
+        handleDownload();
         break;
     }
   };

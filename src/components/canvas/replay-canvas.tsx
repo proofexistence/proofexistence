@@ -34,7 +34,7 @@ const CanvasCapture = forwardRef<CanvasCaptureRef, unknown>((_, ref) => {
       // Do NOT manually render; the EffectComposer loop handles the render.
       // gl.render(scene, camera);
 
-      return gl.domElement.toDataURL('image/png', 1.0);
+      return gl.domElement.toDataURL('image/jpeg', 0.9);
     },
   }));
 

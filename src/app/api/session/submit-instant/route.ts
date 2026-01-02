@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
         // A. Upload Image (Required)
         try {
           imageTxId = await uploadToIrys(buffer, [
-            { name: 'Content-Type', value: 'image/png' },
+            { name: 'Content-Type', value: 'image/jpeg' },
             { name: 'App-Name', value: 'ProofOfExistence2026' },
           ]);
         } catch (imgError: unknown) {
