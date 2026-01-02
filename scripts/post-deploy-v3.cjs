@@ -26,7 +26,7 @@ async function main() {
 
   // Existing contracts
   const TRAIL_NFT = '0x23BA06eeD9007052c9f95f7dC8E92B825399aAa1';
-  const TREASURY_SAFE = '0xc7b9ED3e985706efeb951462d4281f4Ac8fc99B2';
+  const TREASURY_SAFE = '0xBDA2B288154339F88F886949F4CC9dF7D2491f6D';
 
   // Token distribution
   const REWARD_POOL = ethers.utils.parseUnits('31536000', 18); // 31,536,000 TIME26

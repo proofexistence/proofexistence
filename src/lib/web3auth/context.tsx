@@ -72,7 +72,9 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       try {
         const userInfo = await web3authInstance.getUserInfo();
         if (userInfo) {
-          userId = userInfo.verifierId || userInfo.email || walletAddress;
+          // Use verifierId if available (cast needed as type doesn't always include it)
+          const verifierId = (userInfo as { verifierId?: string }).verifierId;
+          userId = verifierId || userInfo.email || walletAddress;
           email = userInfo.email || null;
           name = userInfo.name || null;
           profileImage = userInfo.profileImage || null;
@@ -96,7 +98,10 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         event.reason?.message?.includes('Failed to connect')
       ) {
         event.preventDefault();
-        console.warn('[Web3Auth] MetaMask not available:', event.reason?.message);
+        console.warn(
+          '[Web3Auth] MetaMask not available:',
+          event.reason?.message
+        );
       }
     };
     window.addEventListener('unhandledrejection', handleUnhandledRejection);
@@ -182,7 +187,10 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     init();
 
     return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener(
+        'unhandledrejection',
+        handleUnhandledRejection
+      );
     };
   }, [fetchUserData]);
 

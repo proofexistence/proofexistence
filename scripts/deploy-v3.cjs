@@ -22,7 +22,7 @@ async function main() {
   // ============================================================
 
   // Multi-sig Treasury (Owner of all contracts)
-  const TREASURY_SAFE = '0xc7b9ED3e985706efeb951462d4281f4Ac8fc99B2';
+  const TREASURY_SAFE = '0xBDA2B288154339F88F886949F4CC9dF7D2491f6D';
 
   // Operator wallet (hot wallet for daily operations)
   const OPERATOR_WALLET = process.env.OPERATOR_ADDRESS || deployer.address;

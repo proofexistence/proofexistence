@@ -15,8 +15,8 @@ async function main() {
     ['address', 'address', 'address', 'address'],
     [
       '0x56C79b61FFc3D826188DB700791F1A7ECb007FD0', // TIME26
-      '0xc7b9ED3e985706efeb951462d4281f4Ac8fc99B2', // Treasury
-      '0x66F5e775eDa013240c26772f79cd7b5a276850C6', // Operator
+      '0xBDA2B288154339F88F886949F4CC9dF7D2491f6D', // Treasury
+      '0x0Af9d487E8AEaf2B9d0409EDa53fA751d01aF8d1', // Operator
       '0xA7D2A0647F1f12455f543Db4CaA350e85C0Eae09', // Initial Owner (deployer)
     ]
   );

@@ -3,33 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, Check, Heart, Wallet } from 'lucide-react';
-
-const WALLETS = [
-  {
-    symbol: 'POL',
-    name: 'Polygon',
-    address: '0xA7D2A0647F1f12455f543Db4CaA350e85C0Eae09',
-    color: 'from-purple-400 to-violet-500',
-  },
-  {
-    symbol: 'BTC',
-    name: 'Bitcoin',
-    address: 'bc1qqzdd7fjll2vuujp3pglxmnkj66cf3rsxu3jhsx',
-    color: 'from-orange-400 to-amber-500',
-  },
-  {
-    symbol: 'SOL',
-    name: 'Solana',
-    address: '3EAHVpuY7MYAUrZoWfy2MGLmHZDpwYNZB6MYmATny6QN',
-    color: 'from-purple-400 to-fuchsia-500',
-  },
-];
+import { Heart, Wallet } from 'lucide-react';
+import { SponsorModal } from '@/components/sponsor/sponsor-modal';
 
 export function Footer() {
   const pathname = usePathname();
-  const [copied, setCopied] = useState<string | null>(null);
+  const [sponsorOpen, setSponsorOpen] = useState(false);
 
   // Hide footer on specific routes
   if (
@@ -39,12 +18,6 @@ export function Footer() {
   ) {
     return null;
   }
-
-  const handleCopy = (address: string, symbol: string) => {
-    navigator.clipboard.writeText(address);
-    setCopied(symbol);
-    setTimeout(() => setCopied(null), 2000);
-  };
 
   return (
     <footer className="w-full border-t border-white/5 bg-black/40 backdrop-blur-xl mt-20">
@@ -73,75 +46,30 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Wallets Column */}
+          {/* Sponsor Column */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-6">
               <Wallet className="w-4 h-4 text-zinc-400" />
               <h4 className="text-sm font-semibold text-zinc-200">
-                Sponsor a Stranger On-Chain
+                Support the Project
               </h4>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {WALLETS.map((wallet) => (
-                <button
-                  key={wallet.symbol}
-                  onClick={() => handleCopy(wallet.address, wallet.symbol)}
-                  className="group relative flex flex-col gap-2 p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 transition-all duration-300 text-left"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span
-                      className={`text-xs font-bold bg-clip-text text-transparent bg-gradient-to-r ${wallet.color}`}
-                    >
-                      {wallet.name}
-                    </span>
-                    <div className="text-zinc-500 group-hover:text-white transition-colors">
-                      <AnimatePresence mode="wait">
-                        {copied === wallet.symbol ? (
-                          <motion.div
-                            key="check"
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0, opacity: 0 }}
-                          >
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            key="copy"
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0, opacity: 0 }}
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
+            <button
+              onClick={() => setSponsorOpen(true)}
+              className="group flex items-center gap-3 px-6 py-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 transition-all duration-300"
+            >
+              <Heart className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+              <div className="text-left">
+                <span className="font-medium text-zinc-200 group-hover:text-white transition-colors">
+                  Sponsor a Stranger
+                </span>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  Pay for gas-free proofs worldwide
+                </p>
+              </div>
+            </button>
 
-                  <div className="font-mono text-[10px] text-zinc-500 truncate w-full group-hover:text-zinc-400 transition-colors">
-                    {wallet.address}
-                  </div>
-
-                  {/* Tooltip feedback for copy */}
-                  <AnimatePresence>
-                    {copied === wallet.symbol && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute inset-x-0 -top-8 flex justify-center pointer-events-none"
-                      >
-                        <span className="px-2 py-1 rounded bg-zinc-800 text-zinc-200 text-[10px] font-medium border border-zinc-700 shadow-xl">
-                          Address Copied
-                        </span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </button>
-              ))}
-            </div>
             <p className="text-[10px] text-zinc-600 mt-3 pl-1">
               Your donation sponsors gas-free proofs for strangers worldwide.
               Every contribution helps preserve someone&apos;s digital existence
@@ -185,6 +113,9 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Sponsor Modal */}
+      <SponsorModal open={sponsorOpen} onOpenChange={setSponsorOpen} />
     </footer>
   );
 }

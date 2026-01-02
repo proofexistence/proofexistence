@@ -201,11 +201,7 @@ function Scene({
       <SpaceBackground starCount={800} />
 
       {/* The Main Art: Dot Matrix */}
-      <DotMatrix
-        cursorPosition={cursorPosition}
-        isRecording={true} // Always reactive for fun interaction
-        theme={theme}
-      />
+      <DotMatrix cursorPosition={cursorPosition} theme={theme} />
 
       {/* Ambient Floating Particles */}
       <ParticleSystem

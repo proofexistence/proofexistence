@@ -16,7 +16,7 @@ export const TIME26_ADDRESS = isTestnet
 // ProofRecorder (Core Logic - replaces old ProofOfExistence)
 export const PROOF_RECORDER_ADDRESS = isTestnet
   ? '0xd8ec22eaed3DA06592b31c3F7e95a68a2d96e78A' // Amoy testnet
-  : '0x7FF137359720f01aDcA9C524818E55ed352831DB'; // Polygon mainnet (v3 - with rewards)
+  : '0x72Ac729a8f6efb68A5d6765EC375aC4578a3c756'; // Polygon mainnet (v4 - new treasury/operator)
 
 // TrailNFT (User's Personal Trails - ERC-721)
 export const TRAIL_NFT_ADDRESS = isTestnet
