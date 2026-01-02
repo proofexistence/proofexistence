@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { type SessionStatus } from '@/db/schema';
 import {
   // Link as LinkIcon,
@@ -52,11 +53,23 @@ export function ProofCard({
   hidden = 0,
   onVisibilityChange,
 }: ProofCardProps) {
+  const router = useRouter();
   const shortId = id.slice(0, 8);
   const dateStr = new Date(createdAt).toLocaleDateString();
   const displayName =
     userName ||
     (walletAddress ? `${walletAddress.slice(0, 6)}...` : 'Anonymous');
+
+  // Profile URL - use wallet address as identifier
+  const profileUrl = walletAddress ? `/u/${walletAddress}` : null;
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (profileUrl) {
+      router.push(profileUrl);
+    }
+  };
 
   // Local state for interactions (optimistic UI)
   const [likeCount, setLikeCount] = useState(likes);
@@ -242,9 +255,12 @@ export function ProofCard({
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 via-black/60 to-transparent">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-sm font-mono text-white font-bold group-hover:text-purple-400 transition-colors">
+              <button
+                onClick={handleProfileClick}
+                className="text-sm font-mono text-white font-bold hover:text-purple-400 transition-colors text-left"
+              >
                 {displayName}
-              </div>
+              </button>
               {title ? (
                 <div className="text-sm font-medium text-white/90 line-clamp-1 mt-0.5">
                   {title}
