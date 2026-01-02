@@ -25,6 +25,7 @@ export interface Web3AuthUser {
 interface Web3AuthContextType {
   provider: IProvider | null;
   isLoading: boolean;
+  isLoggingIn: boolean;
   isConnected: boolean;
   user: Web3AuthUser | null;
   login: () => Promise<void>;
@@ -38,6 +39,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [user, setUser] = useState<Web3AuthUser | null>(null);
 
@@ -144,11 +146,14 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     try {
+      setIsLoggingIn(true);
       const web3authProvider = await web3auth.connect();
       setProvider(web3authProvider);
       await fetchUserData(web3auth);
     } catch (error) {
       console.error('[Web3Auth] Login error:', error);
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -177,6 +182,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       value={{
         provider,
         isLoading,
+        isLoggingIn,
         isConnected,
         user,
         login,
@@ -193,6 +199,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
 const defaultContext: Web3AuthContextType = {
   provider: null,
   isLoading: true,
+  isLoggingIn: false,
   isConnected: false,
   user: null,
   login: async () => {},

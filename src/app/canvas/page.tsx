@@ -17,7 +17,7 @@ const POECanvas = dynamic(
 
 export default function CanvasPage() {
   const router = useRouter();
-  const { isLoading, isConnected, login } = useWeb3Auth();
+  const { isLoading, isLoggingIn, isConnected, login } = useWeb3Auth();
 
   useEffect(() => {
     // Wait for auth to load
@@ -60,9 +60,21 @@ export default function CanvasPage() {
             </div>
             <button
               onClick={login}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium rounded-xl transition-all"
+              disabled={isLoggingIn}
+              className={`w-full px-6 py-3 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2 ${
+                isLoggingIn
+                  ? 'bg-zinc-700 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500'
+              }`}
             >
-              Connect Wallet
+              {isLoggingIn ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                'Connect Wallet'
+              )}
             </button>
           </div>
         </div>
