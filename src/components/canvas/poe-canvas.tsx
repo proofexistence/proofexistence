@@ -291,8 +291,8 @@ const CanvasCapture = ({
           ctx.drawImage(canvas, x, y, size, size, 0, 0, size, size);
         }
 
-        // 5. Return cropped image
-        const dataUrl = tempCanvas.toDataURL('image/png');
+        // 5. Return cropped image (JPEG 90% quality for smaller files)
+        const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
         return dataUrl;
       },
     };
@@ -723,9 +723,9 @@ export function POECanvas() {
               for (let i = 0; i < binaryData.length; i++) {
                 bytes[i] = binaryData.charCodeAt(i);
               }
-              const blob = new Blob([bytes], { type: 'image/webp' });
-              const file = new File([blob], 'preview.webp', {
-                type: 'image/webp',
+              const blob = new Blob([bytes], { type: 'image/jpeg' });
+              const file = new File([blob], 'preview.jpg', {
+                type: 'image/jpeg',
               });
 
               const formData = new FormData();
