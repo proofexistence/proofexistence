@@ -24,9 +24,29 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
-    // If we have an ID, fetch session data for rich preview
-    if (id) {
-      const session = await getSessionData(id);
+    // If we have an ID or image param, try to get session data
+    if (id || searchParams.get('image')) {
+      let session = null;
+
+      // Priority: Construct from params if image is provided (avoids fetch)
+      if (searchParams.get('image')) {
+        session = {
+          id: id || 'preview',
+          createdAt: searchParams.get('date') || new Date().toISOString(),
+          title: searchParams.get('title'),
+          user: {
+            name: searchParams.get('author') || 'Anonymous',
+            username: searchParams.get('author'), // Fallback
+          },
+          duration: searchParams.get('duration'),
+          message: searchParams.get('message'),
+          previewUrl: searchParams.get('image'),
+          status: searchParams.get('status'),
+        };
+      } else if (id) {
+        // Fallback: Fetch if only ID is provided
+        session = await getSessionData(id);
+      }
 
       if (session) {
         const date = new Date(session.createdAt).toLocaleDateString('en-US', {
@@ -34,7 +54,7 @@ export async function GET(req: NextRequest) {
           month: 'short',
           day: 'numeric',
         });
-        const displayTitle = session.title || `Proof #${id.slice(0, 8)}`;
+        const displayTitle = session.title || `Proof #${session.id.slice(0, 8)}`;
         const authorName =
           session.user?.name || session.user?.username || 'Anonymous';
         const duration = session.duration ? `${session.duration}s` : '';

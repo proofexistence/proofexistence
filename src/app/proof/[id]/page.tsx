@@ -95,6 +95,23 @@ export async function generateMetadata({
   ogUrl.searchParams.set('date', dateStr);
   ogUrl.searchParams.set('id', session.id);
 
+  if (session.previewUrl) {
+    ogUrl.searchParams.set('image', session.previewUrl);
+  }
+  if (session.user) {
+    const authorName = session.user.name || session.user.username || 'Anonymous';
+    ogUrl.searchParams.set('author', authorName);
+  }
+  if (session.duration) {
+    ogUrl.searchParams.set('duration', session.duration.toString());
+  }
+  if (session.message) {
+    ogUrl.searchParams.set('message', session.message.slice(0, 100));
+  }
+  if (session.status) {
+    ogUrl.searchParams.set('status', session.status);
+  }
+
   const imageUrl = ogUrl.toString();
   const description =
     session.description ||

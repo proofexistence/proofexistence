@@ -72,7 +72,7 @@ export function MobileConnectButton({
   if (isMobile && !hasWallet) {
     return (
       <>
-        <div onClick={handleClick} className={className}>
+        <div onClickCapture={handleClick} className={className}>
           {children}
         </div>
 
