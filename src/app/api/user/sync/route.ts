@@ -28,11 +28,14 @@ export async function POST() {
     const cookieStore = await cookies();
     const referralCode = cookieStore.get('referral_code')?.value;
 
+    // Compute display name from first/last name
+    const name =
+      `${user.firstName || ''} ${user.lastName || ''}`.trim() || null;
+
     const result = await syncUserToDatabase({
       userId,
       email: user.emailAddresses[0]?.emailAddress,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      name,
       imageUrl: user.imageUrl,
       web3Wallet: web3Wallet,
       referredByCode: referralCode,

@@ -14,8 +14,6 @@ const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
 export interface UserProfile {
   // Auth provider data
   clerkId: string; // For Web3Auth: empty string (not used)
-  firstName: string | null;
-  lastName: string | null;
   imageUrl: string | null;
   email: string | null;
 
@@ -26,16 +24,13 @@ export interface UserProfile {
   referralCode: string | null;
 
   // Computed
-  fullName: string | null; // firstName + lastName
-  displayLabel: string; // What to show in UI: displayName > fullName > truncated wallet
+  displayLabel: string; // What to show in UI: displayName > truncated wallet
 }
 
 interface DbProfileResponse {
   user: {
     username: string | null;
     name: string | null;
-    firstName: string | null;
-    lastName: string | null;
     avatarUrl: string | null;
     walletAddress: string;
     createdAt: string;
@@ -66,8 +61,6 @@ function useWeb3AuthProfile() {
     ? {
         // Auth provider data
         clerkId: dbProfile.clerkId || '', // Not used for Web3Auth
-        firstName: dbProfile.firstName || null,
-        lastName: dbProfile.lastName || null,
         imageUrl: dbProfile.avatarUrl || null,
         email: dbProfile.email || null,
 
@@ -78,20 +71,7 @@ function useWeb3AuthProfile() {
         referralCode: dbProfile.referralCode || null,
 
         // Computed
-        fullName:
-          [dbProfile.firstName, dbProfile.lastName]
-            .filter(Boolean)
-            .join(' ')
-            .trim() ||
-          dbProfile.name ||
-          null,
-        displayLabel:
-          dbProfile.name ||
-          [dbProfile.firstName, dbProfile.lastName]
-            .filter(Boolean)
-            .join(' ')
-            .trim() ||
-          truncateWallet(dbProfile.walletAddress),
+        displayLabel: dbProfile.name || truncateWallet(dbProfile.walletAddress),
       }
     : null;
 
@@ -163,8 +143,6 @@ function useClerkProfile() {
     isClerkLoaded && clerkUser && lookupIdentifier
       ? {
           clerkId: clerkUser.id,
-          firstName: clerkUser.firstName || null,
-          lastName: clerkUser.lastName || null,
           imageUrl: clerkUser.imageUrl || null,
           email: clerkUser.primaryEmailAddress?.emailAddress || null,
 
@@ -176,17 +154,8 @@ function useClerkProfile() {
             '',
           referralCode: dbData?.user?.referralCode || null,
 
-          fullName:
-            [clerkUser.firstName, clerkUser.lastName]
-              .filter(Boolean)
-              .join(' ')
-              .trim() || null,
           displayLabel:
             dbData?.user?.name ||
-            [clerkUser.firstName, clerkUser.lastName]
-              .filter(Boolean)
-              .join(' ')
-              .trim() ||
             truncateWallet(
               dbData?.user?.walletAddress ||
                 (isExternalWallet ? lookupIdentifier : '') ||

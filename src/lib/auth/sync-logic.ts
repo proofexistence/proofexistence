@@ -8,19 +8,17 @@ import { ethers } from 'ethers';
 export interface SyncUserParams {
   userId: string;
   email?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
+  name?: string | null; // Display name
   imageUrl?: string | null;
   web3Wallet?: string | null; // If they signed up via Wallet
   referredByCode?: string | null; // The referral code (if any)
 }
 
 export async function syncUserToDatabase(params: SyncUserParams) {
-  const { userId, email, firstName, lastName, web3Wallet, referredByCode } =
-    params;
+  const { userId, email, name, web3Wallet, referredByCode } = params;
 
-  // 0. Pre-calculate display name from first/last name (for initial setup only)
-  const fullName = `${firstName || ''} ${lastName || ''}`.trim();
+  // Display name passed from caller (already computed from first/last if needed)
+  const displayName = name?.trim() || null;
 
   // 1. Check if user already exists
   const existingUser = await db.query.users.findFirst({
@@ -103,7 +101,7 @@ export async function syncUserToDatabase(params: SyncUserParams) {
         if (!playerId) {
           console.log('[Sync] Player not found in Openfort. Creating new...');
           const player = await openfort.players.create({
-            name: fullName,
+            name: displayName || 'User',
             description: `Clerk User: ${userId}`,
           });
           playerId = player.id;
@@ -157,7 +155,7 @@ export async function syncUserToDatabase(params: SyncUserParams) {
     // CASE B: Email/Social -> Create Openfort Wallet
     try {
       const player = await openfort.players.create({
-        name: fullName,
+        name: displayName || 'User',
         description: `Clerk User: ${userId}`,
       });
       openfortPlayerId = player.id;
@@ -242,8 +240,7 @@ export async function syncUserToDatabase(params: SyncUserParams) {
     clerkId: userId,
     walletAddress: finalWalletAddress,
     email: email || null,
-    // Display name: use first+last if available, otherwise null (shows as Anonymous)
-    name: fullName || null,
+    name: displayName,
     username: username,
     referralCode: referralCode,
     referredBy: referredByUserId,

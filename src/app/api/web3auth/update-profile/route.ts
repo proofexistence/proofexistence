@@ -19,14 +19,7 @@ import { checkRateLimit } from '@/lib/ratelimit';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const {
-      walletAddress: rawWalletAddress,
-      username,
-      name,
-      firstName,
-      lastName,
-      avatarUrl,
-    } = body;
+    const { walletAddress: rawWalletAddress, username, name, avatarUrl } = body;
 
     if (!rawWalletAddress) {
       return NextResponse.json(
@@ -112,22 +105,9 @@ export async function POST(req: Request) {
       name: name !== undefined ? name || null : existingUser.name,
     };
 
-    // Include additional profile fields
-    if (firstName !== undefined) {
-      updateData.firstName = firstName || null;
-    }
-    if (lastName !== undefined) {
-      updateData.lastName = lastName || null;
-    }
     if (avatarUrl !== undefined) {
       updateData.avatarUrl = avatarUrl || null;
     }
-
-    console.log('[Web3Auth Update Profile] Updating:', {
-      walletAddress,
-      from: { username: existingUser.username, name: existingUser.name },
-      to: updateData,
-    });
 
     // Update database
     const result = await db

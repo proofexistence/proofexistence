@@ -20,11 +20,8 @@ export function ProfileSettingsForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [useFullNameAsDisplay, setUseFullNameAsDisplay] = useState(false);
 
   // Track if user has modified the form
   const isDirtyRef = useRef(false);
@@ -44,29 +41,14 @@ export function ProfileSettingsForm() {
   useEffect(() => {
     if (!profile || isDirtyRef.current) return;
 
-    setFirstName(profile.firstName || '');
-    setLastName(profile.lastName || '');
     setUsername(profile.username || '');
     setDisplayName(profile.name || '');
-
-    const fullName = [profile.firstName, profile.lastName]
-      .filter(Boolean)
-      .join(' ')
-      .trim();
-    setUseFullNameAsDisplay(profile.name === fullName && fullName !== '');
 
     if (!isInitialized) setIsInitialized(true);
   }, [profile, isInitialized]);
 
   // Computed values
-  const computedFullName = [firstName, lastName]
-    .filter(Boolean)
-    .join(' ')
-    .trim();
-  const computedDisplayName = useFullNameAsDisplay
-    ? computedFullName
-    : displayName;
-  const displayLabel = computedDisplayName || 'Anonymous';
+  const displayLabel = displayName || 'Anonymous';
   const displayImage = imagePreview || profile?.avatarUrl;
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,10 +82,6 @@ export function ProfileSettingsForm() {
     setSuccess(false);
 
     try {
-      const finalDisplayName = useFullNameAsDisplay
-        ? computedFullName || null
-        : displayName || null;
-
       // Upload image to R2 if changed
       let avatarUrl: string | undefined;
       if (imageFile && user?.walletAddress) {
@@ -128,9 +106,7 @@ export function ProfileSettingsForm() {
 
       await updateProfile({
         username: username || null,
-        name: finalDisplayName,
-        firstName: firstName || null,
-        lastName: lastName || null,
+        name: displayName || null,
         avatarUrl,
       });
 
@@ -243,99 +219,30 @@ export function ProfileSettingsForm() {
         </p>
       </div>
 
-      {/* First Name & Last Name */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label
-            htmlFor="firstName"
-            className="block text-sm font-medium text-zinc-400"
-          >
-            First Name (Optional)
-          </label>
-          <input
-            id="firstName"
-            type="text"
-            value={firstName}
-            onChange={(e) => {
-              setFirstName(e.target.value);
-              isDirtyRef.current = true;
-            }}
-            disabled={isSaving}
-            className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
-            placeholder="e.g. Satoshi"
-            maxLength={50}
-          />
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor="lastName"
-            className="block text-sm font-medium text-zinc-400"
-          >
-            Last Name (Optional)
-          </label>
-          <input
-            id="lastName"
-            type="text"
-            value={lastName}
-            onChange={(e) => {
-              setLastName(e.target.value);
-              isDirtyRef.current = true;
-            }}
-            disabled={isSaving}
-            className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
-            placeholder="e.g. Nakamoto"
-            maxLength={50}
-          />
-        </div>
-      </div>
-
-      {/* Display Name Toggle */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
-          <input
-            id="useFullName"
-            type="checkbox"
-            checked={useFullNameAsDisplay}
-            onChange={(e) => {
-              setUseFullNameAsDisplay(e.target.checked);
-              isDirtyRef.current = true;
-            }}
-            disabled={isSaving}
-            className="w-4 h-4 rounded border-white/20 bg-zinc-900 text-purple-500 focus:ring-purple-500/50 focus:ring-offset-0"
-          />
-          <label htmlFor="useFullName" className="text-sm text-zinc-400">
-            Use first and last name as display name
-          </label>
-        </div>
-
-        {!useFullNameAsDisplay && (
-          <div className="space-y-2">
-            <label
-              htmlFor="displayName"
-              className="block text-sm font-medium text-zinc-400"
-            >
-              Custom Display Name
-            </label>
-            <input
-              id="displayName"
-              type="text"
-              value={displayName}
-              onChange={(e) => {
-                setDisplayName(e.target.value);
-                isDirtyRef.current = true;
-              }}
-              disabled={isSaving}
-              className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
-              placeholder="e.g. Satoshi"
-              maxLength={50}
-            />
-          </div>
-        )}
-
-        <div className="text-xs text-zinc-500">
-          Your display name will be:{' '}
-          <span className="text-white">{displayLabel}</span>
-        </div>
+      {/* Display Name */}
+      <div className="space-y-2">
+        <label
+          htmlFor="displayName"
+          className="block text-sm font-medium text-zinc-400"
+        >
+          Display Name
+        </label>
+        <input
+          id="displayName"
+          type="text"
+          value={displayName}
+          onChange={(e) => {
+            setDisplayName(e.target.value);
+            isDirtyRef.current = true;
+          }}
+          disabled={isSaving}
+          className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
+          placeholder="e.g. Satoshi Nakamoto"
+          maxLength={50}
+        />
+        <p className="text-xs text-zinc-500">
+          Your public display name. Shows as &quot;Anonymous&quot; if empty.
+        </p>
       </div>
 
       {/* Error/Success Messages */}

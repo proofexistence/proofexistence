@@ -46,9 +46,12 @@ export async function POST(req: Request) {
   if (eventType === 'user.created') {
     const userId = evt.data.id;
     const email = evt.data.email_addresses[0]?.email_address;
-    const firstName = evt.data.first_name;
-    const lastName = evt.data.last_name;
     const imageUrl = evt.data.image_url;
+
+    // Compute display name from first/last name
+    const firstName = evt.data.first_name || '';
+    const lastName = evt.data.last_name || '';
+    const name = `${firstName} ${lastName}`.trim() || null;
 
     // Check if user has a web3 wallet (signed up via MetaMask)
     const web3Wallets = evt.data.web3_wallets || [];
@@ -61,8 +64,7 @@ export async function POST(req: Request) {
       await syncUserToDatabase({
         userId,
         email,
-        firstName,
-        lastName,
+        name,
         imageUrl,
         web3Wallet: primaryWeb3Wallet?.web3_wallet,
       });

@@ -10,8 +10,6 @@ export interface Profile {
   username: string | null;
   email: string | null;
   name: string | null;
-  firstName: string | null;
-  lastName: string | null;
   avatarUrl: string | null;
   referralCode: string | null;
 }
@@ -59,12 +57,10 @@ export function useProfile() {
       });
 
       if (!res.ok) {
-        console.error('[useProfile] Sync failed:', res.status);
         throw new Error('Failed to sync profile');
       }
 
       const data: SyncResponse = await res.json();
-      console.log('[useProfile] Sync result:', data.status);
       return data.user;
     },
     enabled: isConnected && !!user?.walletAddress,
@@ -76,8 +72,6 @@ export function useProfile() {
   const updateProfile = async (data: {
     username?: string | null;
     name?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
     avatarUrl?: string | null;
   }): Promise<Profile> => {
     if (!user?.walletAddress) throw new Error('Not authenticated');

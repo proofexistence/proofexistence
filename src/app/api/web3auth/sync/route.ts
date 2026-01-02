@@ -46,32 +46,8 @@ export async function POST(req: Request) {
     });
 
     if (existingUser) {
-      // Check if anything changed
-      const hasChanges =
-        (email && email !== existingUser.email) ||
-        (name && name !== existingUser.name) ||
-        (avatarUrl && avatarUrl !== existingUser.avatarUrl);
-
-      if (hasChanges) {
-        const [updated] = await db
-          .update(users)
-          .set({
-            email: email || existingUser.email,
-            name: name || existingUser.name,
-            avatarUrl: avatarUrl || existingUser.avatarUrl,
-            lastSeenAt: new Date(),
-          })
-          .where(eq(users.walletAddress, walletAddress))
-          .returning();
-
-        return NextResponse.json({
-          success: true,
-          status: 'updated',
-          user: updated,
-        });
-      }
-
-      // No changes, just update lastSeenAt
+      // For existing users, only update lastSeenAt
+      // DO NOT touch name/avatarUrl - user has full control over these via settings
       await db
         .update(users)
         .set({ lastSeenAt: new Date() })
@@ -91,31 +67,18 @@ export async function POST(req: Request) {
 
     const referralCode = ethers.id(walletAddress).slice(2, 10);
 
-    // Parse name into firstName/lastName if possible
-    let firstName: string | null = null;
-    let lastName: string | null = null;
-    if (name) {
-      const parts = name.trim().split(/\s+/);
-      firstName = parts[0] || null;
-      lastName = parts.slice(1).join(' ') || null;
-    }
-
     const [newUser] = await db
       .insert(users)
       .values({
-        clerkId: userId || null, // Store userId like clerkId
+        clerkId: userId || null,
         walletAddress,
         email: email || null,
         name: name || null,
-        firstName,
-        lastName,
         avatarUrl: avatarUrl || null,
         username,
         referralCode,
       })
       .returning();
-
-    console.log('[Web3Auth Sync] Created user:', walletAddress);
 
     return NextResponse.json({
       success: true,

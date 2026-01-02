@@ -28,10 +28,6 @@ export const users = pgTable(
     email: varchar('email', { length: 255 }),
     username: varchar('username', { length: 30 }).unique(),
     name: varchar('name', { length: 50 }), // Display Name (shown everywhere, "Anonymous" if empty)
-
-    // Profile fields (for Web3Auth, stored in DB instead of Clerk)
-    firstName: varchar('first_name', { length: 50 }),
-    lastName: varchar('last_name', { length: 50 }),
     avatarUrl: varchar('avatar_url', { length: 500 }),
 
     // Referral System

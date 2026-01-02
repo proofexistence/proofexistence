@@ -13,6 +13,31 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'img.clerk.com',
       },
+      // Web3Auth social login profile images
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com', // Google
+      },
+      {
+        protocol: 'https',
+        hostname: 'pbs.twimg.com', // X (Twitter)
+      },
+      {
+        protocol: 'https',
+        hostname: 'platform-lookaside.fbsbx.com', // Facebook
+      },
+      {
+        protocol: 'https',
+        hostname: 'graph.facebook.com', // Facebook (alternative)
+      },
+      {
+        protocol: 'https',
+        hostname: 'profile.line-scdn.net', // Line
+      },
+      {
+        protocol: 'https',
+        hostname: 'sprofile.line-scdn.net', // Line (alternative)
+      },
     ],
   },
   compress: true,

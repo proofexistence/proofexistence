@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { GalleryGrid } from '@/components/gallery/gallery-grid';
 import { BadgeDisplay } from '@/components/dashboard/badge-display';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUserSafe as useUser } from '@/lib/clerk/safe-hooks';
+import { useWeb3Auth } from '@/lib/web3auth';
 
 import Image from 'next/image';
 
@@ -14,6 +14,7 @@ type ProfileUser = {
   clerkId: string | null; // nullable for Web3Auth users
   name: string | null;
   walletAddress: string;
+  avatarUrl: string | null;
   createdAt: Date;
 };
 
@@ -77,17 +78,15 @@ export function ProfileView({
       walletAddress: p.walletAddress || user.walletAddress,
     }));
 
-  const { user: currentUser } = useUser();
-  const currentWalletAddress = (
-    currentUser?.publicMetadata as { walletAddress?: string } | undefined
-  )?.walletAddress;
+  const { user: currentUser } = useWeb3Auth();
 
   // Check if the current logged-in user is the owner of this profile
   const isOwner =
-    currentWalletAddress?.toLowerCase() === user.walletAddress.toLowerCase();
+    currentUser?.walletAddress?.toLowerCase() ===
+    user.walletAddress.toLowerCase();
 
-  // Get profile image from Clerk if viewing own profile
-  const profileImageUrl = isOwner ? currentUser?.imageUrl : null;
+  // Use avatarUrl from database
+  const profileImageUrl = user.avatarUrl;
 
   return (
     <div className="max-w-7xl mx-auto">

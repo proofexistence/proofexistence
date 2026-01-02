@@ -15,10 +15,7 @@ const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
  * DB fields:
  * - username (unique)
  * - name (display name)
- * - firstName, lastName, avatarUrl (Web3Auth mode only)
- *
- * Clerk mode: firstName, lastName, profileImage are updated via Clerk SDK.
- * Web3Auth mode: All fields are updated in DB.
+ * - avatarUrl
  */
 export async function POST(req: NextRequest) {
   try {
@@ -76,16 +73,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { username, name, firstName, lastName, avatarUrl } = body;
-
-    console.log('[User Update] Request:', {
-      walletAddress,
-      username,
-      name,
-      firstName,
-      lastName,
-      avatarUrl: avatarUrl ? '[provided]' : undefined,
-    });
+    const { username, name, avatarUrl } = body;
 
     // Validation for username
     if (username !== undefined && username !== null && username !== '') {
@@ -144,24 +132,9 @@ export async function POST(req: NextRequest) {
       name: name !== undefined ? name || null : existingUser.name,
     };
 
-    // Web3Auth mode: Include additional fields
-    if (USE_WEB3AUTH) {
-      if (firstName !== undefined) {
-        updateData.firstName = firstName || null;
-      }
-      if (lastName !== undefined) {
-        updateData.lastName = lastName || null;
-      }
-      if (avatarUrl !== undefined) {
-        updateData.avatarUrl = avatarUrl || null;
-      }
+    if (avatarUrl !== undefined) {
+      updateData.avatarUrl = avatarUrl || null;
     }
-
-    console.log('[User Update] Updating:', {
-      walletAddress,
-      from: { username: existingUser.username, name: existingUser.name },
-      to: updateData,
-    });
 
     // Update database
     const result = await db
@@ -169,8 +142,6 @@ export async function POST(req: NextRequest) {
       .set(updateData)
       .where(eq(users.walletAddress, walletAddress))
       .returning();
-
-    console.log('[User Update] Result:', result[0]);
 
     return NextResponse.json({
       success: true,

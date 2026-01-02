@@ -9,17 +9,23 @@ import { Settings, LogOut, User } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function AvatarDropdown() {
-  const { isLoading, isConnected, user, login, logout } = useWeb3Auth();
-  const { profile } = useProfile();
+  const {
+    isLoading: isAuthLoading,
+    isConnected,
+    user,
+    login,
+    logout,
+  } = useWeb3Auth();
+  const { profile, isLoading: isProfileLoading } = useProfile();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Get values from profile (synced to DB) or fallback to Web3Auth user
-  const walletAddress = user?.walletAddress;
-  const displayName = profile?.name || user?.name || null;
+  // Only use DB profile data - no fallback to Web3Auth to avoid flickering
+  const walletAddress = profile?.walletAddress || user?.walletAddress;
+  const displayName = profile?.name || null;
   const username = profile?.username || null;
-  const userImage = profile?.avatarUrl || user?.profileImage || null;
+  const userImage = profile?.avatarUrl || null;
 
-  if (isLoading) return null;
+  if (isAuthLoading || (isConnected && isProfileLoading)) return null;
 
   return (
     <div className="relative z-50 pointer-events-auto">

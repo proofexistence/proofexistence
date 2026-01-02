@@ -1,48 +1,69 @@
-import { getProfile } from '@/lib/db/queries/get-profile';
+'use client';
+
+import { use } from 'react';
 import { notFound } from 'next/navigation';
-import { ProfileView } from '@/components/dashboard/profile-view'; // Client component for tabs
+import { ProfileView } from '@/components/dashboard/profile-view';
+import { usePublicProfile } from '@/hooks/use-public-profile';
+import { Loader2 } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{
-    username: string; // Dynamic route param
+    username: string;
   }>;
 }
 
-export const revalidate = 60;
-
-export async function generateMetadata({ params }: PageProps) {
-  const { username } = await params;
-  const decodedName = decodeURIComponent(username);
-  return {
-    title: `${decodedName} | Proof of Existence`,
-    description: `Explore the digital legacy of ${decodedName}.`,
-  };
-}
-
-export default async function ProfilePage({ params }: PageProps) {
-  const { username } = await params;
-  // Decode since URL might have %20 etc
+export default function ProfilePage({ params }: PageProps) {
+  const { username } = use(params);
   const identifier = decodeURIComponent(username);
 
-  const profileData = await getProfile(identifier);
+  const { profile, isLoading } = usePublicProfile(identifier);
 
-  if (!profileData) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pt-32 pb-20 px-6 flex justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
+      </div>
+    );
+  }
+
+  if (!profile) {
     notFound();
   }
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-6">
       <ProfileView
-        user={profileData.user}
-        createdProofs={profileData.createdProofs}
-        savedProofs={
-          profileData.savedProofs.filter(
-            (s) => s.id !== null
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ) as any
-        } // Cast to any to avoid strict type mismatch from disparate DB types, we know it conforms at runtime mostly
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        badges={profileData.badges.filter((b) => b.id !== null) as any}
+        user={{
+          id: profile.user.id,
+          clerkId: profile.user.clerkId,
+          name: profile.user.name,
+          walletAddress: profile.user.walletAddress,
+          avatarUrl: profile.user.avatarUrl,
+          createdAt: new Date(profile.user.createdAt),
+        }}
+        createdProofs={profile.createdProofs
+          .filter((p) => p.id !== null)
+          .map((p) => ({
+            ...p,
+            createdAt: new Date(p.createdAt),
+          }))}
+        savedProofs={profile.savedProofs
+          .filter((s) => s.id !== null)
+          .map((s) => ({
+            ...s,
+            id: s.id!,
+            createdAt: new Date(s.createdAt!),
+            status: s.status!,
+          }))}
+        badges={profile.badges
+          .filter((b) => b.id !== null)
+          .map((b) => ({
+            id: b.id!,
+            name: b.name!,
+            description: b.description!,
+            imageUrl: b.imageUrl,
+            awardedAt: b.awardedAt ? new Date(b.awardedAt) : null,
+          }))}
       />
     </div>
   );

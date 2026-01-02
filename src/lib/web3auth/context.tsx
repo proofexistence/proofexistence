@@ -34,18 +34,6 @@ interface Web3AuthContextType {
 
 const Web3AuthContext = createContext<Web3AuthContextType | null>(null);
 
-// Decode JWT payload (without verification - server will verify)
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    const payload = JSON.parse(atob(parts[1]));
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
 export function Web3AuthProvider({ children }: { children: ReactNode }) {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<IProvider | null>(null);
@@ -57,55 +45,38 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     if (!web3authInstance.provider) return;
 
     try {
-      // Get wallet address
-      const accounts = (await web3authInstance.provider.request({
-        method: 'eth_accounts',
-      })) as string[];
+      // Get wallet address (with retry for session restore timing)
+      let accounts: string[] = [];
+      for (let i = 0; i < 5; i++) {
+        accounts = (await web3authInstance.provider.request({
+          method: 'eth_accounts',
+        })) as string[];
 
-      if (!accounts || accounts.length === 0) {
-        console.error('[Web3Auth] No accounts found');
-        return;
+        if (accounts && accounts.length > 0) break;
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
-      const walletAddress = ethers.getAddress(accounts[0]); // Checksum
+      if (!accounts || accounts.length === 0) return;
 
-      // Get ID token with all user info
-      let userId = walletAddress; // Default to wallet address
+      const walletAddress = ethers.getAddress(accounts[0]);
+
+      // Default to wallet address for external wallets
+      let userId = walletAddress;
       let email: string | null = null;
       let name: string | null = null;
       let profileImage: string | null = null;
 
+      // Try to get user info (only available for social logins)
       try {
-        const authMethod = (
-          web3authInstance as unknown as {
-            authenticateUser: () => Promise<{ idToken: string }>;
-          }
-        ).authenticateUser;
-
-        if (authMethod) {
-          const { idToken } = await authMethod.call(web3authInstance);
-          const payload = decodeJwtPayload(idToken);
-
-          if (payload) {
-            // Use userId from token (like clerkId)
-            userId =
-              (payload.userId as string) ||
-              (payload.sub as string) ||
-              walletAddress;
-            email = (payload.email as string) || null;
-            name = (payload.name as string) || null;
-            profileImage = (payload.profileImage as string) || null;
-
-            console.log('[Web3Auth] User info from token:', {
-              userId,
-              email,
-              name,
-            });
-          }
+        const userInfo = await web3authInstance.getUserInfo();
+        if (userInfo) {
+          userId = userInfo.verifierId || userInfo.email || walletAddress;
+          email = userInfo.email || null;
+          name = userInfo.name || null;
+          profileImage = userInfo.profileImage || null;
         }
       } catch {
-        // External wallet - use wallet address as userId
-        console.log('[Web3Auth] No ID token, using wallet as userId');
+        // External wallet - no user info available, use defaults
       }
 
       setUser({ userId, walletAddress, email, name, profileImage });
@@ -193,22 +164,11 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Note: Web3Auth Modal SDK doesn't expose authenticateUser directly
+  // API auth uses wallet address header instead (set in getAuthHeaders)
   const getIdToken = async (): Promise<string | null> => {
-    if (!web3auth || !web3auth.connected) return null;
-    try {
-      const authMethod = (
-        web3auth as unknown as {
-          authenticateUser: () => Promise<{ idToken: string }>;
-        }
-      ).authenticateUser;
-
-      if (authMethod) {
-        const { idToken } = await authMethod.call(web3auth);
-        return idToken;
-      }
-    } catch (error) {
-      console.error('[Web3Auth] Error getting ID token:', error);
-    }
+    // Token-based auth not available with Modal SDK
+    // Use X-Wallet-Address header for API authentication
     return null;
   };
 
