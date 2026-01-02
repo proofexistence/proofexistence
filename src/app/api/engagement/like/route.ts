@@ -1,29 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getCurrentUser } from '@/lib/auth/get-user';
 import { db } from '@/db';
-import { likes, sessions, users } from '@/db/schema';
+import { likes, sessions } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Auth Check (Clerk)
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
+    // 1. Auth Check
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Get DB User
-    const [dbUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, clerkId))
-      .limit(1);
-
-    if (!dbUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // 3. Parse Body
+    // 2. Parse Body
     const { sessionId, action } = await req.json();
 
     if (!sessionId || !action) {
@@ -33,13 +22,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Execute Action
+    // 3. Execute Action
     if (action === 'like') {
       // Upsert like (ignore if exists)
       await db
         .insert(likes)
         .values({
-          userId: dbUser.id,
+          userId: user.id,
           sessionId: sessionId,
         })
         .onConflictDoNothing();
@@ -52,7 +41,7 @@ export async function POST(req: NextRequest) {
     } else if (action === 'unlike') {
       const deleted = await db
         .delete(likes)
-        .where(and(eq(likes.userId, dbUser.id), eq(likes.sessionId, sessionId)))
+        .where(and(eq(likes.userId, user.id), eq(likes.sessionId, sessionId)))
         .returning();
 
       if (deleted.length > 0) {

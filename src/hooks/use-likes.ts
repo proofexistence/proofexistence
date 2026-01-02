@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { useAuthSafe as useAuth } from '@/lib/clerk/safe-hooks';
+import { useWeb3Auth } from '@/lib/web3auth';
 
 interface LikeMutationParams {
   sessionId: string;
@@ -7,19 +7,27 @@ interface LikeMutationParams {
 }
 
 export function useLikes() {
-  const { getToken } = useAuth();
+  const { getIdToken, user } = useWeb3Auth();
 
   const { mutate: toggleLike, isPending } = useMutation({
     mutationFn: async ({ sessionId, isLiked }: LikeMutationParams) => {
-      const token = await getToken();
       const action = isLiked ? 'unlike' : 'like';
+
+      // Build headers based on auth method
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      const token = await getIdToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (user?.walletAddress) {
+        headers['X-Wallet-Address'] = user.walletAddress;
+      }
 
       const res = await fetch('/api/engagement/like', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify({ sessionId, action }),
       });
 

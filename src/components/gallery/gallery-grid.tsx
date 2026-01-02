@@ -13,11 +13,17 @@ interface GalleryGridProps {
     userName?: string | null;
     walletAddress?: string | null;
     previewUrl?: string | null;
+    hidden?: number;
   }[];
   isOwner?: boolean;
+  onVisibilityChange?: () => void;
 }
 
-export function GalleryGrid({ proofs, isOwner }: GalleryGridProps) {
+export function GalleryGrid({
+  proofs,
+  isOwner,
+  onVisibilityChange,
+}: GalleryGridProps) {
   if (proofs.length === 0) {
     return (
       <div className="text-center py-20">
@@ -44,6 +50,8 @@ export function GalleryGrid({ proofs, isOwner }: GalleryGridProps) {
           userName={proof.userName}
           walletAddress={proof.walletAddress}
           isOwner={isOwner}
+          hidden={proof.hidden}
+          onVisibilityChange={onVisibilityChange}
         />
       ))}
     </div>

@@ -9,13 +9,15 @@ import {
   Heart,
   Bookmark,
   Share2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { NFTThumbnail } from './nft-thumbnail';
 import { useState } from 'react';
-import { useClerkSafe as useClerk } from '@/lib/clerk/safe-hooks';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useSavedProofs } from '@/hooks/use-saved-proofs';
 import { useLikes } from '@/hooks/use-likes';
+import { useWeb3Auth } from '@/lib/web3auth';
 
 interface ProofCardProps {
   id: string;
@@ -30,6 +32,8 @@ interface ProofCardProps {
   walletAddress?: string | null;
   isOwner?: boolean;
   previewUrl?: string | null;
+  hidden?: number;
+  onVisibilityChange?: () => void;
 }
 
 export function ProofCard({
@@ -45,6 +49,8 @@ export function ProofCard({
   userName,
   walletAddress,
   isOwner,
+  hidden = 0,
+  onVisibilityChange,
 }: ProofCardProps) {
   const shortId = id.slice(0, 8);
   const dateStr = new Date(createdAt).toLocaleDateString();
@@ -64,15 +70,43 @@ export function ProofCard({
   const [isCopied, setIsCopied] = useState(false);
 
   const { isAuthenticated } = useUserProfile();
-  const { openSignIn } = useClerk();
+  const { login, user } = useWeb3Auth();
+  const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
 
   // React Query Hook for Likes
   const { toggleLike } = useLikes();
 
+  const handleToggleVisibility = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user?.walletAddress || isTogglingVisibility) return;
+
+    setIsTogglingVisibility(true);
+    try {
+      const res = await fetch(`/api/sessions/${id}/visibility`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Wallet-Address': user.walletAddress,
+        },
+        body: JSON.stringify({ hidden: hidden === 0 }),
+      });
+
+      if (res.ok) {
+        onVisibilityChange?.();
+      }
+    } catch (error) {
+      console.error('Failed to toggle visibility:', error);
+    } finally {
+      setIsTogglingVisibility(false);
+    }
+  };
+
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      openSignIn();
+      login();
       return;
     }
 
@@ -96,11 +130,14 @@ export function ProofCard({
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      openSignIn();
+      login();
       return;
     }
     toggleSave({ sessionId: id, isSaved });
   };
+
+  // Check if this proof is hidden
+  const isHidden = hidden === 1;
 
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -158,7 +195,13 @@ export function ProofCard({
   };
 
   return (
-    <div className="group relative flex flex-col aspect-[4/5] rounded-2xl bg-zinc-900/20 border border-white/5 overflow-hidden hover:border-purple-500/50 transition-colors">
+    <div
+      className={`group relative flex flex-col aspect-[4/5] rounded-2xl bg-zinc-900/20 border overflow-hidden transition-colors ${
+        isHidden
+          ? 'border-yellow-500/30 opacity-60'
+          : 'border-white/5 hover:border-purple-500/50'
+      }`}
+    >
       {/* Main Content Area (Image + Info) */}
       <Link
         href={`/proof/${id}`}
@@ -224,6 +267,16 @@ export function ProofCard({
         </div>
       </Link>
 
+      {/* Hidden Badge for Owner */}
+      {isOwner && isHidden && (
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/30">
+          <EyeOff className="w-3 h-3 text-yellow-400" />
+          <span className="text-[10px] font-medium text-yellow-400">
+            Hidden
+          </span>
+        </div>
+      )}
+
       {/* Social Actions Footer */}
       <div className="flex items-center justify-between p-3 bg-white/[0.03] backdrop-blur-md border-t border-white/5 relative z-10">
         {/* View Count */}
@@ -265,6 +318,26 @@ export function ProofCard({
             <Share2 className="w-4 h-4" />
           )}
         </button>
+
+        {/* Visibility Toggle (Owner Only) */}
+        {isOwner && (
+          <button
+            onClick={handleToggleVisibility}
+            disabled={isTogglingVisibility}
+            className={`flex items-center justify-center w-8 h-8 -mr-1 transition-colors ${
+              isHidden
+                ? 'text-yellow-400 hover:text-yellow-300'
+                : 'text-zinc-500 hover:text-yellow-400'
+            } ${isTogglingVisibility ? 'opacity-50' : ''}`}
+            title={isHidden ? 'Show in Explore' : 'Hide from Explore'}
+          >
+            {isHidden ? (
+              <Eye className="w-4 h-4" />
+            ) : (
+              <EyeOff className="w-4 h-4" />
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

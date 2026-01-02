@@ -1,13 +1,9 @@
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { auth, clerkClient } from '@clerk/nextjs/server';
 import { eq, ilike, and, ne } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWeb3AuthToken } from '@/lib/web3auth/verify';
 import { ethers } from 'ethers';
-
-// Feature flag
-const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
 
 /**
  * Update user profile in DB
@@ -21,55 +17,32 @@ export async function POST(req: NextRequest) {
   try {
     let walletAddress: string | null = null;
 
-    if (USE_WEB3AUTH) {
-      // Web3Auth mode: Check for Bearer token or wallet address header
-      const authHeader = req.headers.get('Authorization');
-      const walletHeader = req.headers.get('X-Wallet-Address');
+    // Web3Auth mode: Check for Bearer token or wallet address header
+    const authHeader = req.headers.get('Authorization');
+    const walletHeader = req.headers.get('X-Wallet-Address');
 
-      if (authHeader?.startsWith('Bearer ')) {
-        const idToken = authHeader.slice(7);
-        const verified = await verifyWeb3AuthToken(idToken);
-        if (verified) {
-          walletAddress = ethers.getAddress(verified.walletAddress);
-        }
+    if (authHeader?.startsWith('Bearer ')) {
+      const idToken = authHeader.slice(7);
+      const verified = await verifyWeb3AuthToken(idToken);
+      if (verified) {
+        walletAddress = ethers.getAddress(verified.walletAddress);
       }
+    }
 
-      // Fallback to wallet address header (for external wallets)
-      if (!walletAddress && walletHeader) {
-        try {
-          walletAddress = ethers.getAddress(walletHeader);
-        } catch {
-          return NextResponse.json(
-            { error: 'Invalid wallet address' },
-            { status: 400 }
-          );
-        }
-      }
-
-      if (!walletAddress) {
+    // Fallback to wallet address header (for external wallets)
+    if (!walletAddress && walletHeader) {
+      try {
+        walletAddress = ethers.getAddress(walletHeader);
+      } catch {
         return NextResponse.json(
-          { error: 'Not authenticated' },
-          { status: 401 }
-        );
-      }
-    } else {
-      // Clerk mode
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-
-      const client = await clerkClient();
-      const clerkUser = await client.users.getUser(userId);
-      walletAddress = (clerkUser.publicMetadata as Record<string, unknown>)
-        ?.walletAddress as string;
-
-      if (!walletAddress) {
-        return NextResponse.json(
-          { error: 'No wallet linked' },
+          { error: 'Invalid wallet address' },
           { status: 400 }
         );
       }
+    }
+
+    if (!walletAddress) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const body = await req.json();

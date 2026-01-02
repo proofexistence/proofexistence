@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getCurrentUser } from '@/lib/auth/get-user';
 import { db } from '@/db';
 import { users, userDailyRewards } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
@@ -15,23 +15,23 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user with balance
-    const [user] = await db
+    const [dbUser] = await db
       .select({
         id: users.id,
         time26Balance: users.time26Balance,
         walletAddress: users.walletAddress,
       })
       .from(users)
-      .where(eq(users.clerkId, clerkId))
+      .where(eq(users.walletAddress, user.walletAddress))
       .limit(1);
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -46,7 +46,7 @@ export async function GET() {
         createdAt: userDailyRewards.createdAt,
       })
       .from(userDailyRewards)
-      .where(eq(userDailyRewards.userId, user.id))
+      .where(eq(userDailyRewards.userId, dbUser.id))
       .orderBy(desc(userDailyRewards.dayId))
       .limit(30);
 
@@ -62,10 +62,10 @@ export async function GET() {
 
     return NextResponse.json({
       balance: {
-        raw: user.time26Balance, // Raw decimal value (wei)
-        formatted: formatTime26(user.time26Balance), // Human-readable
+        raw: dbUser.time26Balance, // Raw decimal value (wei)
+        formatted: formatTime26(dbUser.time26Balance), // Human-readable
       },
-      walletAddress: user.walletAddress,
+      walletAddress: dbUser.walletAddress,
       stats: {
         totalEarned: formatTime26(totalEarned.toString()),
         totalDrawingSeconds: totalSeconds,

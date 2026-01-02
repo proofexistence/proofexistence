@@ -44,7 +44,7 @@ export default function InstructionsPage() {
                 <p className="text-zinc-400 leading-relaxed mb-4">
                   To interact with the Proof of Existence protocol, you need a
                   Web3 wallet. We support various connection methods including
-                  MetaMask, Coinbase Wallet, and social logins via Clerk.
+                  MetaMask, Coinbase Wallet, and social logins via Web3Auth.
                 </p>
                 <div className="p-4 bg-black/30 rounded-lg border border-white/5 text-sm text-zinc-500">
                   <span className="text-purple-400 font-semibold">Note:</span>{' '}

@@ -30,6 +30,7 @@ type ProofItem = {
   userName?: string | null;
   walletAddress?: string | null;
   previewUrl?: string | null;
+  hidden?: number;
 };
 
 type BadgeItem = {
@@ -45,6 +46,7 @@ interface ProfileViewProps {
   createdProofs: ProofItem[];
   savedProofs: ProofItem[];
   badges: BadgeItem[];
+  onVisibilityChange?: () => void;
 }
 
 export function ProfileView({
@@ -52,6 +54,7 @@ export function ProfileView({
   createdProofs,
   savedProofs,
   badges,
+  onVisibilityChange,
 }: ProfileViewProps) {
   const [activeTab, setActiveTab] = useState<'created' | 'saved' | 'badges'>(
     'created'
@@ -74,6 +77,7 @@ export function ProfileView({
       views: p.views || 0,
       likes: p.likes || 0,
       previewUrl: p.previewUrl,
+      hidden: p.hidden || 0,
       userName: p.userName || user.name, // Fallback to profile user if null
       walletAddress: p.walletAddress || user.walletAddress,
     }));
@@ -172,10 +176,11 @@ export function ProfileView({
             <GalleryGrid
               proofs={formatProofs(createdProofs)}
               isOwner={isOwner}
+              onVisibilityChange={onVisibilityChange}
             />
           )}
           {activeTab === 'saved' && (
-            <GalleryGrid proofs={formatProofs(savedProofs)} isOwner={isOwner} />
+            <GalleryGrid proofs={formatProofs(savedProofs)} isOwner={false} />
           )}
           {activeTab === 'badges' && <BadgeDisplay badgesList={badges} />}
         </motion.div>

@@ -10,7 +10,12 @@ interface PageProps {
 export async function GET(req: NextRequest, { params }: PageProps) {
   try {
     const { identifier } = await params;
-    const profile = await getProfile(identifier);
+
+    // Get viewer's wallet address from header (set by client if logged in)
+    const viewerWalletAddress =
+      req.headers.get('X-Wallet-Address') || undefined;
+
+    const profile = await getProfile(identifier, viewerWalletAddress);
 
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });

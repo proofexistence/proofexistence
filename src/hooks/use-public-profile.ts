@@ -22,6 +22,7 @@ export interface PublicProfile {
     likes: number | null;
     title: string | null;
     previewUrl: string | null;
+    hidden: number;
     userName: string | null;
     walletAddress: string | null;
   }>;
@@ -50,19 +51,35 @@ export interface PublicProfile {
 /**
  * Hook to fetch any user's public profile by username or wallet address
  * Uses React Query for caching
+ *
+ * @param identifier - Username or wallet address to look up
+ * @param viewerWalletAddress - Current user's wallet address (to show hidden sessions if viewing own profile)
  */
-export function usePublicProfile(identifier: string | undefined) {
+export function usePublicProfile(
+  identifier: string | undefined,
+  viewerWalletAddress?: string
+) {
   const {
     data: profile,
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: ['public-profile', identifier],
+    queryKey: ['public-profile', identifier, viewerWalletAddress],
     queryFn: async (): Promise<PublicProfile | null> => {
       if (!identifier) return null;
 
-      const res = await fetch(`/api/profile/${encodeURIComponent(identifier)}`);
+      const headers: Record<string, string> = {};
+      if (viewerWalletAddress) {
+        headers['X-Wallet-Address'] = viewerWalletAddress;
+      }
+
+      const res = await fetch(
+        `/api/profile/${encodeURIComponent(identifier)}`,
+        {
+          headers,
+        }
+      );
 
       if (!res.ok) {
         if (res.status === 404) return null;

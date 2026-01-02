@@ -1,13 +1,9 @@
 import { headers } from 'next/headers';
-import { auth } from '@clerk/nextjs/server';
 import { verifyWeb3AuthToken } from '@/lib/web3auth/verify';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { ethers } from 'ethers';
-
-// Feature flag
-const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
 
 export interface AuthenticatedUser {
   id: string; // UUID from DB
@@ -23,7 +19,7 @@ export interface AuthenticatedUser {
  * For social login users: Uses Bearer token (ID token from Web3Auth)
  * For external wallet users: Uses X-Wallet-Address header (less secure, but works)
  */
-async function getWeb3AuthUser(): Promise<AuthenticatedUser | null> {
+export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
   const headersList = await headers();
   const authHeader = headersList.get('Authorization');
   const walletHeader = headersList.get('X-Wallet-Address');
@@ -73,44 +69,6 @@ async function getWeb3AuthUser(): Promise<AuthenticatedUser | null> {
 }
 
 /**
- * Get authenticated user from Clerk session
- */
-async function getClerkUser(): Promise<AuthenticatedUser | null> {
-  const { userId: clerkId } = await auth();
-
-  if (!clerkId) {
-    return null;
-  }
-
-  const user = await db.query.users.findFirst({
-    where: eq(users.clerkId, clerkId),
-  });
-
-  if (!user) {
-    return null;
-  }
-
-  return {
-    id: user.id,
-    walletAddress: user.walletAddress,
-    email: user.email,
-    username: user.username,
-    name: user.name,
-  };
-}
-
-/**
- * Get the currently authenticated user
- * Automatically uses Web3Auth or Clerk based on feature flag
- */
-export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
-  if (USE_WEB3AUTH) {
-    return getWeb3AuthUser();
-  }
-  return getClerkUser();
-}
-
-/**
  * Require authentication - throws if not authenticated
  * Use this in API routes that require a logged-in user
  */
@@ -123,28 +81,31 @@ export async function requireAuth(): Promise<AuthenticatedUser> {
 }
 
 /**
- * Get user ID for rate limiting
- * Uses clerkId for Clerk, walletAddress for Web3Auth
+ * Get user ID for rate limiting (wallet address)
  */
 export async function getRateLimitKey(): Promise<string | null> {
-  if (USE_WEB3AUTH) {
-    const headersList = await headers();
-    const authHeader = headersList.get('Authorization');
+  const headersList = await headers();
+  const authHeader = headersList.get('Authorization');
+  const walletHeader = headersList.get('X-Wallet-Address');
 
-    if (!authHeader?.startsWith('Bearer ')) {
-      return null;
-    }
-
+  // Try Bearer token first
+  if (authHeader?.startsWith('Bearer ')) {
     const idToken = authHeader.slice(7);
     const verified = await verifyWeb3AuthToken(idToken);
 
-    if (!verified) {
-      return null;
+    if (verified) {
+      return ethers.getAddress(verified.walletAddress);
     }
-
-    return ethers.getAddress(verified.walletAddress);
   }
 
-  const { userId } = await auth();
-  return userId;
+  // Fallback to wallet header
+  if (walletHeader) {
+    try {
+      return ethers.getAddress(walletHeader);
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
 }

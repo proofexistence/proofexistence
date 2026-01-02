@@ -1,29 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getCurrentUser } from '@/lib/auth/get-user';
 import { db } from '@/db';
-import { users, sessions } from '@/db/schema';
+import { sessions } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Auth Check (Clerk)
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
+    // 1. Auth Check
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Get DB User
-    const [dbUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, clerkId))
-      .limit(1);
-
-    if (!dbUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // 3. Process Submission
+    // 2. Process Submission
     const body = await req.json();
     const { sessionId, type, txHash } = body;
 
@@ -38,7 +27,7 @@ export async function POST(req: NextRequest) {
     const existingSession = await db
       .select()
       .from(sessions)
-      .where(and(eq(sessions.id, sessionId), eq(sessions.userId, dbUser.id)))
+      .where(and(eq(sessions.id, sessionId), eq(sessions.userId, user.id)))
       .limit(1);
 
     if (existingSession.length === 0) {

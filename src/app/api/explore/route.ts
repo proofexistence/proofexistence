@@ -25,6 +25,9 @@ export async function GET(req: NextRequest) {
     // Build where conditions
     const conditions = [];
 
+    // Always exclude hidden sessions from explore
+    conditions.push(eq(sessions.hidden, 0));
+
     // Status filter
     if (status && status !== 'all') {
       conditions.push(eq(sessions.status, status));

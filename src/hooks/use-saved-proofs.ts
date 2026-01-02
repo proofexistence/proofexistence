@@ -1,26 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuthSafe as useAuth } from '@/lib/clerk/safe-hooks';
+import { useWeb3Auth } from '@/lib/web3auth';
 
 type SavedResponse = {
   savedSessionIds: string[];
 };
 
 export function useSavedProofs() {
-  const { getToken, isSignedIn } = useAuth();
+  const { getIdToken, user, isConnected } = useWeb3Auth();
   const queryClient = useQueryClient();
+
+  const getAuthHeaders = async (): Promise<Record<string, string>> => {
+    const headers: Record<string, string> = {};
+    const token = await getIdToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (user?.walletAddress) {
+      headers['X-Wallet-Address'] = user.walletAddress;
+    }
+    return headers;
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['saved-proofs'],
     queryFn: async () => {
-      if (!isSignedIn) return { savedSessionIds: [] };
-      const token = await getToken();
-      const res = await fetch('/api/user/saved', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (!isConnected) return { savedSessionIds: [] };
+      const headers = await getAuthHeaders();
+      const res = await fetch('/api/user/saved', { headers });
       if (!res.ok) throw new Error('Failed to fetch saved proofs');
       return (await res.json()) as SavedResponse;
     },
-    enabled: !!isSignedIn,
+    enabled: isConnected,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
@@ -34,7 +43,7 @@ export function useSavedProofs() {
       sessionId: string;
       isSaved: boolean;
     }) => {
-      const token = await getToken();
+      const headers = await getAuthHeaders();
       // 'isSaved' here is the *current* state before toggle, so if true, we want to unsave
       const action = isSaved ? 'unsave' : 'save';
 
@@ -42,7 +51,7 @@ export function useSavedProofs() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          ...headers,
         },
         body: JSON.stringify({ sessionId, action }),
       });

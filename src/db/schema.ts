@@ -77,6 +77,9 @@ export const sessions = pgTable(
     views: integer('views').default(0).notNull(),
     likes: integer('likes').default(0).notNull(), // Denormalized count for performance
 
+    // Visibility
+    hidden: integer('hidden').default(0).notNull(), // 0 = visible, 1 = hidden from explore/public profile
+
     status: varchar('status', { length: 20 }).default('PENDING').notNull(), // PENDING | SETTLED | MINTED
     txHash: varchar('tx_hash', { length: 66 }), // Populated if Instant Proof (minted)
     ipfsHash: varchar('ipfs_hash', { length: 255 }), // IPFS CID for NFT metadata

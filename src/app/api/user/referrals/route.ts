@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getCurrentUser } from '@/lib/auth/get-user';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
@@ -8,21 +8,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const { userId: clerkId } = await auth();
-
-    if (!clerkId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get the user's ID from clerkId
-    const [user] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.clerkId, clerkId))
-      .limit(1);
-
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ count: 0 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Count users who were referred by this user

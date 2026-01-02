@@ -10,7 +10,7 @@ import { BrandConstellation } from './brand-constellation';
 import { ACTIVE_BRANDS } from '@/config/brands';
 import { CosmosSearch } from './cosmos-search';
 import { TechInfoOverlay } from './tech-info-overlay';
-import { useUserSafe as useUser } from '@/lib/clerk/safe-hooks';
+import { useWeb3Auth } from '@/lib/web3auth';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { StarField } from './star-field';
@@ -354,14 +354,12 @@ function FindMeButton({
   onFocus: (t: CosmosTrail) => void;
   compact?: boolean;
 }) {
-  const { user, isSignedIn } = useUser();
+  const { user, isConnected } = useWeb3Auth();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  if (!isSignedIn || !user) return null;
+  if (!isConnected || !user) return null;
 
-  const walletAddress = (
-    user.publicMetadata as { walletAddress?: string } | undefined
-  )?.walletAddress;
+  const walletAddress = user.walletAddress;
 
   if (!walletAddress) return null;
 

@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useClerkSafe as useClerk } from '@/lib/clerk/safe-hooks';
 import { useWeb3Auth } from '@/lib/web3auth';
 import { useEffect, useState } from 'react';
 import VariableFontHoverByRandomLetter from '@/components/fancy/text/variable-font-hover-by-random-letter';
@@ -24,19 +23,11 @@ import { NavbarCountdown } from './navbar-countdown';
 import { MobileConnectButton } from '@/components/auth/mobile-connect-button';
 import { ReferralDialog } from '@/components/ui/referral-dialog';
 
-// Feature flag
-const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
-
 export function Navbar() {
   const { profile, isLoading, isAuthenticated } = useUserProfile();
+  const { logout } = useWeb3Auth();
 
-  // Always call all hooks unconditionally to satisfy React hooks rules
-  const clerkActions = useClerk();
-  const web3AuthActions = useWeb3Auth();
-
-  const handleSignOut = USE_WEB3AUTH
-    ? () => web3AuthActions.logout()
-    : () => clerkActions.signOut();
+  const handleSignOut = () => logout();
 
   const ready = !isLoading;
   const authenticated = isAuthenticated;
@@ -453,12 +444,7 @@ export function Navbar() {
                 >
                   <button
                     onClick={() => {
-                      // We don't close the menu immediately if it's going to open the dialog
-                      // But MobileConnectButton stops propagation if it opens dialog.
-                      // If it's standard sign in, it opens Clerk modal.
-                      // We might want to close the mobile menu ONLY if we are NOT showing the dialog?
-                      // Actually MobileConnectButton children onClick is wrapped.
-                      // Let's just close the menu? No, if we close menu, verify dialog z-index.
+                      // Close the mobile menu when the connect button is clicked
                       setIsMobileMenuOpen(false);
                     }}
                     className="w-full py-4 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-colors"

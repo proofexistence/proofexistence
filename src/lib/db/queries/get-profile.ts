@@ -8,7 +8,10 @@ import {
 } from '@/db/schema';
 import { eq, or, desc, sql, inArray, and, ilike } from 'drizzle-orm';
 
-export async function getProfile(identifier: string) {
+export async function getProfile(
+  identifier: string,
+  viewerWalletAddress?: string
+) {
   try {
     // 1. Find User
     // Identifier could be username or wallet address
@@ -24,7 +27,22 @@ export async function getProfile(identifier: string) {
 
     if (!user) return null;
 
+    // Check if viewer is the profile owner
+    const isOwner =
+      viewerWalletAddress?.toLowerCase() === user.walletAddress.toLowerCase();
+
     // 2. Fetch Created Proofs (Sessions)
+    // If viewer is owner, show all sessions including hidden
+    // If viewer is not owner, only show non-hidden sessions
+    const sessionConditions = [
+      eq(sessions.userId, user.id),
+      inArray(sessions.status, ['MINTED', 'SETTLED', 'PENDING']),
+    ];
+
+    if (!isOwner) {
+      sessionConditions.push(eq(sessions.hidden, 0));
+    }
+
     const createdProofs = await db
       .select({
         id: sessions.id,
@@ -36,17 +54,13 @@ export async function getProfile(identifier: string) {
         likes: sessions.likes,
         title: sessions.title,
         previewUrl: sessions.previewUrl,
+        hidden: sessions.hidden,
         // Join user data for card standard props, though we know the user
         userName: sql<string>`${user.name}`,
         walletAddress: sql<string>`${user.walletAddress}`,
       })
       .from(sessions)
-      .where(
-        and(
-          eq(sessions.userId, user.id),
-          inArray(sessions.status, ['MINTED', 'SETTLED', 'PENDING'])
-        )
-      )
+      .where(and(...sessionConditions))
       .orderBy(desc(sessions.createdAt));
 
     // 3. Fetch Saved Proofs
