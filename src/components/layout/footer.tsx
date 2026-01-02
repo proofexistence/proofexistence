@@ -8,10 +8,10 @@ import { Copy, Check, Heart, Wallet } from 'lucide-react';
 
 const WALLETS = [
   {
-    symbol: 'ETH',
-    name: 'Ethereum',
+    symbol: 'POL',
+    name: 'Polygon',
     address: '0xA7D2A0647F1f12455f543Db4CaA350e85C0Eae09',
-    color: 'from-blue-400 to-indigo-500',
+    color: 'from-purple-400 to-violet-500',
   },
   {
     symbol: 'BTC',

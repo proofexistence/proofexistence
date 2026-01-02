@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { notFound } from 'next/navigation';
 import { ProfileView } from '@/components/dashboard/profile-view';
-import { usePublicProfile } from '@/hooks/use-public-profile';
+import { useProfileSessions } from '@/hooks/use-public-profile';
 import { useWeb3Auth } from '@/lib/web3auth';
 import { Loader2 } from 'lucide-react';
 
@@ -19,10 +19,14 @@ export default function ProfilePage({ params }: PageProps) {
   const { user } = useWeb3Auth();
 
   // Pass viewer's wallet to get hidden sessions if viewing own profile
-  const { profile, isLoading, refetch } = usePublicProfile(
-    identifier,
-    user?.walletAddress
-  );
+  const {
+    profile,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useProfileSessions(identifier, user?.walletAddress);
 
   if (isLoading) {
     return (
@@ -55,6 +59,9 @@ export default function ProfilePage({ params }: PageProps) {
             hidden: p.hidden,
           }))}
         onVisibilityChange={refetch}
+        hasMoreProofs={hasNextPage}
+        isLoadingMore={isFetchingNextPage}
+        onLoadMore={() => fetchNextPage()}
         savedProofs={profile.savedProofs
           .filter((s) => s.id !== null)
           .map((s) => ({

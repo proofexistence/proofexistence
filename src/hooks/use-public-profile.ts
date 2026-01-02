@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 
 // Types matching the API response from getProfile
 export interface PublicProfile {
@@ -46,6 +46,12 @@ export interface PublicProfile {
     imageUrl: string | null;
     awardedAt: string | null;
   }>;
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
 }
 
 /**
@@ -96,6 +102,71 @@ export function usePublicProfile(
     profile,
     isLoading,
     error,
+    refetch,
+  };
+}
+
+/**
+ * Hook to fetch more sessions with infinite scroll
+ */
+export function useProfileSessions(
+  identifier: string | undefined,
+  viewerWalletAddress?: string
+) {
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ['profile-sessions', identifier, viewerWalletAddress],
+    queryFn: async ({ pageParam = 0 }): Promise<PublicProfile | null> => {
+      if (!identifier) return null;
+
+      const headers: Record<string, string> = {};
+      if (viewerWalletAddress) {
+        headers['X-Wallet-Address'] = viewerWalletAddress;
+      }
+
+      const res = await fetch(
+        `/api/profile/${encodeURIComponent(identifier)}?limit=20&offset=${pageParam}`,
+        { headers }
+      );
+
+      if (!res.ok) {
+        if (res.status === 404) return null;
+        throw new Error('Failed to fetch profile');
+      }
+
+      return res.json();
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage?.pagination?.hasMore) return undefined;
+      return lastPage.pagination.offset + lastPage.pagination.limit;
+    },
+    enabled: !!identifier,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Combine all pages of sessions
+  const allSessions =
+    data?.pages.flatMap((page) => page?.createdProofs || []) || [];
+  const firstPage = data?.pages[0];
+
+  return {
+    profile: firstPage
+      ? {
+          ...firstPage,
+          createdProofs: allSessions,
+        }
+      : null,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage: !!hasNextPage,
+    fetchNextPage,
     refetch,
   };
 }

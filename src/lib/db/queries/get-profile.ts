@@ -10,8 +10,11 @@ import { eq, or, desc, sql, inArray, and, ilike } from 'drizzle-orm';
 
 export async function getProfile(
   identifier: string,
-  viewerWalletAddress?: string
+  viewerWalletAddress?: string,
+  options?: { limit?: number; offset?: number }
 ) {
+  const limit = options?.limit || 20;
+  const offset = options?.offset || 0;
   try {
     // 1. Find User
     // Identifier could be username or wallet address
@@ -43,6 +46,12 @@ export async function getProfile(
       sessionConditions.push(eq(sessions.hidden, 0));
     }
 
+    // Get total count for pagination
+    const [{ count: totalCreated }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(sessions)
+      .where(and(...sessionConditions));
+
     const createdProofs = await db
       .select({
         id: sessions.id,
@@ -61,7 +70,9 @@ export async function getProfile(
       })
       .from(sessions)
       .where(and(...sessionConditions))
-      .orderBy(desc(sessions.createdAt));
+      .orderBy(desc(sessions.createdAt))
+      .limit(limit)
+      .offset(offset);
 
     // 3. Fetch Saved Proofs
     // Need to join saved_sessions -> sessions -> users (owner of session)
@@ -102,6 +113,12 @@ export async function getProfile(
       createdProofs,
       savedProofs: saved, // savedSessions might have null sessions if deleted? ensure non-null
       badges: earnedBadges,
+      pagination: {
+        total: totalCreated,
+        limit,
+        offset,
+        hasMore: offset + createdProofs.length < totalCreated,
+      },
     };
   } catch (error) {
     console.error('Error fetching profile:', error);

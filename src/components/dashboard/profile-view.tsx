@@ -5,7 +5,7 @@ import { GalleryGrid } from '@/components/gallery/gallery-grid';
 import { BadgeDisplay } from '@/components/dashboard/badge-display';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWeb3Auth } from '@/lib/web3auth';
-
+import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
 // Types (should ideally be imported from shared location but defining here for speed)
@@ -47,6 +47,9 @@ interface ProfileViewProps {
   savedProofs: ProofItem[];
   badges: BadgeItem[];
   onVisibilityChange?: () => void;
+  hasMoreProofs?: boolean;
+  isLoadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 export function ProfileView({
@@ -55,6 +58,9 @@ export function ProfileView({
   savedProofs,
   badges,
   onVisibilityChange,
+  hasMoreProofs,
+  isLoadingMore,
+  onLoadMore,
 }: ProfileViewProps) {
   const [activeTab, setActiveTab] = useState<'created' | 'saved' | 'badges'>(
     'created'
@@ -173,11 +179,31 @@ export function ProfileView({
           transition={{ duration: 0.2 }}
         >
           {activeTab === 'created' && (
-            <GalleryGrid
-              proofs={formatProofs(createdProofs)}
-              isOwner={isOwner}
-              onVisibilityChange={onVisibilityChange}
-            />
+            <>
+              <GalleryGrid
+                proofs={formatProofs(createdProofs)}
+                isOwner={isOwner}
+                onVisibilityChange={onVisibilityChange}
+              />
+              {hasMoreProofs && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={onLoadMore}
+                    disabled={isLoadingMore}
+                    className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white/70 hover:text-white transition-all flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {isLoadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      'Load More'
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           )}
           {activeTab === 'saved' && (
             <GalleryGrid proofs={formatProofs(savedProofs)} isOwner={false} />

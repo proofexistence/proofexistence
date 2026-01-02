@@ -10,12 +10,20 @@ interface PageProps {
 export async function GET(req: NextRequest, { params }: PageProps) {
   try {
     const { identifier } = await params;
+    const { searchParams } = new URL(req.url);
 
     // Get viewer's wallet address from header (set by client if logged in)
     const viewerWalletAddress =
       req.headers.get('X-Wallet-Address') || undefined;
 
-    const profile = await getProfile(identifier, viewerWalletAddress);
+    // Pagination params
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
+    const offset = parseInt(searchParams.get('offset') || '0', 10);
+
+    const profile = await getProfile(identifier, viewerWalletAddress, {
+      limit: Math.min(limit, 50), // Max 50 per request
+      offset,
+    });
 
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
