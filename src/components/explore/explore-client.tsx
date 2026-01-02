@@ -69,16 +69,22 @@ export function ExploreClient({
         });
 
         const response = await fetch(`/api/explore?${params}`);
-        const data = await response.json();
 
-        if (reset) {
-          setProofs(data.proofs);
-        } else {
-          setProofs((prev) => [...prev, ...data.proofs]);
+        if (!response.ok) {
+          throw new Error('Failed to fetch proofs');
         }
 
-        setTotal(data.pagination.total);
-        setHasMore(data.pagination.hasMore);
+        const data = await response.json();
+        const newProofs = data.proofs ?? [];
+
+        if (reset) {
+          setProofs(newProofs);
+        } else {
+          setProofs((prev) => [...prev, ...newProofs]);
+        }
+
+        setTotal(data.pagination?.total ?? 0);
+        setHasMore(data.pagination?.hasMore ?? false);
         setPage(pageNum);
       } catch (error) {
         console.error('Error fetching proofs:', error);

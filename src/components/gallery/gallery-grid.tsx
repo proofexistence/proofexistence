@@ -24,7 +24,7 @@ export function GalleryGrid({
   isOwner,
   onVisibilityChange,
 }: GalleryGridProps) {
-  if (proofs.length === 0) {
+  if (!proofs || proofs.length === 0) {
     return (
       <div className="text-center py-20">
         <p className="text-white/40">No proofs found yet.</p>
