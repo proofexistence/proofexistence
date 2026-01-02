@@ -66,6 +66,7 @@ async function getSession(id: string) {
       username: true,
       name: true,
       walletAddress: true,
+      avatarUrl: true,
     },
   });
 

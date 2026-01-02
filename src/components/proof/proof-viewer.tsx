@@ -50,6 +50,7 @@ interface ProofViewerProps {
       username: string | null;
       name: string | null;
       walletAddress: string;
+      avatarUrl?: string | null;
     } | null;
   };
   nftImage?: string | null;
@@ -381,7 +382,15 @@ export function ProofViewer({
                 >
                   <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 p-[1px]">
                     <div className="relative w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center">
-                      <span className="text-sm">👤</span>
+                      {session.user?.avatarUrl ? (
+                        <img
+                          src={session.user.avatarUrl}
+                          alt={authorName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm">👤</span>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -395,8 +404,16 @@ export function ProofViewer({
                 </button>
               ) : (
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                    <span className="text-sm">👤</span>
+                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
+                    {session.user?.avatarUrl ? (
+                      <img
+                        src={session.user.avatarUrl}
+                        alt={authorName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm">👤</span>
+                    )}
                   </div>
                   <div>
                     <div className="text-white font-medium text-sm leading-none">

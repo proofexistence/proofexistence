@@ -36,6 +36,13 @@
       "when": 1767323526296,
       "tag": "0004_modern_princess_powerful",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767367652003,
+      "tag": "0005_careless_pestilence",
+      "breakpoints": true
     }
   ]
 }
