@@ -5,7 +5,7 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 // Type declaration for window.ethereum (MetaMask/Web3 wallets)
 declare global {
   interface Window {
-    ethereum?: import('ethers').providers.ExternalProvider;
+    ethereum?: import('ethers').Eip1193Provider;
   }
 }
 import { Canvas, useThree, useFrame, ThreeEvent } from '@react-three/fiber';
@@ -40,7 +40,7 @@ import { useTrailRecorder } from '@/hooks/use-trail-recorder';
 import { useGravity } from '@/hooks/use-gravity';
 import { TrailPoint, MIN_SESSION_DURATION } from '@/types/session';
 import { TRAIL_COLORS } from './light-trail';
-import { useUser, useAuth, useClerk } from '@clerk/nextjs';
+import { useWeb3Auth } from '@/lib/web3auth';
 import { ethers } from 'ethers';
 import {
   PROOF_OF_EXISTENCE_ADDRESS,
@@ -67,7 +67,7 @@ const getPublicProvider = () => {
       ? 'https://polygon-amoy-bor-rpc.publicnode.com'
       : 'https://polygon-bor-rpc.publicnode.com');
 
-  return new ethers.providers.JsonRpcProvider(rpcUrl);
+  return new ethers.JsonRpcProvider(rpcUrl);
 };
 
 // Raycaster plane for mouse tracking
@@ -307,9 +307,9 @@ import { AvatarDropdown } from './avatar-dropdown';
 import { isTestnet } from '@/lib/contracts';
 
 // Helper to switch network
-async function switchNetwork(provider: ethers.providers.Web3Provider) {
+async function switchNetwork(provider: ethers.BrowserProvider) {
   const targetChainIdHex = isTestnet ? '0x13882' : '0x89'; // 80002 (Amoy) : 137 (Mainnet)
-  const targetChainIdDec = isTestnet ? 80002 : 137;
+  const targetChainIdDec = BigInt(isTestnet ? 80002 : 137); // bigint for ethers v6 comparison
 
   try {
     const network = await provider.getNetwork();
@@ -426,7 +426,7 @@ export function POECanvas() {
   const [mounted, setMounted] = useState(false);
 
   // Auth & Submission State
-  const { data: profile } = useProfile();
+  const { profile } = useProfile();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -558,10 +558,8 @@ export function POECanvas() {
   // Capture Mode handling
   const [captureMode, setCaptureMode] = useState(false);
 
-  const { user, isSignedIn } = useUser();
-  const { getToken } = useAuth();
-  const { openSignIn } = useClerk();
-  const authenticated = isSignedIn; // Mapping for existing logic
+  const { isConnected, user: web3User, login, getIdToken } = useWeb3Auth();
+  const authenticated = isConnected;
 
   // Trigger capture when mode is active
   useEffect(() => {
@@ -619,7 +617,7 @@ export function POECanvas() {
 
     // 1. Check Auth
     if (!authenticated) {
-      openSignIn();
+      login();
       setIsSubmitting(false);
       return;
     }
@@ -627,52 +625,67 @@ export function POECanvas() {
     // 2. Trigger Capture Mode (Session creation moved to confirmation step)
     setCaptureMode(true);
     // Effect will pick this up, render CaptureScene, capture, then open modal
-  }, [authenticated, openSignIn]);
+  }, [authenticated, login]);
+
+  // Helper to build auth headers (token for social login, wallet address for external wallet)
+  const getAuthHeaders = useCallback(async (): Promise<
+    Record<string, string>
+  > => {
+    const token = await getIdToken();
+    if (token) {
+      return { Authorization: `Bearer ${token}` };
+    }
+    // Fallback to wallet address for external wallets
+    if (web3User?.walletAddress) {
+      return { 'X-Wallet-Address': web3User.walletAddress };
+    }
+    throw new Error('Not authenticated');
+  }, [getIdToken, web3User?.walletAddress]);
 
   // Helper function to create session
-  const createSession = useCallback(
-    async (token: string) => {
-      const session = completedSessionRef.current;
-      if (!session) throw new Error('No session data found');
+  const createSession = useCallback(async () => {
+    const session = completedSessionRef.current;
+    if (!session) throw new Error('No session data found');
 
-      const response = await fetch('/api/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          duration: session.duration,
-          points: session.points,
-          sectorId: session.sectorId,
-          color: trailColor, // Use current state (allows changing color after recording)
-        }),
-      });
+    const authHeaders = await getAuthHeaders();
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to create session');
-      }
-      const data = await response.json();
-      return data.session.id; // Return the new session ID
-    },
-    [trailColor]
-  );
+    const response = await fetch('/api/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+      },
+      body: JSON.stringify({
+        duration: session.duration,
+        points: session.points,
+        sectorId: session.sectorId,
+        color: trailColor, // Use current state (allows changing color after recording)
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to create session');
+    }
+    const data = await response.json();
+    return data.session.id; // Return the new session ID
+  }, [trailColor, getAuthHeaders]);
 
   // Helper function to delete session
   const deleteSession = useCallback(
-    async (sessionId: string, token: string) => {
+    async (sessionId: string) => {
       try {
+        const authHeaders = await getAuthHeaders();
         await fetch(`/api/sessions?id=${sessionId}`, {
           method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: authHeaders,
         });
         setCurrentSessionId(null);
       } catch (e) {
         console.error('Failed to cleanup session:', e);
       }
     },
-    []
+    [getAuthHeaders]
   );
 
   // Handle Modal Selection
@@ -694,9 +707,6 @@ export function POECanvas() {
       let sessionId = currentSessionId;
 
       try {
-        const token = await getToken();
-        if (!token) throw new Error('Authentication check failed');
-
         // 1. Validate Session Duration
         const currentSession = completedSessionRef.current;
         if (!currentSession || currentSession.duration < MIN_SESSION_DURATION) {
@@ -707,7 +717,7 @@ export function POECanvas() {
 
         // 2. Create or Reuse Session
         if (!sessionId) {
-          sessionId = await createSession(token);
+          sessionId = await createSession();
           setCurrentSessionId(sessionId); // Store for idempotency
         }
 
@@ -742,11 +752,12 @@ export function POECanvas() {
           }
 
           setLoadingStatus('Submitting proof...');
+          const authHeaders = await getAuthHeaders();
           const response = await fetch('/api/session/submit-standard', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
+              ...authHeaders,
             },
             body: JSON.stringify({
               sessionId: sessionId,
@@ -780,17 +791,20 @@ export function POECanvas() {
             cancelLabel: 'View Proof',
             onCancel: () => {
               setShowSubmissionModal(false);
+              setIsSubmitting(true); // Prevent further actions during navigation
+              setDialogState((prev) => ({ ...prev, isOpen: false }));
               router.push(`/proof/${sessionId}`);
             },
           });
         } else {
           // INSTANT
           const imageData = screenshotRef.current || screenshotData;
+          const instantAuthHeaders = await getAuthHeaders();
           const response = await fetch('/api/session/submit-instant', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
+              ...instantAuthHeaders,
             },
             body: JSON.stringify({
               sessionId: sessionId,
@@ -831,9 +845,8 @@ export function POECanvas() {
           const session = completedSessionRef.current; // Need duration
           if (!session) throw new Error('Session missing');
 
-          // Check if user has a web3 wallet connected via Clerk (MetaMask, OKX, etc.)
-          const hasWeb3Wallet =
-            user?.web3Wallets && user.web3Wallets.length > 0;
+          // Check if user has an external wallet (MetaMask, etc.)
+          const hasWeb3Wallet = !!window.ethereum;
 
           if (hasWeb3Wallet) {
             // CLIENT-SIDE MINTING (MetaMask)
@@ -846,8 +859,8 @@ export function POECanvas() {
               throw new Error(
                 'No crypto wallet found. Please install MetaMask.'
               );
-            const provider = new ethers.providers.Web3Provider(
-              window.ethereum as ethers.providers.ExternalProvider
+            const provider = new ethers.BrowserProvider(
+              window.ethereum as ethers.Eip1193Provider
             );
 
             // Force Network Switch
@@ -864,7 +877,7 @@ export function POECanvas() {
             }
 
             await provider.send('eth_requestAccounts', []);
-            const signer = provider.getSigner();
+            const signer = await provider.getSigner();
 
             const poeContract = new ethers.Contract(
               PROOF_OF_EXISTENCE_ADDRESS,
@@ -880,18 +893,24 @@ export function POECanvas() {
                 Math.floor(session.duration)
               );
 
-              if (nativeBalance.lt(cost)) {
+              if (nativeBalance < cost) {
                 throw new Error('Insufficient MATIC balance for minting');
               }
 
               // Fetch gas fees with timeout and fallback
               setLoadingStatus('Estimating gas fees...');
-              const overrides: ethers.PayableOverrides = { value: cost };
+              const overrides: {
+                value?: bigint;
+                gasPrice?: bigint;
+                maxFeePerGas?: bigint;
+                maxPriorityFeePerGas?: bigint;
+                gasLimit?: bigint;
+              } = { value: cost };
 
               try {
                 // Use a timeout to prevent hanging
                 const feeDataPromise = provider.getFeeData();
-                const timeoutPromise = new Promise<ethers.providers.FeeData>(
+                const timeoutPromise = new Promise<ethers.FeeData>(
                   (_, reject) =>
                     setTimeout(
                       () => reject(new Error('Gas estimation timeout')),
@@ -906,15 +925,15 @@ export function POECanvas() {
 
                 // Use gasPrice with 20% buffer for Polygon reliability
                 if (feeData.gasPrice) {
-                  overrides.gasPrice = feeData.gasPrice.mul(120).div(100);
+                  overrides.gasPrice =
+                    (feeData.gasPrice * BigInt(120)) / BigInt(100);
                 } else if (feeData.maxFeePerGas) {
                   // EIP-1559 Support
-                  overrides.maxFeePerGas = feeData.maxFeePerGas
-                    .mul(120)
-                    .div(100);
+                  overrides.maxFeePerGas =
+                    (feeData.maxFeePerGas * BigInt(120)) / BigInt(100);
                   overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas
-                    ?.mul(120)
-                    .div(100);
+                    ? (feeData.maxPriorityFeePerGas * BigInt(120)) / BigInt(100)
+                    : undefined;
                 }
               } catch (feeError) {
                 console.warn(
@@ -924,17 +943,17 @@ export function POECanvas() {
                 // We proceed without overrides, letting MetaMask estimate
               }
 
-              let gasLimit = ethers.BigNumber.from(300000); // Default fallback
+              let gasLimit = BigInt(300000); // Default fallback
               try {
                 const estimatedGas =
-                  await poeContract.estimateGas.mintEternalNative(
+                  await poeContract.mintEternalNative.estimateGas(
                     Math.floor(session.duration),
                     dataRes.arweaveTxId,
                     displayName,
                     data.message || '',
                     { ...overrides }
                   );
-                gasLimit = estimatedGas.mul(120).div(100); // Add 20% buffer
+                gasLimit = (estimatedGas * BigInt(120)) / BigInt(100); // Add 20% buffer
               } catch {
                 // Use default gasLimit if estimation fails
               }
@@ -964,7 +983,7 @@ export function POECanvas() {
               setLoadingStatus('Approving TIME26 (1/2)...');
               const approveTx = await time26Contract.approve(
                 PROOF_OF_EXISTENCE_ADDRESS,
-                ethers.constants.MaxUint256
+                ethers.MaxUint256
               );
               await approveTx.wait();
 
@@ -993,7 +1012,7 @@ export function POECanvas() {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
+                ...instantAuthHeaders,
               },
               body: JSON.stringify({
                 sessionId: sessionId,
@@ -1082,6 +1101,9 @@ export function POECanvas() {
             },
             cancelLabel: 'View Proof',
             onCancel: () => {
+              setShowSubmissionModal(false);
+              setIsSubmitting(true); // Prevent further actions during navigation
+              setDialogState((prev) => ({ ...prev, isOpen: false }));
               router.push(`/proof/${sessionId}`);
             },
           });
@@ -1116,7 +1138,7 @@ export function POECanvas() {
 
         // Cleanup failed session
         if (sessionId) {
-          await deleteSession(sessionId, (await getToken()) || '');
+          await deleteSession(sessionId);
         }
 
         setDialogState({
@@ -1137,7 +1159,7 @@ export function POECanvas() {
       }
     },
     [
-      getToken,
+      getAuthHeaders,
       clearTrail,
       router,
       screenshotData,
@@ -1147,7 +1169,6 @@ export function POECanvas() {
       existingArweaveTxId,
       deleteSession,
       setLoadingStatus,
-      user?.web3Wallets,
     ]
   );
 
@@ -1176,9 +1197,7 @@ export function POECanvas() {
       if (!showSubmissionModal) return;
 
       try {
-        const address = (
-          user?.publicMetadata as { walletAddress?: string } | undefined
-        )?.walletAddress;
+        const address = web3User?.walletAddress;
         if (!address) return;
 
         let provider;
@@ -1211,7 +1230,7 @@ export function POECanvas() {
 
         // Fetch TIME26 balance
         const bal = await time26Contract.balanceOf(address);
-        setTime26Balance(ethers.utils.formatEther(bal));
+        setTime26Balance(ethers.formatEther(bal));
 
         // Fetch costs
         const duration = completedSessionRef.current?.duration || 10;
@@ -1223,16 +1242,16 @@ export function POECanvas() {
         );
 
         setNativeCost(
-          `${parseFloat(ethers.utils.formatEther(costNative)).toFixed(4)} POL`
+          `${parseFloat(ethers.formatEther(costNative)).toFixed(4)} POL`
         );
 
         const usdValue = (
-          parseFloat(ethers.utils.formatEther(costNative)) * 0.5
+          parseFloat(ethers.formatEther(costNative)) * 0.5
         ).toFixed(2);
         setNativeCostUsd(`~$${usdValue}`);
 
         setTime26Cost(
-          `${parseFloat(ethers.utils.formatEther(costTime26)).toFixed(0)} TIME`
+          `${parseFloat(ethers.formatEther(costTime26)).toFixed(0)} TIME`
         );
       } catch (err) {
         console.error('Failed to fetch contract data:', err);
@@ -1240,7 +1259,7 @@ export function POECanvas() {
     };
 
     fetchContractData();
-  }, [showSubmissionModal, user?.publicMetadata]);
+  }, [showSubmissionModal, web3User?.walletAddress]);
 
   if (!mounted) return null;
 
@@ -1310,10 +1329,6 @@ export function POECanvas() {
         </div>
       )}
 
-      <div className="absolute top-4 left-4 z-50 text-xs text-white/30 font-mono pointer-events-none">
-        Theme: {currentTheme.name}
-      </div>
-
       <div className="absolute inset-0 pointer-events-none">
         <BackgroundOverlay />
 
@@ -1326,7 +1341,7 @@ export function POECanvas() {
         />
 
         <div className="absolute top-6 right-4 md:top-8 md:right-6 flex flex-col md:flex-row gap-3 items-end md:items-center z-40 pointer-events-none">
-          {isReady && !isRecording && (
+          {isReady && !isRecording && !isSubmitting && !dialogState.isOpen && (
             <div className="hidden md:block">
               <ActionButtons
                 onClear={() => setShowClearConfirm(true)}
@@ -1355,20 +1370,20 @@ export function POECanvas() {
           onSelectStandard={(data) => handleProofSelection('STANDARD', data)}
           onSelectInstant={(data) => handleProofSelection('INSTANT', data)}
           isSubmitting={isSubmitting}
-          profileName={profile?.user?.name || undefined}
-          profileUsername={profile?.user?.username || undefined}
+          profileName={profile?.name || undefined}
+          profileUsername={profile?.username || undefined}
           loadingMessage={loadingStatus}
           time26Balance={parseFloat(time26Balance).toFixed(1)}
           nativeCost={nativeCost}
           nativeCostUsd={nativeCostUsd}
           time26Cost={time26Cost}
           onSetAsDisplayName={async (name: string) => {
-            const token = await getToken();
-            if (!token) throw new Error('Not authenticated');
+            const headers = await getAuthHeaders();
             const res = await fetch('/api/user/update', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
+                ...headers,
               },
               body: JSON.stringify({ name }),
             });

@@ -33,7 +33,7 @@ async function main() {
   console.log('🚀 Testing POL (Native) Payment Flow\n');
   console.log('━'.repeat(50));
 
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
   const wallet = new ethers.Wallet(privateKey, provider);
 
   console.log(`📍 Wallet: ${wallet.address}`);
@@ -45,7 +45,7 @@ async function main() {
   // Check wallet balance
   console.log('\n📊 Step 1: Checking POL balance...');
   const balance = await provider.getBalance(wallet.address);
-  console.log(`   Balance: ${ethers.utils.formatEther(balance)} POL`);
+  console.log(`   Balance: ${ethers.formatEther(balance)} POL`);
 
   // Check POE contract configuration
   console.log('\n📊 Step 2: Checking POE contract configuration...');
@@ -55,22 +55,20 @@ async function main() {
   const freeAllowance = await poe.freeAllowance();
 
   console.log(`   Treasury: ${treasury}`);
-  console.log(`   Base Fee: ${ethers.utils.formatEther(baseFee)} POL`);
-  console.log(
-    `   Price/Second: ${ethers.utils.formatEther(pricePerSecond)} POL`
-  );
+  console.log(`   Base Fee: ${ethers.formatEther(baseFee)} POL`);
+  console.log(`   Price/Second: ${ethers.formatEther(pricePerSecond)} POL`);
   console.log(`   Free Allowance: ${freeAllowance.toString()} seconds`);
 
   // Calculate cost for test mint
   const testDuration = 60;
   console.log(`\n📊 Step 3: Calculating cost for ${testDuration}s duration...`);
   const cost = await poe.calculateCostNative(testDuration);
-  console.log(`   Cost: ${ethers.utils.formatEther(cost)} POL`);
+  console.log(`   Cost: ${ethers.formatEther(cost)} POL`);
 
   if (cost.gt(balance)) {
     console.log('\n❌ Insufficient POL balance for test mint.');
-    console.log(`   Need: ${ethers.utils.formatEther(cost)} POL`);
-    console.log(`   Have: ${ethers.utils.formatEther(balance)} POL`);
+    console.log(`   Need: ${ethers.formatEther(cost)} POL`);
+    console.log(`   Have: ${ethers.formatEther(balance)} POL`);
     process.exit(1);
   }
 
@@ -84,11 +82,11 @@ async function main() {
   console.log(`   Metadata: ${testMetadata}`);
   console.log(`   Display Name: ${testDisplayName}`);
   console.log(`   Message: ${testMessage}`);
-  console.log(`   Value: ${ethers.utils.formatEther(cost)} POL`);
+  console.log(`   Value: ${ethers.formatEther(cost)} POL`);
 
   try {
-    const gasPrice = await provider.getGasPrice();
-    const adjustedGasPrice = gasPrice.mul(150).div(100);
+    const gasPrice = (await provider.getFeeData()).gasPrice ?? BigInt(0);
+    const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
     const mintTx = await poe.mintEternalNative(
       testDuration,
       testMetadata,
@@ -121,9 +119,9 @@ async function main() {
     const newBalance = await provider.getBalance(wallet.address);
     const spent = balance.sub(newBalance);
     console.log(
-      `\n💰 POL spent (including gas): ~${ethers.utils.formatEther(spent)} POL`
+      `\n💰 POL spent (including gas): ~${ethers.formatEther(spent)} POL`
     );
-    console.log(`   New balance: ${ethers.utils.formatEther(newBalance)} POL`);
+    console.log(`   New balance: ${ethers.formatEther(newBalance)} POL`);
 
     console.log('\n━'.repeat(50));
     console.log('✅ POL Payment Test PASSED!');

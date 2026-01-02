@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
       encoding: false,
       'why-is-node-running': false,
     };
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@react-native-async-storage/async-storage': false,
+    };
     return config;
   },
 };

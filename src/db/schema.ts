@@ -23,11 +23,16 @@ export const users = pgTable(
   'users',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-    clerkId: varchar('clerk_id', { length: 50 }).notNull().unique(), // Link to Clerk
-    walletAddress: varchar('wallet_address', { length: 42 }).notNull().unique(), // Primary active wallet (Openfort or External)
+    clerkId: varchar('clerk_id', { length: 50 }).unique(), // Link to Clerk (nullable for Web3Auth users)
+    walletAddress: varchar('wallet_address', { length: 42 }).notNull().unique(), // Primary wallet (Web3Auth MPC or External)
     email: varchar('email', { length: 255 }),
     username: varchar('username', { length: 30 }).unique(),
     name: varchar('name', { length: 50 }), // Display Name (shown everywhere, "Anonymous" if empty)
+
+    // Profile fields (for Web3Auth, stored in DB instead of Clerk)
+    firstName: varchar('first_name', { length: 50 }),
+    lastName: varchar('last_name', { length: 50 }),
+    avatarUrl: varchar('avatar_url', { length: 500 }),
 
     // Referral System
     referralCode: varchar('referral_code', { length: 10 }).unique(), // Short hash of wallet

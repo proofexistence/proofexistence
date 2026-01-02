@@ -186,7 +186,7 @@ export async function syncUserToDatabase(params: SyncUserParams) {
   // Generate Referral Code (Hash of wallet, first 8 chars)
   // Ensure we have a wallet address (we should by now)
   const codeSource = finalWalletAddress || userId;
-  const referralCode = ethers.utils.id(codeSource).slice(2, 10); // keccak256, remove 0x, take 8 chars
+  const referralCode = ethers.id(codeSource).slice(2, 10); // keccak256, remove 0x, take 8 chars
 
   // Resolve Referrer (if code provided)
   let referredByUserId: string | null = null;

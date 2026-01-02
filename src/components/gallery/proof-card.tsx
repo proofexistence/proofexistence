@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { NFTThumbnail } from './nft-thumbnail';
 import { useState } from 'react';
-import { useClerk } from '@clerk/nextjs';
+import { useClerkSafe as useClerk } from '@/lib/clerk/safe-hooks';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useSavedProofs } from '@/hooks/use-saved-proofs';
 import { useLikes } from '@/hooks/use-likes';

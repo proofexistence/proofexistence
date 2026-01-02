@@ -7,9 +7,7 @@ config({ path: '.env.local' });
 import { ethers } from 'ethers';
 
 async function main() {
-  const provider = new ethers.providers.JsonRpcProvider(
-    process.env.NEXT_PUBLIC_RPC_URL
-  );
+  const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
 
   const nonce = await provider.getTransactionCount(wallet.address, 'latest');
@@ -27,10 +25,11 @@ async function main() {
     return;
   }
 
-  const gasPrice = await provider.getGasPrice();
-  const highGasPrice = gasPrice.mul(200).div(100); // 2x gas price
+  const feeData = await provider.getFeeData();
+  const gasPrice = feeData.gasPrice ?? BigInt(0);
+  const highGasPrice = (gasPrice * BigInt(200)) / BigInt(100); // 2x gas price
   console.log(
-    `Using gas price: ${ethers.utils.formatUnits(highGasPrice, 'gwei')} gwei`
+    `Using gas price: ${ethers.formatUnits(highGasPrice, 'gwei')} gwei`
   );
 
   // Send replacement transactions for each pending nonce

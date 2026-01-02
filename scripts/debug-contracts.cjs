@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 
 async function main() {
-  const provider = new hre.ethers.providers.JsonRpcProvider(
+  const provider = new hre.ethers.JsonRpcProvider(
     'https://rpc-amoy.polygon.technology'
   );
 

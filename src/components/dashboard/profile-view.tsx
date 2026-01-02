@@ -4,14 +4,14 @@ import { useState } from 'react';
 import { GalleryGrid } from '@/components/gallery/gallery-grid';
 import { BadgeDisplay } from '@/components/dashboard/badge-display';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser } from '@clerk/nextjs';
+import { useUserSafe as useUser } from '@/lib/clerk/safe-hooks';
 
 import Image from 'next/image';
 
 // Types (should ideally be imported from shared location but defining here for speed)
 type ProfileUser = {
   id: string;
-  clerkId: string;
+  clerkId: string | null; // nullable for Web3Auth users
   name: string | null;
   walletAddress: string;
   createdAt: Date;

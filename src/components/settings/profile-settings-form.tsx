@@ -1,38 +1,32 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { Loader2, Save, ExternalLink, Camera } from 'lucide-react';
 import NextImage from 'next/image';
-import { useQueryClient } from '@tanstack/react-query';
-import { useUserProfile } from '@/hooks/use-user-profile';
+import { useProfile } from '@/hooks/use-profile';
+import { useWeb3Auth } from '@/lib/web3auth';
 
 /**
- * Profile Settings Form
+ * Profile Settings Form (Web3Auth mode)
  *
- * Data sources:
- * - Clerk: firstName, lastName, profileImage
- * - DB: username, displayName (name field)
- *
- * Display name logic:
- * - If checkbox checked: use firstName + lastName as display name
- * - If checkbox unchecked: use custom display name
- * - If empty: show as "Anonymous"
+ * Uses useProfile hook which:
+ * - Syncs user to DB on mount
+ * - Provides updateProfile function
+ * - Caches with React Query
  */
 export function ProfileSettingsForm() {
-  const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
-  const { profile, isLoading: isProfileLoading } = useUserProfile();
-  const queryClient = useQueryClient();
+  const { profile, isLoading, updateProfile } = useProfile();
+  const { user } = useWeb3Auth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Form state - initialized from profile data
+  // Form state
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [useFullNameAsDisplay, setUseFullNameAsDisplay] = useState(false); // Default unchecked until profile loads
+  const [useFullNameAsDisplay, setUseFullNameAsDisplay] = useState(false);
 
-  // Track if user has modified the form. If so, stop syncing with profile data.
+  // Track if user has modified the form
   const isDirtyRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -42,46 +36,26 @@ export function ProfileSettingsForm() {
     type: string;
   } | null>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Sync form state with profile data
-  // We allow updates as long as the user hasn't started typing (isDirtyRef).
-  // This fixes the issue where an initial empty profile might lock the form, preventing the real data from loading.
+  // Initialize form from profile
   useEffect(() => {
-    // Only proceed if we have a profile
-    if (!profile) return;
+    if (!profile || isDirtyRef.current) return;
 
-    // If user has already edited the form, do NOT overwrite their changes
-    if (isDirtyRef.current) return;
+    setFirstName(profile.firstName || '');
+    setLastName(profile.lastName || '');
+    setUsername(profile.username || '');
+    setDisplayName(profile.name || '');
 
-    // From Clerk
-    // Only update if the state is empty or different, to avoid unnecessary re-renders (though React handles this)
-    if (profile.firstName) setFirstName(profile.firstName);
-    if (profile.lastName) setLastName(profile.lastName);
-
-    // From DB
-    if (profile.username) setUsername(profile.username);
-    if (profile.displayName) setDisplayName(profile.displayName);
-
-    // Determine checkbox state:
-    // - Only set this ONCE during first initialization or if we haven't touched it logic?
-    // - Actually, just re-evaluate if not dirty is fine.
     const fullName = [profile.firstName, profile.lastName]
       .filter(Boolean)
       .join(' ')
       .trim();
-    const isUsingFullName = profile.displayName === fullName && fullName !== '';
+    setUseFullNameAsDisplay(profile.name === fullName && fullName !== '');
 
-    // Only update these if we actually have data, to avoid un-checking it by accident if data is missing
-    if (profile.displayName || fullName) {
-      setUseFullNameAsDisplay(isUsingFullName);
-    }
-
-    if (!isInitialized) {
-      setIsInitialized(true);
-    }
+    if (!isInitialized) setIsInitialized(true);
   }, [profile, isInitialized]);
 
   // Computed values
@@ -93,9 +67,7 @@ export function ProfileSettingsForm() {
     ? computedFullName
     : displayName;
   const displayLabel = computedDisplayName || 'Anonymous';
-
-  // Image handling
-  const displayImage = imagePreview || profile?.imageUrl;
+  const displayImage = imagePreview || profile?.avatarUrl;
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     isDirtyRef.current = true;
@@ -123,93 +95,71 @@ export function ProfileSettingsForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSaving(true);
     setError(null);
     setSuccess(false);
 
     try {
-      // 1. Update Clerk (firstName, lastName, profileImage)
-      if (clerkUser) {
-        const clerkUpdates: { firstName?: string; lastName?: string } = {};
-
-        if (firstName !== (clerkUser.firstName || '')) {
-          clerkUpdates.firstName = firstName || '';
-        }
-        if (lastName !== (clerkUser.lastName || '')) {
-          clerkUpdates.lastName = lastName || '';
-        }
-
-        if (Object.keys(clerkUpdates).length > 0) {
-          await clerkUser.update(clerkUpdates);
-        }
-
-        // Upload image to Clerk if changed
-        if (imageFile) {
-          const base64Data = imageFile.base64.includes(',')
-            ? imageFile.base64.split(',')[1]
-            : imageFile.base64;
-          const buffer = Uint8Array.from(atob(base64Data), (c) =>
-            c.charCodeAt(0)
-          );
-          const blob = new Blob([buffer], { type: imageFile.type });
-          const file = new File([blob], 'avatar.webp', {
-            type: imageFile.type,
-          });
-          await clerkUser.setProfileImage({ file });
-        }
-      }
-
-      // 2. Update DB (username, displayName)
       const finalDisplayName = useFullNameAsDisplay
         ? computedFullName || null
         : displayName || null;
 
-      const res = await fetch('/api/user/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: username || null,
-          name: finalDisplayName,
-        }),
-      });
+      // Upload image to R2 if changed
+      let avatarUrl: string | undefined;
+      if (imageFile && user?.walletAddress) {
+        const uploadRes = await fetch('/api/web3auth/upload-avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            walletAddress: user.walletAddress,
+            imageBase64: imageFile.base64,
+            imageType: imageFile.type,
+          }),
+        });
 
-      const data = await res.json();
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json().catch(() => ({}));
+          throw new Error(err.error || 'Failed to upload image');
+        }
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to update profile');
+        const uploadData = await uploadRes.json();
+        avatarUrl = uploadData.url;
       }
 
-      // Success!
+      await updateProfile({
+        username: username || null,
+        name: finalDisplayName,
+        firstName: firstName || null,
+        lastName: lastName || null,
+        avatarUrl,
+      });
+
       setSuccess(true);
       setImageFile(null);
       setImagePreview(null);
-
-      // Reload Clerk user to get updated data
-      await clerkUser?.reload();
-
-      // Refetch profile data to update all components (navbar, etc.)
-      await queryClient.refetchQueries({ queryKey: ['db-profile'] });
-
-      // Dispatch event for any components not using React Query
-      window.dispatchEvent(new CustomEvent('profile-updated'));
+      isDirtyRef.current = false;
 
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error('[Settings] Error:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Something went wrong');
-      }
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
-  if (!isClerkLoaded || isProfileLoading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center p-12">
         <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="text-center p-12 text-zinc-400">
+        Please connect your wallet to access settings.
       </div>
     );
   }
@@ -242,15 +192,9 @@ export function ProfileSettingsForm() {
               <span className="text-3xl">👤</span>
             )}
           </div>
-          {isLoading ? (
-            <div className="absolute inset-0 rounded-full bg-black/70 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-white" />
-            </div>
-          ) : (
-            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <Camera className="w-6 h-6 text-white" />
-            </div>
-          )}
+          <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+            <Camera className="w-6 h-6 text-white" />
+          </div>
         </div>
 
         <div className="flex-1 space-y-1">
@@ -258,7 +202,7 @@ export function ProfileSettingsForm() {
           <p className="text-xs text-zinc-500">
             Click the avatar to upload a new photo.
           </p>
-          {profile?.walletAddress && (
+          {profile.walletAddress && (
             <a
               href={`https://polygonscan.com/address/${profile.walletAddress}`}
               target="_blank"
@@ -273,7 +217,7 @@ export function ProfileSettingsForm() {
         </div>
       </div>
 
-      {/* Username (DB) */}
+      {/* Username */}
       <div className="space-y-2">
         <label
           htmlFor="username"
@@ -289,7 +233,7 @@ export function ProfileSettingsForm() {
             setUsername(e.target.value);
             isDirtyRef.current = true;
           }}
-          disabled={isLoading}
+          disabled={isSaving}
           className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="e.g. SatoshiNakamoto"
           maxLength={30}
@@ -299,7 +243,7 @@ export function ProfileSettingsForm() {
         </p>
       </div>
 
-      {/* First Name & Last Name (Clerk) */}
+      {/* First Name & Last Name */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <label
@@ -316,7 +260,7 @@ export function ProfileSettingsForm() {
               setFirstName(e.target.value);
               isDirtyRef.current = true;
             }}
-            disabled={isLoading}
+            disabled={isSaving}
             className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
             placeholder="e.g. Satoshi"
             maxLength={50}
@@ -337,7 +281,7 @@ export function ProfileSettingsForm() {
               setLastName(e.target.value);
               isDirtyRef.current = true;
             }}
-            disabled={isLoading}
+            disabled={isSaving}
             className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
             placeholder="e.g. Nakamoto"
             maxLength={50}
@@ -345,7 +289,7 @@ export function ProfileSettingsForm() {
         </div>
       </div>
 
-      {/* Display Name Toggle (DB) */}
+      {/* Display Name Toggle */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <input
@@ -356,7 +300,7 @@ export function ProfileSettingsForm() {
               setUseFullNameAsDisplay(e.target.checked);
               isDirtyRef.current = true;
             }}
-            disabled={isLoading}
+            disabled={isSaving}
             className="w-4 h-4 rounded border-white/20 bg-zinc-900 text-purple-500 focus:ring-purple-500/50 focus:ring-offset-0"
           />
           <label htmlFor="useFullName" className="text-sm text-zinc-400">
@@ -380,7 +324,7 @@ export function ProfileSettingsForm() {
                 setDisplayName(e.target.value);
                 isDirtyRef.current = true;
               }}
-              disabled={isLoading}
+              disabled={isSaving}
               className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all placeholder:text-zinc-600 disabled:opacity-50"
               placeholder="e.g. Satoshi"
               maxLength={50}
@@ -392,9 +336,6 @@ export function ProfileSettingsForm() {
           Your display name will be:{' '}
           <span className="text-white">{displayLabel}</span>
         </div>
-        <p className="text-xs text-zinc-600">
-          Leave empty to appear as &ldquo;Anonymous&rdquo; on the platform.
-        </p>
       </div>
 
       {/* Error/Success Messages */}
@@ -412,10 +353,10 @@ export function ProfileSettingsForm() {
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={isLoading}
+        disabled={isSaving}
         className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isLoading ? (
+        {isSaving ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
             Saving...

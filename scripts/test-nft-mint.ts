@@ -52,7 +52,7 @@ async function main() {
   console.log('🚀 Testing NFT Minting through ProofRecorder\n');
   console.log('━'.repeat(50));
 
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
   const wallet = new ethers.Wallet(privateKey, provider);
 
   console.log(`📍 Wallet: ${wallet.address}`);
@@ -93,7 +93,7 @@ async function main() {
   const testDuration = 60;
   console.log(`\n📊 Step 2: Calculating cost for ${testDuration}s...`);
   const costNative = await proofRecorder.calculateCostNative(testDuration);
-  console.log(`   POL Cost: ${ethers.utils.formatEther(costNative)} POL`);
+  console.log(`   POL Cost: ${ethers.formatEther(costNative)} POL`);
 
   // Mint with POL
   console.log('\n📊 Step 3: Minting with POL...');
@@ -107,8 +107,8 @@ async function main() {
   console.log(`   Message: ${testMessage}`);
 
   try {
-    const gasPrice = await provider.getGasPrice();
-    const adjustedGasPrice = gasPrice.mul(150).div(100);
+    const gasPrice = (await provider.getFeeData()).gasPrice ?? BigInt(0);
+    const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
 
     const mintTx = await proofRecorder.mintInstantNative(
       testDuration,

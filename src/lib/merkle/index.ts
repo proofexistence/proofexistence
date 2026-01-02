@@ -14,8 +14,9 @@ export interface BatchSession {
  * Leaf Structure: keccak256(sessionId + userId + timestamp + dataHash)
  */
 export function generateLeaf(session: BatchSession): Buffer {
-  const dataHash = ethers.utils.id(session.data);
-  const leafContent = ethers.utils.defaultAbiCoder.encode(
+  const dataHash = ethers.id(session.data);
+  const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+  const leafContent = abiCoder.encode(
     ['string', 'string', 'uint256', 'bytes32'],
     [session.sessionId, session.userId, session.timestamp, dataHash]
   );

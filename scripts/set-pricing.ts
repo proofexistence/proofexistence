@@ -22,9 +22,7 @@ const POE_ABI = [
 ];
 
 async function main() {
-  const provider = new ethers.providers.JsonRpcProvider(
-    process.env.NEXT_PUBLIC_RPC_URL
-  );
+  const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
   const poe = new ethers.Contract(POE_ADDRESS, POE_ABI, wallet);
 
@@ -46,14 +44,12 @@ async function main() {
   console.log('Your Wallet:', wallet.address);
   console.log('');
   console.log('POL (Native) Pricing:');
-  console.log(`  Base Fee: ${ethers.utils.formatEther(baseNative)} POL`);
-  console.log(`  Per Second: ${ethers.utils.formatEther(rateNative)} POL`);
+  console.log(`  Base Fee: ${ethers.formatEther(baseNative)} POL`);
+  console.log(`  Per Second: ${ethers.formatEther(rateNative)} POL`);
   console.log('');
   console.log('TIME26 Pricing:');
-  console.log(`  Base Fee: ${ethers.utils.formatUnits(baseTime26, 18)} TIME26`);
-  console.log(
-    `  Per Second: ${ethers.utils.formatUnits(rateTime26, 18)} TIME26`
-  );
+  console.log(`  Base Fee: ${ethers.formatUnits(baseTime26, 18)} TIME26`);
+  console.log(`  Per Second: ${ethers.formatUnits(rateTime26, 18)} TIME26`);
   console.log('');
   console.log(`Free Allowance: ${freeAllowance.toString()} seconds`);
 
@@ -63,7 +59,7 @@ async function main() {
     const costNative = await poe.calculateCostNative(duration);
     const costTime26 = await poe.calculateCostTime26(duration);
     console.log(
-      `  ${duration}s: ${ethers.utils.formatEther(costNative)} POL / ${ethers.utils.formatUnits(costTime26, 18)} TIME26`
+      `  ${duration}s: ${ethers.formatEther(costNative)} POL / ${ethers.formatUnits(costTime26, 18)} TIME26`
     );
   }
 
@@ -75,30 +71,26 @@ async function main() {
   // Assuming POL ≈ $0.40, TIME26 ≈ $0.01
   const newPricing = {
     // POL pricing: ~$0.04 base + ~$0.004/second
-    baseNative: ethers.utils.parseEther('0.1'), // 0.1 POL base
-    rateNative: ethers.utils.parseEther('0.005'), // 0.005 POL per second
+    baseNative: ethers.parseEther('0.1'), // 0.1 POL base
+    rateNative: ethers.parseEther('0.005'), // 0.005 POL per second
 
     // TIME26 pricing: ~$0.10 base + ~$0.01/second (with 20% discount)
-    baseTime26: ethers.utils.parseUnits('10', 18), // 10 TIME26 base
-    rateTime26: ethers.utils.parseUnits('1', 18), // 1 TIME26 per second
+    baseTime26: ethers.parseUnits('10', 18), // 10 TIME26 base
+    rateTime26: ethers.parseUnits('1', 18), // 1 TIME26 per second
 
     freeAllowance: 45, // 45 seconds free
   };
 
   console.log('New POL (Native) Pricing:');
-  console.log(
-    `  Base Fee: ${ethers.utils.formatEther(newPricing.baseNative)} POL`
-  );
-  console.log(
-    `  Per Second: ${ethers.utils.formatEther(newPricing.rateNative)} POL`
-  );
+  console.log(`  Base Fee: ${ethers.formatEther(newPricing.baseNative)} POL`);
+  console.log(`  Per Second: ${ethers.formatEther(newPricing.rateNative)} POL`);
   console.log('');
   console.log('New TIME26 Pricing:');
   console.log(
-    `  Base Fee: ${ethers.utils.formatUnits(newPricing.baseTime26, 18)} TIME26`
+    `  Base Fee: ${ethers.formatUnits(newPricing.baseTime26, 18)} TIME26`
   );
   console.log(
-    `  Per Second: ${ethers.utils.formatUnits(newPricing.rateTime26, 18)} TIME26`
+    `  Per Second: ${ethers.formatUnits(newPricing.rateTime26, 18)} TIME26`
   );
   console.log('');
   console.log(`Free Allowance: ${newPricing.freeAllowance} seconds`);
@@ -108,12 +100,11 @@ async function main() {
   for (const duration of [30, 60, 120, 300]) {
     const extraTime = Math.max(0, duration - newPricing.freeAllowance);
     const costNative =
-      parseFloat(ethers.utils.formatEther(newPricing.baseNative)) +
-      extraTime * parseFloat(ethers.utils.formatEther(newPricing.rateNative));
+      parseFloat(ethers.formatEther(newPricing.baseNative)) +
+      extraTime * parseFloat(ethers.formatEther(newPricing.rateNative));
     const costTime26 =
-      parseFloat(ethers.utils.formatUnits(newPricing.baseTime26, 18)) +
-      extraTime *
-        parseFloat(ethers.utils.formatUnits(newPricing.rateTime26, 18));
+      parseFloat(ethers.formatUnits(newPricing.baseTime26, 18)) +
+      extraTime * parseFloat(ethers.formatUnits(newPricing.rateTime26, 18));
     console.log(
       `  ${duration}s: ${costNative.toFixed(3)} POL / ${costTime26} TIME26`
     );
@@ -127,7 +118,8 @@ async function main() {
     return;
   }
 
-  const gasPrice = await provider.getGasPrice();
+  const feeData = await provider.getFeeData();
+  const gasPrice = feeData.gasPrice ?? BigInt(0);
   const tx = await poe.setPricing(
     newPricing.baseNative,
     newPricing.rateNative,
@@ -135,7 +127,7 @@ async function main() {
     newPricing.rateTime26,
     newPricing.freeAllowance,
     {
-      gasPrice: gasPrice.mul(150).div(100),
+      gasPrice: (gasPrice * BigInt(150)) / BigInt(100),
     }
   );
 
@@ -153,10 +145,10 @@ async function main() {
       poe.pricePerSecondTime26(),
     ]);
   console.log(
-    `  POL: ${ethers.utils.formatEther(newBaseNative)} base + ${ethers.utils.formatEther(newRateNative)}/s`
+    `  POL: ${ethers.formatEther(newBaseNative)} base + ${ethers.formatEther(newRateNative)}/s`
   );
   console.log(
-    `  TIME26: ${ethers.utils.formatUnits(newBaseTime26v, 18)} base + ${ethers.utils.formatUnits(newRateTime26v, 18)}/s`
+    `  TIME26: ${ethers.formatUnits(newBaseTime26v, 18)} base + ${ethers.formatUnits(newRateTime26v, 18)}/s`
   );
 }
 

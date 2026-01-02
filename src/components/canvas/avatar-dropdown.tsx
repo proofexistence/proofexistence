@@ -1,64 +1,29 @@
 'use client';
 
-import { useUser, useClerk } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import { useWeb3Auth } from '@/lib/web3auth';
+import { useProfile } from '@/hooks/use-profile';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Settings, LogOut, User } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function AvatarDropdown() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { signOut, openSignIn } = useClerk();
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
-  const [userImage, setUserImage] = useState<string | null>(null);
+  const { isLoading, isConnected, user, login, logout } = useWeb3Auth();
+  const { profile } = useProfile();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Get wallet from metadata
-  const walletAddress = (
-    user?.publicMetadata as { walletAddress?: string } | undefined
-  )?.walletAddress;
+  // Get values from profile (synced to DB) or fallback to Web3Auth user
+  const walletAddress = user?.walletAddress;
+  const displayName = profile?.name || user?.name || null;
+  const username = profile?.username || null;
+  const userImage = profile?.avatarUrl || user?.profileImage || null;
 
-  // Fetch user profile
-  useEffect(() => {
-    async function fetchProfile() {
-      if (isLoaded && isSignedIn && walletAddress) {
-        try {
-          const res = await fetch(`/api/profile/${walletAddress}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.user?.name) setDisplayName(data.user.name);
-            if (data.user?.username) setUsername(data.user.username);
-            if (data.user?.imageUrl) setUserImage(data.user.imageUrl);
-          }
-        } catch (err) {
-          console.error('Failed to fetch profile for avatar dropdown', err);
-        }
-      }
-    }
-
-    fetchProfile();
-
-    const handleUpdate = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail && typeof customEvent.detail === 'string') {
-        setUserImage(customEvent.detail);
-      }
-      fetchProfile();
-    };
-    window.addEventListener('profile-updated', handleUpdate);
-
-    return () => {
-      window.removeEventListener('profile-updated', handleUpdate);
-    };
-  }, [isLoaded, isSignedIn, walletAddress]);
-
-  if (!isLoaded) return null;
+  if (isLoading) return null;
 
   return (
     <div className="relative z-50 pointer-events-auto">
-      {isSignedIn ? (
+      {isConnected ? (
         <div
           className="relative"
           onMouseEnter={() => setIsOpen(true)}
@@ -75,9 +40,9 @@ export function AvatarDropdown() {
             }
             className="block relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/50 transition-colors shadow-lg shadow-black/20"
           >
-            {user?.imageUrl || userImage ? (
+            {userImage ? (
               <Image
-                src={user?.imageUrl || userImage || ''}
+                src={userImage}
                 alt="Profile"
                 fill
                 sizes="44px"
@@ -118,9 +83,7 @@ export function AvatarDropdown() {
                   Settings
                 </Link>
                 <button
-                  onClick={async () => {
-                    await signOut();
-                  }}
+                  onClick={() => logout()}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2.5"
                 >
                   <LogOut className="w-4 h-4" />
@@ -132,7 +95,7 @@ export function AvatarDropdown() {
         </div>
       ) : (
         <button
-          onClick={() => openSignIn()}
+          onClick={() => login()}
           className="bg-black/20 hover:bg-black/40 backdrop-blur-xl text-white font-medium px-4 py-2 rounded-xl border border-white/10 hover:border-white/20 transition-all shadow-lg active:scale-95 text-sm"
         >
           Login

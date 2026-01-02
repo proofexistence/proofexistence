@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@clerk/nextjs';
+import { useAuthSafe as useAuth } from '@/lib/clerk/safe-hooks';
 
 type SavedResponse = {
   savedSessionIds: string[];

@@ -1,31 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { users, sessions } from '@/db/schema';
+import { sessions } from '@/db/schema';
+import { getCurrentUser } from '@/lib/auth/get-user';
 import { eq } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Auth Check (Clerk)
-    const { userId: clerkId } = await auth();
+    // 1. Auth Check
+    const user = await getCurrentUser();
 
-    if (!clerkId) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Get User from DB
-    const existingUser = await db.query.users.findFirst({
-      where: eq(users.clerkId, clerkId),
-    });
-
-    if (!existingUser) {
-      return NextResponse.json(
-        { error: 'User not found in database. Please refresh to sync.' },
-        { status: 404 }
-      );
-    }
-
-    const userId = existingUser.id;
+    const userId = user.id;
 
     // 4. Create Session
     const body = await req.json();
@@ -76,18 +64,9 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     // 1. Auth Check
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 2. Get User from DB
-    const user = await db.query.users.findFirst({
-      where: eq(users.clerkId, clerkId),
-    });
-
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 3. Get ID from URL

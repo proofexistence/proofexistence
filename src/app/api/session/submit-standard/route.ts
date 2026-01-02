@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { users, sessions } from '@/db/schema';
+import { sessions } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { checkRateLimit } from '@/lib/ratelimit';
+import { getCurrentUser } from '@/lib/auth/get-user';
 
 export async function POST(req: NextRequest) {
   try {
     // 1. Auth Check
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 1.5 Rate Limit Check
-    const { success } = await checkRateLimit(clerkId);
+    const { success } = await checkRateLimit(user.walletAddress);
     if (!success) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
@@ -28,21 +28,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Missing session ID' },
         { status: 400 }
-      );
-    }
-
-    // 3. Verify Ownership & Update
-    // Find internal user ID
-    const [user] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.clerkId, clerkId))
-      .limit(1);
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User record not found' },
-        { status: 404 }
       );
     }
 

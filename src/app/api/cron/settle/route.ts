@@ -66,13 +66,14 @@ export async function GET(req: NextRequest) {
     const wallet = new ethers.Wallet(privateKey, provider);
 
     // Get nonce and gas price
-    const nonce = await wallet.getTransactionCount('latest');
-    const gasPrice = await provider.getGasPrice();
-    const adjustedGasPrice = gasPrice.mul(150).div(100); // 50% buffer
+    const nonce = await provider.getTransactionCount(wallet.address, 'latest');
+    const feeData = await provider.getFeeData();
+    const gasPrice = feeData.gasPrice ?? BigInt(0);
+    const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100); // 50% buffer
     console.log('[Settle] Nonce:', nonce);
     console.log(
       '[Settle] Gas price:',
-      ethers.utils.formatUnits(adjustedGasPrice, 'gwei'),
+      ethers.formatUnits(adjustedGasPrice, 'gwei'),
       'gwei'
     );
 

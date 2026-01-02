@@ -99,7 +99,8 @@ export async function generateMetadata({
     ogUrl.searchParams.set('image', session.previewUrl);
   }
   if (session.user) {
-    const authorName = session.user.name || session.user.username || 'Anonymous';
+    const authorName =
+      session.user.name || session.user.username || 'Anonymous';
     ogUrl.searchParams.set('author', authorName);
   }
   if (session.duration) {

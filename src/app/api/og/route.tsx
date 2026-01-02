@@ -54,7 +54,8 @@ export async function GET(req: NextRequest) {
           month: 'short',
           day: 'numeric',
         });
-        const displayTitle = session.title || `Proof #${session.id.slice(0, 8)}`;
+        const displayTitle =
+          session.title || `Proof #${session.id.slice(0, 8)}`;
         const authorName =
           session.user?.name || session.user?.username || 'Anonymous';
         const duration = session.duration ? `${session.duration}s` : '';

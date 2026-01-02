@@ -10,9 +10,7 @@ const POE_ADDRESS = '0x0c109bEc02C2b548980fE357BF32D938A0bfc5bf';
 const TIME26_ADDRESS = '0x04dAa891066d5cAf98Df93c2C2Ae2F9b6B62e591';
 
 async function main() {
-  const provider = new ethers.providers.JsonRpcProvider(
-    process.env.NEXT_PUBLIC_RPC_URL
-  );
+  const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
 
   console.log('Wallet:', wallet.address);
@@ -40,11 +38,8 @@ async function main() {
   const allowance = await time26.allowance(wallet.address, POE_ADDRESS);
   const balance = await time26.balanceOf(wallet.address);
 
-  console.log('TIME26 Balance:', ethers.utils.formatUnits(balance, 18));
-  console.log(
-    'TIME26 Allowance for POE:',
-    ethers.utils.formatUnits(allowance, 18)
-  );
+  console.log('TIME26 Balance:', ethers.formatUnits(balance, 18));
+  console.log('TIME26 Allowance for POE:', ethers.formatUnits(allowance, 18));
 
   // Check POE config
   const poe = new ethers.Contract(
@@ -62,11 +57,8 @@ async function main() {
   const pricePerSecond = await poe.pricePerSecondTime26();
 
   console.log('Deflation Mode:', deflationMode);
-  console.log('Base Fee TIME26:', ethers.utils.formatUnits(baseFee, 18));
-  console.log(
-    'Price/Second TIME26:',
-    ethers.utils.formatUnits(pricePerSecond, 18)
-  );
+  console.log('Base Fee TIME26:', ethers.formatUnits(baseFee, 18));
+  console.log('Price/Second TIME26:', ethers.formatUnits(pricePerSecond, 18));
 }
 
 main().catch(console.error);

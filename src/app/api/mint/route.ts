@@ -85,21 +85,21 @@ export async function POST(req: NextRequest) {
     const isTestnet = chainId === 80002;
 
     // Create contract interface for encoding
-    const poeInterface = new ethers.utils.Interface(PROOF_OF_EXISTENCE_ABI);
-    const time26Interface = new ethers.utils.Interface(TIME26_ABI);
+    const poeInterface = new ethers.Interface(PROOF_OF_EXISTENCE_ABI);
+    const time26Interface = new ethers.Interface(TIME26_ABI);
 
     if (paymentMethod === 'NATIVE') {
       let value: string;
 
       if (isTestnet) {
         // Testnet: use generous estimate (0.01 MATIC) - testnet MATIC is free
-        value = ethers.utils.parseEther('0.01').toString();
+        value = ethers.parseEther('0.01').toString();
       } else {
         // Mainnet: call contract for exact cost
         const rpcUrl =
           process.env.NEXT_PUBLIC_RPC_URL ||
           'https://polygon-bor-rpc.publicnode.com';
-        const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
         const contract = new ethers.Contract(
           PROOF_OF_EXISTENCE_ADDRESS,
           PROOF_OF_EXISTENCE_ABI,
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
       // TIME26 logic (Approve + Mint)
       const approveData = time26Interface.encodeFunctionData('approve', [
         PROOF_OF_EXISTENCE_ADDRESS,
-        ethers.constants.MaxUint256,
+        ethers.MaxUint256,
       ]);
 
       interactions.push({

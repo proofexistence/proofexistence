@@ -99,9 +99,10 @@ async function runSettle(): Promise<{
     }
     const wallet = new ethers.Wallet(privateKey, provider);
 
-    const nonce = await wallet.getTransactionCount('latest');
-    const gasPrice = await provider.getGasPrice();
-    const adjustedGasPrice = gasPrice.mul(150).div(100);
+    const nonce = await provider.getTransactionCount(wallet.address, 'latest');
+    const feeData = await provider.getFeeData();
+    const gasPrice = feeData.gasPrice ?? BigInt(0);
+    const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
 
     const contract = new ethers.Contract(
       PROOF_OF_EXISTENCE_ADDRESS,

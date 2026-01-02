@@ -45,7 +45,7 @@ async function main() {
   console.log('🚀 Testing Time26 Payment Flow\n');
   console.log('━'.repeat(50));
 
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
   const wallet = new ethers.Wallet(privateKey, provider);
 
   console.log(`📍 Wallet: ${wallet.address}`);
@@ -62,9 +62,7 @@ async function main() {
   const balance = await time26.balanceOf(wallet.address);
   const decimals = await time26.decimals();
   const symbol = await time26.symbol();
-  console.log(
-    `   Balance: ${ethers.utils.formatUnits(balance, decimals)} ${symbol}`
-  );
+  console.log(`   Balance: ${ethers.formatUnits(balance, decimals)} ${symbol}`);
 
   if (balance.isZero()) {
     console.log('\n❌ No TIME26 balance. Need tokens to test payment.');
@@ -84,11 +82,9 @@ async function main() {
 
   console.log(`   Linked TIME26: ${linkedTime26}`);
   console.log(`   Treasury: ${treasury}`);
+  console.log(`   Base Fee: ${ethers.formatUnits(baseFee, decimals)} TIME26`);
   console.log(
-    `   Base Fee: ${ethers.utils.formatUnits(baseFee, decimals)} TIME26`
-  );
-  console.log(
-    `   Price/Second: ${ethers.utils.formatUnits(pricePerSecond, decimals)} TIME26`
+    `   Price/Second: ${ethers.formatUnits(pricePerSecond, decimals)} TIME26`
   );
   console.log(`   Free Allowance: ${freeAllowance.toString()} seconds`);
 
@@ -103,14 +99,12 @@ async function main() {
   const testDuration = 60; // 60 seconds
   console.log(`\n📊 Step 3: Calculating cost for ${testDuration}s duration...`);
   const cost = await poe.calculateCostTime26(testDuration);
-  console.log(`   Cost: ${ethers.utils.formatUnits(cost, decimals)} TIME26`);
+  console.log(`   Cost: ${ethers.formatUnits(cost, decimals)} TIME26`);
 
   if (cost.gt(balance)) {
     console.log('\n❌ Insufficient TIME26 balance for test mint.');
-    console.log(`   Need: ${ethers.utils.formatUnits(cost, decimals)} TIME26`);
-    console.log(
-      `   Have: ${ethers.utils.formatUnits(balance, decimals)} TIME26`
-    );
+    console.log(`   Need: ${ethers.formatUnits(cost, decimals)} TIME26`);
+    console.log(`   Have: ${ethers.formatUnits(balance, decimals)} TIME26`);
     process.exit(1);
   }
 
@@ -118,20 +112,16 @@ async function main() {
   console.log('\n📊 Step 4: Checking TIME26 approval...');
   const currentAllowance = await time26.allowance(wallet.address, POE_ADDRESS);
   console.log(
-    `   Current allowance: ${ethers.utils.formatUnits(currentAllowance, decimals)} TIME26`
+    `   Current allowance: ${ethers.formatUnits(currentAllowance, decimals)} TIME26`
   );
 
   if (currentAllowance.lt(cost)) {
     console.log('   Approving TIME26 spend...');
-    const gasPrice = await provider.getGasPrice();
-    const adjustedGasPrice = gasPrice.mul(150).div(100);
-    const approveTx = await time26.approve(
-      POE_ADDRESS,
-      ethers.constants.MaxUint256,
-      {
-        gasPrice: adjustedGasPrice,
-      }
-    );
+    const gasPrice = (await provider.getFeeData()).gasPrice ?? BigInt(0);
+    const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
+    const approveTx = await time26.approve(POE_ADDRESS, ethers.MaxUint256, {
+      gasPrice: adjustedGasPrice,
+    });
     console.log(`   TX: ${approveTx.hash}`);
     await approveTx.wait();
     console.log('   ✅ Approval confirmed');
@@ -151,8 +141,8 @@ async function main() {
   console.log(`   Message: ${testMessage}`);
 
   try {
-    const gasPrice = await provider.getGasPrice();
-    const adjustedGasPrice = gasPrice.mul(150).div(100);
+    const gasPrice = (await provider.getFeeData()).gasPrice ?? BigInt(0);
+    const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
     const mintTx = await poe.mintEternalTime26(
       testDuration,
       testMetadata,
@@ -184,10 +174,10 @@ async function main() {
     const newBalance = await time26.balanceOf(wallet.address);
     const spent = balance.sub(newBalance);
     console.log(
-      `\n💰 TIME26 spent: ${ethers.utils.formatUnits(spent, decimals)} TIME26`
+      `\n💰 TIME26 spent: ${ethers.formatUnits(spent, decimals)} TIME26`
     );
     console.log(
-      `   New balance: ${ethers.utils.formatUnits(newBalance, decimals)} TIME26`
+      `   New balance: ${ethers.formatUnits(newBalance, decimals)} TIME26`
     );
 
     console.log('\n━'.repeat(50));

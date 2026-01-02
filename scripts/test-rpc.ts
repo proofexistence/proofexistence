@@ -13,7 +13,7 @@ async function testRpc() {
   }
 
   try {
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
     const network = await provider.getNetwork();
     console.log('✅ Network:', network.name, '(chainId:', network.chainId, ')');
 

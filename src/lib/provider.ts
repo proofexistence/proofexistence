@@ -38,10 +38,10 @@ async function fetchJsonRpc(
  * Custom provider that wraps native fetch for JSON-RPC calls
  * Use this in Next.js API routes where ethers.js's built-in fetch doesn't work
  */
-export class NativeFetchProvider extends ethers.providers.JsonRpcProvider {
+export class NativeFetchProvider extends ethers.JsonRpcProvider {
   private rpcUrl: string;
 
-  constructor(url: string, network?: ethers.providers.Networkish) {
+  constructor(url: string, network?: ethers.Networkish) {
     super(url, network);
     this.rpcUrl = url;
   }
@@ -131,15 +131,18 @@ export async function waitForTransaction(
   txHash: string,
   confirmations = 1,
   timeout = 60000
-): Promise<ethers.providers.TransactionReceipt> {
+): Promise<ethers.TransactionReceipt> {
   const startTime = Date.now();
   const pollInterval = 2000; // 2 seconds
 
   while (Date.now() - startTime < timeout) {
     try {
       const receipt = await provider.getTransactionReceipt(txHash);
-      if (receipt && receipt.confirmations >= confirmations) {
-        return receipt;
+      if (receipt) {
+        const currentConfirmations = await receipt.confirmations();
+        if (currentConfirmations >= confirmations) {
+          return receipt;
+        }
       }
     } catch {
       // Ignore errors during polling

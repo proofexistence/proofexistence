@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { SignInButton } from '@clerk/nextjs';
+import { useWeb3Auth } from '@/lib/web3auth';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,9 @@ import {
 } from '@/components/ui/dialog';
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
+
+// Feature flag
+const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
 
 interface MobileConnectButtonProps {
   children: React.ReactNode;
@@ -26,6 +30,9 @@ export function MobileConnectButton({
   const [isMobile, setIsMobile] = useState(false);
   const [hasWallet, setHasWallet] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+
+  // Always call hook unconditionally to satisfy React hooks rules
+  const web3AuthData = useWeb3Auth();
 
   useEffect(() => {
     // Basic mobile detection
@@ -47,18 +54,20 @@ export function MobileConnectButton({
   }, []);
 
   const handleClick = (e: React.MouseEvent) => {
+    if (USE_WEB3AUTH) {
+      // Web3Auth handles mobile wallets internally
+      e.preventDefault();
+      e.stopPropagation();
+      web3AuthData.login();
+      return;
+    }
+
     if (isMobile && !hasWallet) {
       e.preventDefault();
       e.stopPropagation();
       setShowDialog(true);
       onOpenChange?.(true);
     }
-    // If not mobile or has wallet, let the default behavior (Sign In Modal) happen
-    // But since we are wrapping a button, we might need to be careful.
-    // Actually, getting the click event before the SignInButton's internal logic is tricky
-    // if we wrap it directly.
-    // Better strategy: Render our OWN button. If conditions met, show dialog.
-    // If not, render the SignInButton.
   };
 
   const getDeepLink = (scheme: string) => {
@@ -69,6 +78,16 @@ export function MobileConnectButton({
     return `${scheme}://dapp/${urlNoProtocol}`;
   };
 
+  // Web3Auth mode: Simple button that triggers login
+  if (USE_WEB3AUTH) {
+    return (
+      <div onClick={handleClick} className={className}>
+        {children}
+      </div>
+    );
+  }
+
+  // Clerk mode: Mobile without wallet - show dialog
   if (isMobile && !hasWallet) {
     return (
       <>
@@ -101,11 +120,6 @@ export function MobileConnectButton({
                 <div className="w-10 h-10 relative">
                   <Image
                     src="https://wd51a2qvzp.ufs.sh/f/16893e42-1e96-4127-b08e-8a712217f2ca-2h533j.svg"
-                    // Fallback or external URL for MetaMask logo if local not available.
-                    // Using a generic placeholder or no image if preferred, but logo is nice.
-                    // For now, I'll assume we can use a text label or a generic one.
-                    // Let's rely on text if no asset.
-                    // Actually, I'll use a simple colored div if no asset.
                     fill
                     alt="MetaMask"
                     className="object-contain"
@@ -160,6 +174,6 @@ export function MobileConnectButton({
     );
   }
 
-  // Default behavior for Desktop or In-App Browser
+  // Clerk mode: Default behavior for Desktop or In-App Browser
   return <SignInButton mode="modal">{children}</SignInButton>;
 }

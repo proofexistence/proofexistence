@@ -10,7 +10,7 @@ import { BrandConstellation } from './brand-constellation';
 import { ACTIVE_BRANDS } from '@/config/brands';
 import { CosmosSearch } from './cosmos-search';
 import { TechInfoOverlay } from './tech-info-overlay';
-import { useUser } from '@clerk/nextjs';
+import { useUserSafe as useUser } from '@/lib/clerk/safe-hooks';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { StarField } from './star-field';

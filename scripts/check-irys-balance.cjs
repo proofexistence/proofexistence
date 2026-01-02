@@ -1,32 +1,61 @@
 const Irys = require('@irys/sdk');
+const readline = require('readline');
 require('dotenv').config({ path: '.env.local' });
+
+function createPrompt() {
+  return readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+}
+
+function ask(rl, question) {
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      resolve(answer);
+    });
+  });
+}
 
 async function main() {
   const key = process.env.PRIVATE_KEY;
-  const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true';
-  const network = isTestnet ? 'devnet' : 'mainnet';
-  const rpc = isTestnet
-    ? 'https://rpc-amoy.polygon.technology/'
-    : process.env.NEXT_PUBLIC_RPC_URL || 'https://polygon-rpc.com';
-
-  console.log('=== Irys Configuration ===');
-  console.log('Network:', network);
-  console.log('RPC:', rpc);
-  console.log('NEXT_PUBLIC_IS_TESTNET:', process.env.NEXT_PUBLIC_IS_TESTNET);
-
-  if (!key) {
-    console.error('PRIVATE_KEY not found');
-    return;
-  }
-
-  const irys = new Irys({
-    network: network,
-    token: 'matic',
-    key: key,
-    config: { providerUrl: rpc },
-  });
+  const rl = createPrompt();
 
   try {
+    // Step 1: Select network
+    console.log('\n=== Irys Balance Checker ===\n');
+    console.log('Select network:');
+    console.log('  1. devnet (Polygon Amoy testnet)');
+    console.log('  2. mainnet (Polygon mainnet)');
+
+    const networkChoice = await ask(
+      rl,
+      '\nEnter choice (1 or 2) [default: 1]: '
+    );
+    const isMainnet = networkChoice.trim() === '2';
+    const network = isMainnet ? 'mainnet' : 'devnet';
+
+    const rpc = isMainnet
+      ? process.env.NEXT_PUBLIC_RPC_URL || 'https://polygon-rpc.com'
+      : 'https://rpc-amoy.polygon.technology/';
+
+    console.log('\n=== Irys Configuration ===');
+    console.log('Network:', network);
+    console.log('RPC:', rpc);
+
+    if (!key) {
+      console.error('❌ PRIVATE_KEY not found in .env.local');
+      rl.close();
+      return;
+    }
+
+    const irys = new Irys({
+      network: network,
+      token: 'matic',
+      key: key,
+      config: { providerUrl: rpc },
+    });
+
     const balance = await irys.getLoadedBalance();
     const address = irys.address;
 
@@ -48,7 +77,9 @@ async function main() {
       console.log('\n✅ Balance sufficient for uploads.');
     }
   } catch (e) {
-    console.error('Error:', e.message);
+    console.error('❌ Error:', e.message);
+  } finally {
+    rl.close();
   }
 }
 

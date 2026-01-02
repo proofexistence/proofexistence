@@ -1,22 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
 import { users, sessions, badges, userBadges } from '@/db/schema';
 import { eq, sql, inArray } from 'drizzle-orm';
 import { uploadToIrys } from '@/lib/irys';
 import { checkRateLimit } from '@/lib/ratelimit';
+import { getCurrentUser } from '@/lib/auth/get-user';
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Auth Check (Clerk)
-    const { userId: clerkId } = await auth();
+    // 1. Auth Check
+    const authenticatedUser = await getCurrentUser();
 
-    if (!clerkId) {
+    if (!authenticatedUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 1.5 Rate Limit Check
-    const { success } = await checkRateLimit(clerkId);
+    const { success } = await checkRateLimit(authenticatedUser.walletAddress);
     if (!success) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
@@ -54,15 +54,8 @@ export async function POST(req: NextRequest) {
 
     const userId = session.userId; // Need for badges
 
-    // 3.5 Verify Ownership & Update User Name
-    // Get authenticated user details from DB
-    const [authenticatedUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, clerkId))
-      .limit(1);
-
-    if (!authenticatedUser || authenticatedUser.id !== userId) {
+    // 3.5 Verify Ownership
+    if (authenticatedUser.id !== userId) {
       return NextResponse.json(
         { error: 'Unauthorized: Session ownership mismatch' },
         { status: 403 }

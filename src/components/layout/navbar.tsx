@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useClerk } from '@clerk/nextjs';
+import { useClerkSafe as useClerk } from '@/lib/clerk/safe-hooks';
+import { useWeb3Auth } from '@/lib/web3auth';
 import { useEffect, useState } from 'react';
 import VariableFontHoverByRandomLetter from '@/components/fancy/text/variable-font-hover-by-random-letter';
 import {
@@ -23,9 +24,19 @@ import { NavbarCountdown } from './navbar-countdown';
 import { MobileConnectButton } from '@/components/auth/mobile-connect-button';
 import { ReferralDialog } from '@/components/ui/referral-dialog';
 
+// Feature flag
+const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
+
 export function Navbar() {
   const { profile, isLoading, isAuthenticated } = useUserProfile();
-  const { signOut } = useClerk();
+
+  // Always call all hooks unconditionally to satisfy React hooks rules
+  const clerkActions = useClerk();
+  const web3AuthActions = useWeb3Auth();
+
+  const handleSignOut = USE_WEB3AUTH
+    ? () => web3AuthActions.logout()
+    : () => clerkActions.signOut();
 
   const ready = !isLoading;
   const authenticated = isAuthenticated;
@@ -273,7 +284,7 @@ export function Navbar() {
                   </Link>
                   <button
                     onClick={async () => {
-                      await signOut();
+                      await handleSignOut();
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors flex items-center gap-2"
                   >
@@ -423,7 +434,7 @@ export function Navbar() {
                   </div>
                   <button
                     onClick={async () => {
-                      await signOut();
+                      await handleSignOut();
                       setIsMobileMenuOpen(false);
                     }}
                     className="w-full py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors"

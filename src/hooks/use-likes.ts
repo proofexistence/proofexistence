@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { useAuth } from '@clerk/nextjs';
+import { useAuthSafe as useAuth } from '@/lib/clerk/safe-hooks';
 
 interface LikeMutationParams {
   sessionId: string;

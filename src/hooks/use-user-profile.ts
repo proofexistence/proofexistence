@@ -1,18 +1,19 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useUser } from '@clerk/nextjs';
+import { useUserSafe as useUser } from '@/lib/clerk/safe-hooks';
+import { useProfile } from '@/hooks/use-profile';
 import { ethers } from 'ethers';
 
+// Feature flag - determined at build time
+const USE_WEB3AUTH = process.env.NEXT_PUBLIC_USE_WEB3AUTH === 'true';
+
 /**
- * Unified user profile data combining Clerk and DB sources
- *
- * From Clerk: firstName, lastName, imageUrl
- * From DB: username, displayName, walletAddress
+ * Unified user profile data combining Auth provider and DB sources
  */
 export interface UserProfile {
-  // From Clerk
-  clerkId: string;
+  // Auth provider data
+  clerkId: string; // For Web3Auth: empty string (not used)
   firstName: string | null;
   lastName: string | null;
   imageUrl: string | null;
@@ -33,6 +34,9 @@ interface DbProfileResponse {
   user: {
     username: string | null;
     name: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    avatarUrl: string | null;
     walletAddress: string;
     createdAt: string;
     referralCode: string | null;
@@ -40,15 +44,70 @@ interface DbProfileResponse {
 }
 
 function truncateWallet(address: string): string {
+  if (!address) return '';
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 /**
- * Hook to get unified user profile from Clerk + DB
- * - Clerk data is available immediately via useUser()
- * - DB data is fetched via API and cached with React Query
+ * Hook to get unified user profile (Web3Auth version)
+ * Uses useProfile hook which syncs to DB and caches with React Query
  */
-export function useUserProfile() {
+function useWeb3AuthProfile() {
+  const {
+    profile: dbProfile,
+    isLoading,
+    isAuthenticated,
+    error,
+    refetch,
+  } = useProfile();
+
+  // Map to UserProfile interface for compatibility
+  const profile: UserProfile | null = dbProfile
+    ? {
+        // Auth provider data
+        clerkId: dbProfile.clerkId || '', // Not used for Web3Auth
+        firstName: dbProfile.firstName || null,
+        lastName: dbProfile.lastName || null,
+        imageUrl: dbProfile.avatarUrl || null,
+        email: dbProfile.email || null,
+
+        // From DB
+        username: dbProfile.username || null,
+        displayName: dbProfile.name || null,
+        walletAddress: dbProfile.walletAddress,
+        referralCode: dbProfile.referralCode || null,
+
+        // Computed
+        fullName:
+          [dbProfile.firstName, dbProfile.lastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim() ||
+          dbProfile.name ||
+          null,
+        displayLabel:
+          dbProfile.name ||
+          [dbProfile.firstName, dbProfile.lastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim() ||
+          truncateWallet(dbProfile.walletAddress),
+      }
+    : null;
+
+  return {
+    profile,
+    isLoading,
+    isAuthenticated,
+    error,
+    refetch,
+  };
+}
+
+/**
+ * Hook to get unified user profile (Clerk version)
+ */
+function useClerkProfile() {
   const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
 
   // Parse metadata
@@ -60,17 +119,12 @@ export function useUserProfile() {
   let lookupIdentifier: string | undefined;
 
   if (isExternalWallet && rawWalletAddress) {
-    // For external wallets, we MUST trust the address but checksum it locally
-    // because Clerk might lowercase it
     try {
-      lookupIdentifier = ethers.utils.getAddress(rawWalletAddress);
+      lookupIdentifier = ethers.getAddress(rawWalletAddress);
     } catch {
-      // Fallback if checksum fails (unlikely)
       lookupIdentifier = rawWalletAddress;
     }
   } else if (clerkUser?.id) {
-    // For OpenFort/Email users, ignore the potentially lowercased address in metadata
-    // Use Clerk ID to fetch the authoritative profile from DB
     lookupIdentifier = clerkUser.id;
   }
 
@@ -88,22 +142,17 @@ export function useUserProfile() {
       const res = await fetch(`/api/profile/${lookupIdentifier}`);
 
       if (!res.ok) {
-        // If profile doesn't exist yet (e.g. new user syncing), return null user
-        // so we fall back to Clerk data without error
         if (res.status === 404) {
           return { user: null };
         }
-
         console.error('[useUserProfile] API error:', res.status);
         throw new Error('Failed to fetch profile');
       }
-      const data = await res.json();
-      return data;
+      return res.json();
     },
     enabled: !!lookupIdentifier,
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    staleTime: 1000 * 60 * 5,
     retry: (failureCount, error) => {
-      // Don't retry on 404s (if we were throwing them) or other permanent errors
       if (error.message.includes('404')) return false;
       return failureCount < 3;
     },
@@ -113,15 +162,12 @@ export function useUserProfile() {
   const profile: UserProfile | null =
     isClerkLoaded && clerkUser && lookupIdentifier
       ? {
-          // From Clerk
           clerkId: clerkUser.id,
           firstName: clerkUser.firstName || null,
           lastName: clerkUser.lastName || null,
           imageUrl: clerkUser.imageUrl || null,
           email: clerkUser.primaryEmailAddress?.emailAddress || null,
 
-          // From DB
-          // Prioritize DB data, fallback to checksummed local identifier only if it looks like an address
           username: dbData?.user?.username || null,
           displayName: dbData?.user?.name || null,
           walletAddress:
@@ -130,7 +176,6 @@ export function useUserProfile() {
             '',
           referralCode: dbData?.user?.referralCode || null,
 
-          // Computed
           fullName:
             [clerkUser.firstName, clerkUser.lastName]
               .filter(Boolean)
@@ -150,13 +195,19 @@ export function useUserProfile() {
         }
       : null;
 
-  const result = {
+  return {
     profile,
     isLoading: !isClerkLoaded || (!!lookupIdentifier && isDbLoading),
     isAuthenticated: isClerkLoaded && !!clerkUser,
     error: dbError,
     refetch,
   };
-
-  return result;
 }
+
+/**
+ * Hook to get unified user profile from Auth provider + DB
+ * Automatically uses Web3Auth or Clerk based on feature flag
+ */
+export const useUserProfile = USE_WEB3AUTH
+  ? useWeb3AuthProfile
+  : useClerkProfile;
