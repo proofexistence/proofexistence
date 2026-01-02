@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware for handling request processing
+ * Proxy for handling request processing (Next.js 16 renamed middleware to proxy)
  *
  * With Web3Auth, authentication is handled client-side and via API route headers.
- * This middleware is kept minimal - protection happens in API routes via getCurrentUser().
+ * This proxy is kept minimal - protection happens in API routes via getCurrentUser().
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function middleware(_request: NextRequest) {
+export function proxy(_request: NextRequest) {
   // Pass through all requests - auth is handled at the API route level
   return NextResponse.next();
 }
