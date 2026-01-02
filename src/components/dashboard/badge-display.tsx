@@ -1,4 +1,4 @@
-// import { getUserBadges } from '@/lib/db/queries/get-user-badges';
+
 import Image from 'next/image';
 
 interface BadgeDisplayProps {

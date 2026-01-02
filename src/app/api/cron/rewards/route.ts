@@ -30,19 +30,19 @@ import { createPolygonProvider } from '@/lib/provider';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  console.log('[Rewards Cron] Starting daily reward settlement...');
+  // console.log('[Rewards Cron] Starting daily reward settlement...');
 
   try {
     // 1. Security Check - Vercel Cron uses Authorization: Bearer <CRON_SECRET>
     const authHeader = req.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      console.log('[Rewards Cron] Unauthorized request');
+      // console.log('[Rewards Cron] Unauthorized request');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 2. Determine which day to settle (yesterday for T+1)
     const dayId = getYesterdayDayId();
-    console.log(`[Rewards Cron] Settling rewards for: ${dayId}`);
+    // console.log(`[Rewards Cron] Settling rewards for: ${dayId}`);
 
     // 3. Check if already settled
     const existingSettlement = await db
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       .limit(1);
 
     if (existingSettlement.length > 0) {
-      console.log(`[Rewards Cron] Day ${dayId} already settled, skipping`);
+      // console.log(`[Rewards Cron] Day ${dayId} already settled, skipping`);
       return NextResponse.json({
         success: true,
         message: `Day ${dayId} already settled`,
@@ -72,9 +72,9 @@ export async function GET(req: NextRequest) {
       .from(sessions)
       .where(and(gte(sessions.startTime, start), lte(sessions.startTime, end)));
 
-    console.log(
-      `[Rewards Cron] Found ${daySessions.length} sessions for ${dayId}`
-    );
+    // console.log(
+    //   `[Rewards Cron] Found ${daySessions.length} sessions for ${dayId}`
+    // );
 
     // 5. Calculate rewards
     const drawingPeriods: DrawingPeriod[] = daySessions.map((s) => ({
@@ -85,10 +85,10 @@ export async function GET(req: NextRequest) {
     }));
 
     const rewardResult = calculateDailyRewards(dayId, drawingPeriods);
-    console.log(
-      `[Rewards Cron] Calculated: ${rewardResult.participantCount} participants, ` +
-        `${formatTime26(rewardResult.totalDistributed)} TIME26 distributed`
-    );
+    // console.log(
+    //   `[Rewards Cron] Calculated: ${rewardResult.participantCount} participants, ` +
+    //     `${formatTime26(rewardResult.totalDistributed)} TIME26 distributed`
+    // );
 
     // 6. Get contract balance for auditing (optional)
     let contractBalanceBefore: string | null = null;
@@ -102,9 +102,9 @@ export async function GET(req: NextRequest) {
       const balance = await time26Contract.balanceOf(PROOF_RECORDER_ADDRESS);
       const balanceStr = balance.toString();
       contractBalanceBefore = balanceStr;
-      console.log(
-        `[Rewards Cron] Contract balance: ${formatTime26(balanceStr)} TIME26`
-      );
+      // console.log(
+      //   `[Rewards Cron] Contract balance: ${formatTime26(balanceStr)} TIME26`
+      // );
     } catch (err) {
       console.warn('[Rewards Cron] Could not fetch contract balance:', err);
     }
@@ -146,7 +146,7 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    console.log(`[Rewards Cron] Settlement complete for ${dayId}`);
+    // console.log(`[Rewards Cron] Settlement complete for ${dayId}`);
 
     return NextResponse.json({
       success: true,

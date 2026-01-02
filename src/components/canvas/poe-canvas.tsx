@@ -850,9 +850,7 @@ export function POECanvas() {
 
           if (hasWeb3Wallet) {
             // CLIENT-SIDE MINTING (MetaMask)
-            console.log('Minting via External Wallet (Client-Side)...', {
-              hasEthereum: !!window.ethereum,
-            });
+            // Minting via External Wallet (Client-Side)...
             setLoadingStatus('Please confirm transaction in your wallet...');
 
             if (!window.ethereum)
@@ -999,7 +997,7 @@ export function POECanvas() {
             }
 
             setLoadingStatus('Transaction Confirmed!');
-            console.log('Client-side Mint Confirmed', txHash);
+            // console.log('Client-side Mint Confirmed', txHash);
           } else {
             // SERVER-SIDE MINTING (Openfort embedded wallet)
             // No wallet popup needed - transaction is signed automatically
@@ -1033,7 +1031,7 @@ export function POECanvas() {
             txHash = mintData.txHash;
 
             setLoadingStatus('Transaction Submitted!');
-            console.log('Mint Transaction Confirmed', txHash);
+            // console.log('Mint Transaction Confirmed', txHash);
           }
 
           // PERSIST TX HASH TO DB

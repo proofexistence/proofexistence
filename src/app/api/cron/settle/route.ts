@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
 
     // 4. Upload Batch to Arweave (Irys)
     // We upload the full session details for archival
-    console.log('[Settle] Uploading to Irys...');
+    // console.log('[Settle] Uploading to Irys...');
     const batchData = JSON.stringify(pendingSessions);
     const ipfsCid = await uploadToIrys(batchData, [
       { name: 'Content-Type', value: 'application/json' },
@@ -54,8 +54,8 @@ export async function GET(req: NextRequest) {
     ]);
 
     // 5. Submit to Blockchain
-    console.log('[Settle] Arweave ID:', ipfsCid);
-    console.log('[Settle] Creating provider and wallet...');
+    // console.log('[Settle] Arweave ID:', ipfsCid);
+    // console.log('[Settle] Creating provider and wallet...');
 
     // Use custom provider that works with Next.js 16 Turbopack
     const provider = createAmoyProvider();
@@ -70,12 +70,12 @@ export async function GET(req: NextRequest) {
     const feeData = await provider.getFeeData();
     const gasPrice = feeData.gasPrice ?? BigInt(0);
     const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100); // 50% buffer
-    console.log('[Settle] Nonce:', nonce);
-    console.log(
-      '[Settle] Gas price:',
-      ethers.formatUnits(adjustedGasPrice, 'gwei'),
-      'gwei'
-    );
+    // console.log('[Settle] Nonce:', nonce);
+    // console.log(
+    //   '[Settle] Gas price:',
+    //   ethers.formatUnits(adjustedGasPrice, 'gwei'),
+    //   'gwei'
+    // );
 
     const contract = new ethers.Contract(
       PROOF_OF_EXISTENCE_ADDRESS,
@@ -83,17 +83,17 @@ export async function GET(req: NextRequest) {
       wallet
     );
 
-    console.log('[Settle] Sending tx to contract:', PROOF_OF_EXISTENCE_ADDRESS);
+    // console.log('[Settle] Sending tx to contract:', PROOF_OF_EXISTENCE_ADDRESS);
     const tx = await contract.emitBatchProof(root, ipfsCid, {
       nonce,
       gasPrice: adjustedGasPrice,
       gasLimit: 200000,
     });
-    console.log('[Settle] TX hash:', tx.hash);
+    // console.log('[Settle] TX hash:', tx.hash);
 
     // Use custom wait function (ethers' tx.wait() doesn't work in Next.js)
-    const receipt = await waitForTransaction(provider, tx.hash, 1, 120000);
-    console.log('[Settle] TX confirmed in block:', receipt.blockNumber);
+    await waitForTransaction(provider, tx.hash, 1, 120000);
+    // console.log('[Settle] TX confirmed in block:', receipt.blockNumber);
 
     // 6. Update Database
     // Mark sessions as SETTLED

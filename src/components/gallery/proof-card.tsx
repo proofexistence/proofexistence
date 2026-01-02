@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type SessionStatus } from '@/db/schema';
 import {
-  // Link as LinkIcon,
+
   Check,
   BarChart2,
   Heart,
@@ -209,11 +209,10 @@ export function ProofCard({
 
   return (
     <div
-      className={`group relative flex flex-col aspect-[4/5] rounded-2xl bg-zinc-900/20 border overflow-hidden transition-colors ${
-        isHidden
+      className={`group relative flex flex-col aspect-[4/5] rounded-2xl bg-zinc-900/20 border overflow-hidden transition-colors ${isHidden
           ? 'border-yellow-500/30 opacity-60'
           : 'border-white/5 hover:border-purple-500/50'
-      }`}
+        }`}
     >
       {/* Main Content Area (Image + Info) */}
       <Link
@@ -340,11 +339,10 @@ export function ProofCard({
           <button
             onClick={handleToggleVisibility}
             disabled={isTogglingVisibility}
-            className={`flex items-center justify-center w-8 h-8 -mr-1 transition-colors ${
-              isHidden
+            className={`flex items-center justify-center w-8 h-8 -mr-1 transition-colors ${isHidden
                 ? 'text-yellow-400 hover:text-yellow-300'
                 : 'text-zinc-500 hover:text-yellow-400'
-            } ${isTogglingVisibility ? 'opacity-50' : ''}`}
+              } ${isTogglingVisibility ? 'opacity-50' : ''}`}
             title={isHidden ? 'Show in Explore' : 'Hide from Explore'}
           >
             {isHidden ? (

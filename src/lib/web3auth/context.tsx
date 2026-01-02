@@ -127,8 +127,22 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
 
         // Check if already connected (session restore)
         if (web3authInstance.connected && web3authInstance.provider) {
-          setProvider(web3authInstance.provider);
-          await fetchUserData(web3authInstance);
+          try {
+            setProvider(web3authInstance.provider);
+            await fetchUserData(web3authInstance);
+          } catch (sessionError) {
+            // Session restore failed (e.g., MetaMask not installed anymore)
+            console.warn('[Web3Auth] Session restore failed:', sessionError);
+            // Clear the invalid session
+            try {
+              await web3authInstance.logout();
+            } catch {
+              // Ignore logout errors
+            }
+            setProvider(null);
+            setUser(null);
+            setIsConnected(false);
+          }
         }
       } catch (error) {
         console.error('[Web3Auth] Init error:', error);

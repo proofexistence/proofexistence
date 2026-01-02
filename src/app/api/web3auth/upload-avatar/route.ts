@@ -84,10 +84,10 @@ export async function POST(req: Request) {
       .set({ avatarUrl: publicUrl })
       .where(eq(users.walletAddress, walletAddress));
 
-    console.log('[Upload Avatar] Success:', {
-      walletAddress,
-      url: publicUrl,
-    });
+    // console.log('[Upload Avatar] Success:', {
+    //   walletAddress,
+    //   url: publicUrl,
+    // });
 
     return NextResponse.json({
       success: true,

@@ -86,7 +86,6 @@ export function ProofViewer({
   useEffect(() => {
     // If we already have a preview OR if we have an NFT (ipfsHash), do nothing
     if (session.previewUrl || session.ipfsHash) {
-      if (nftImage) console.log('[ProofViewer] Resolved NFT Image:', nftImage);
       return;
     }
 
@@ -111,7 +110,6 @@ export function ProofViewer({
           }
 
           setTimeout(() => {
-            console.log('[Auto-Preview] Generating preview image...');
             handleScreenshot('upload-only');
             setIsSpinning(true); // Resume spinning
           }, 500); // Small delay after reset to ensure frame is rendered
@@ -360,13 +358,12 @@ export function ProofViewer({
             </h1>
             <div
               className={`px-3 py-1 rounded-full text-[10px] font-bold border backdrop-blur-md uppercase tracking-wider
-                        ${
-                          session.status === 'MINTED'
-                            ? 'bg-purple-500/20 text-purple-200 border-purple-500/50'
-                            : session.status === 'SETTLED'
-                              ? 'bg-blue-500/20 text-blue-300 border-blue-500/50'
-                              : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50'
-                        }`}
+                        ${session.status === 'MINTED'
+                  ? 'bg-purple-500/20 text-purple-200 border-purple-500/50'
+                  : session.status === 'SETTLED'
+                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/50'
+                    : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50'
+                }`}
             >
               {session.status as string}
             </div>

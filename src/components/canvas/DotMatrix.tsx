@@ -7,13 +7,13 @@ import { BrandTheme } from './themes';
 
 export interface DotMatrixProps {
   cursorPosition: [number, number, number];
-  isRecording: boolean;
+
   theme: BrandTheme;
 }
 
 export function DotMatrix({
   cursorPosition,
-  // _isRecording,
+
   theme,
 }: DotMatrixProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -138,7 +138,7 @@ export function DotMatrix({
       <meshStandardMaterial
         toneMapped={false}
         transparent
-        // opacity={0.8}
+      // opacity={0.8}
       />
     </instancedMesh>
   );

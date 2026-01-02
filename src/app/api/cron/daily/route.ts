@@ -56,7 +56,7 @@ async function runSettle(): Promise<{
   txHash?: string;
   error?: string;
 }> {
-  console.log('[Daily Cron] Running settle task...');
+  // console.log('[Daily Cron] Running settle task...');
 
   try {
     // Fetch Pending Sessions
@@ -66,7 +66,7 @@ async function runSettle(): Promise<{
       .where(eq(sessions.status, 'PENDING'));
 
     if (pendingSessions.length === 0) {
-      console.log('[Daily Cron] No pending sessions to settle');
+      // console.log('[Daily Cron] No pending sessions to settle');
       return { success: true, settledCount: 0 };
     }
 
@@ -82,7 +82,7 @@ async function runSettle(): Promise<{
     const root = tree.getHexRoot();
 
     // Upload Batch to Arweave (Irys)
-    console.log('[Daily Cron] Uploading to Irys...');
+    // console.log('[Daily Cron] Uploading to Irys...');
     const batchData = JSON.stringify(pendingSessions);
     const ipfsCid = await uploadToIrys(batchData, [
       { name: 'Content-Type', value: 'application/json' },
@@ -91,7 +91,7 @@ async function runSettle(): Promise<{
     ]);
 
     // Submit to Blockchain
-    console.log('[Daily Cron] Arweave ID:', ipfsCid);
+    // console.log('[Daily Cron] Arweave ID:', ipfsCid);
     const provider = createAmoyProvider();
     const privateKey = process.env.PRIVATE_KEY;
     if (!privateKey) {
@@ -115,10 +115,10 @@ async function runSettle(): Promise<{
       gasPrice: adjustedGasPrice,
       gasLimit: 200000,
     });
-    console.log('[Daily Cron] TX hash:', tx.hash);
+    // console.log('[Daily Cron] TX hash:', tx.hash);
 
-    const receipt = await waitForTransaction(provider, tx.hash, 1, 120000);
-    console.log('[Daily Cron] TX confirmed in block:', receipt.blockNumber);
+    await waitForTransaction(provider, tx.hash, 1, 120000);
+    // console.log('[Daily Cron] TX confirmed in block:', receipt.blockNumber);
 
     // Update Database
     const sessionIds = pendingSessions.map((s) => s.id);
@@ -175,7 +175,7 @@ async function runRewards(): Promise<{
   skipped?: boolean;
   error?: string;
 }> {
-  console.log('[Daily Cron] Running rewards task...');
+  // console.log('[Daily Cron] Running rewards task...');
 
   const dayId = getYesterdayDayId();
 
@@ -188,7 +188,7 @@ async function runRewards(): Promise<{
       .limit(1);
 
     if (existingSettlement.length > 0) {
-      console.log(`[Daily Cron] Day ${dayId} already settled, skipping`);
+      // console.log(`[Daily Cron] Day ${dayId} already settled, skipping`);
       return {
         success: true,
         dayId,
@@ -210,9 +210,9 @@ async function runRewards(): Promise<{
       .from(sessions)
       .where(and(gte(sessions.startTime, start), lte(sessions.startTime, end)));
 
-    console.log(
-      `[Daily Cron] Found ${daySessions.length} sessions for ${dayId}`
-    );
+    // console.log(
+    //   `[Daily Cron] Found ${daySessions.length} sessions for ${dayId}`
+    // );
 
     // Calculate rewards
     const drawingPeriods: DrawingPeriod[] = daySessions.map((s) => ({
@@ -223,9 +223,9 @@ async function runRewards(): Promise<{
     }));
 
     const rewardResult = calculateDailyRewards(dayId, drawingPeriods);
-    console.log(
-      `[Daily Cron] Calculated: ${rewardResult.participantCount} participants`
-    );
+    // console.log(
+    //   `[Daily Cron] Calculated: ${rewardResult.participantCount} participants`
+    // );
 
     // Get contract balance for auditing
     let contractBalanceBefore: string | null = null;
@@ -297,7 +297,7 @@ async function runRewards(): Promise<{
 // Main Handler
 // ============================================================
 export async function GET(req: NextRequest) {
-  console.log('[Daily Cron] Starting combined daily tasks...');
+  // console.log('[Daily Cron] Starting combined daily tasks...');
 
   // Security Check
   const authHeader = req.headers.get('authorization');
