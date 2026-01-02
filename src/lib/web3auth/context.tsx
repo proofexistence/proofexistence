@@ -89,6 +89,18 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Suppress MetaMask connection errors when extension is not installed
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (
+        event.reason?.message?.includes('MetaMask') ||
+        event.reason?.message?.includes('Failed to connect')
+      ) {
+        event.preventDefault();
+        console.warn('[Web3Auth] MetaMask not available:', event.reason?.message);
+      }
+    };
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
     const init = async () => {
       try {
         if (!web3AuthConfig.clientId) {
@@ -111,8 +123,16 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {
           if (web3authInstance.provider) {
-            setProvider(web3authInstance.provider);
-            await fetchUserData(web3authInstance);
+            try {
+              setProvider(web3authInstance.provider);
+              await fetchUserData(web3authInstance);
+            } catch (error) {
+              console.warn('[Web3Auth] Connected event error:', error);
+              // Clear state on error
+              setProvider(null);
+              setUser(null);
+              setIsConnected(false);
+            }
           }
         });
 
@@ -122,7 +142,15 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
         });
 
-        await web3authInstance.init();
+        // Handle adapter errors (e.g., MetaMask not found)
+        web3authInstance.on(ADAPTER_EVENTS.ERRORED, (error) => {
+          console.warn('[Web3Auth] Adapter error:', error);
+        });
+
+        await web3authInstance.init().catch((initError) => {
+          // Catch init errors but don't throw - allow app to continue
+          console.warn('[Web3Auth] Init warning:', initError);
+        });
         setWeb3auth(web3authInstance);
 
         // Check if already connected (session restore)
@@ -152,6 +180,10 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     };
 
     init();
+
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
   }, [fetchUserData]);
 
   const login = async () => {
