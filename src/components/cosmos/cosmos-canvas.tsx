@@ -207,7 +207,7 @@ export function CosmosCanvas({
 
       {/* UI Overlay */}
       {/* Top Controls - Below navbar */}
-      <div className="fixed top-20 md:top-24 left-0 right-0 z-40 px-4 md:px-6 pointer-events-none">
+      <div className="fixed top-16 md:top-20 left-0 right-0 z-40 px-4 md:px-6 pointer-events-none">
         <div className="flex items-center justify-between md:justify-center gap-3 max-w-screen-lg mx-auto">
           {/* Search */}
           <div className="pointer-events-auto flex-1 md:flex-none">

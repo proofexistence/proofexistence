@@ -151,7 +151,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-6 left-0 w-full p-6 flex justify-between items-center z-50 pointer-events-none">
+      <nav className="fixed top-3 md:top-4 left-0 w-full px-4 py-3 md:px-6 md:py-4 flex justify-between items-center z-50 pointer-events-none">
         {/* ------------------- DESKTOP VIEW (md:flex) ------------------- */}
         <div className="hidden md:flex w-full items-center justify-between relative">
           {/* Left Side Wrapper: Nav Pill + Independent Proof Button */}
