@@ -93,9 +93,13 @@ async function runSettle(): Promise<{
     // Submit to Blockchain
     // console.log('[Daily Cron] Arweave ID:', ipfsCid);
     const provider = createAmoyProvider();
-    const privateKey = process.env.PRIVATE_KEY;
+    // Use OPERATOR_PRIVATE_KEY for batch settlement, fallback to PRIVATE_KEY
+    const privateKey =
+      process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
     if (!privateKey) {
-      throw new Error('PRIVATE_KEY environment variable is not set');
+      throw new Error(
+        'OPERATOR_PRIVATE_KEY or PRIVATE_KEY environment variable is not set'
+      );
     }
     const wallet = new ethers.Wallet(privateKey, provider);
 
@@ -120,11 +124,11 @@ async function runSettle(): Promise<{
     await waitForTransaction(provider, tx.hash, 1, 120000);
     // console.log('[Daily Cron] TX confirmed in block:', receipt.blockNumber);
 
-    // Update Database
+    // Update Database - mark sessions as SETTLED with the batch settlement txHash
     const sessionIds = pendingSessions.map((s) => s.id);
     await db
       .update(sessions)
-      .set({ status: 'SETTLED' })
+      .set({ status: 'SETTLED', txHash: tx.hash })
       .where(inArray(sessions.id, sessionIds));
 
     const today = new Date().toISOString().split('T')[0];

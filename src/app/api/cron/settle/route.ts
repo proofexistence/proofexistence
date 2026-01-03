@@ -59,9 +59,13 @@ export async function GET(req: NextRequest) {
 
     // Use custom provider that works with Next.js 16 Turbopack
     const provider = createAmoyProvider();
-    const privateKey = process.env.PRIVATE_KEY;
+    // Use OPERATOR_PRIVATE_KEY for batch settlement, fallback to PRIVATE_KEY
+    const privateKey =
+      process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
     if (!privateKey) {
-      throw new Error('PRIVATE_KEY environment variable is not set');
+      throw new Error(
+        'OPERATOR_PRIVATE_KEY or PRIVATE_KEY environment variable is not set'
+      );
     }
     const wallet = new ethers.Wallet(privateKey, provider);
 
