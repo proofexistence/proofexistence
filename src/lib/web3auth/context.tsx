@@ -171,7 +171,10 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           // Catch init errors but don't throw - allow app to continue
           console.warn('[Web3Auth] Init warning:', initError);
         });
-        console.log('[Web3Auth] Init complete, status:', web3authInstance.status);
+        console.log(
+          '[Web3Auth] Init complete, status:',
+          web3authInstance.status
+        );
         setWeb3auth(web3authInstance);
 
         // Check if already connected (session restore)

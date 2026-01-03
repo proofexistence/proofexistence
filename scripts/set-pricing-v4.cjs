@@ -22,15 +22,33 @@ async function main() {
   };
 
   console.log('\n=== Pricing Configuration ===');
-  console.log('baseFeeNative:', ethers.formatEther(PRICING.baseFeeNative), 'POL');
-  console.log('pricePerSecondNative:', ethers.formatEther(PRICING.pricePerSecondNative), 'POL/sec');
-  console.log('baseFeeTime26:', ethers.formatUnits(PRICING.baseFeeTime26, 18), 'TIME26');
-  console.log('pricePerSecondTime26:', ethers.formatUnits(PRICING.pricePerSecondTime26, 18), 'TIME26/sec');
+  console.log(
+    'baseFeeNative:',
+    ethers.formatEther(PRICING.baseFeeNative),
+    'POL'
+  );
+  console.log(
+    'pricePerSecondNative:',
+    ethers.formatEther(PRICING.pricePerSecondNative),
+    'POL/sec'
+  );
+  console.log(
+    'baseFeeTime26:',
+    ethers.formatUnits(PRICING.baseFeeTime26, 18),
+    'TIME26'
+  );
+  console.log(
+    'pricePerSecondTime26:',
+    ethers.formatUnits(PRICING.pricePerSecondTime26, 18),
+    'TIME26/sec'
+  );
   console.log('');
 
   // Get contract
   const proofRecorder = await hre.ethers.getContractAt(
-    ['function setPricing(uint256 _baseNative, uint256 _rateNative, uint256 _baseTime26, uint256 _rateTime26, uint256 _allowance) external'],
+    [
+      'function setPricing(uint256 _baseNative, uint256 _rateNative, uint256 _baseTime26, uint256 _rateTime26, uint256 _allowance) external',
+    ],
     PROOF_RECORDER,
     deployer
   );

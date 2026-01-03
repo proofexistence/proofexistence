@@ -102,7 +102,52 @@ export function ScrollDrawingCanvas({
   start,
   end,
 }: ScrollDrawingCanvasProps) {
-  if (!points || points.length === 0) return null;
+  // Normalize points to fit within the view
+  const normalizedPoints = useMemo(() => {
+    if (!points || points.length === 0) return [];
+
+    // 1. Find bounding box
+    let minX = Infinity,
+      minY = Infinity,
+      minZ = Infinity;
+    let maxX = -Infinity,
+      maxY = -Infinity,
+      maxZ = -Infinity;
+
+    points.forEach((p) => {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+      if (p.z < minZ) minZ = p.z;
+      if (p.z > maxZ) maxZ = p.z;
+    });
+
+    const width = maxX - minX;
+    const height = maxY - minY;
+    // const depth = maxZ - minZ;
+
+    // 2. Calculate center
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const centerZ = (minZ + maxZ) / 2;
+
+    // 3. Determine scale factor
+    // Target size: ~18 units tall/wide to fit comfortably in view (camera z=20, fov=45 => visible height ~16)
+    const maxDim = Math.max(width, height);
+    const TARGET_SIZE = 18;
+    const scale = maxDim > 0 ? TARGET_SIZE / maxDim : 1;
+
+    // 4. Transform points
+    return points.map((p) => ({
+      ...p,
+      x: (p.x - centerX) * scale,
+      y: (p.y - centerY) * scale - 2, // Shift down by 2 units to center visually
+      z: (p.z - centerZ) * scale, // Optional: flatten Z if desired, but keeping 3D structure is usually better
+    }));
+  }, [points]);
+
+  if (!normalizedPoints || normalizedPoints.length === 0) return null;
 
   return (
     <div className={`absolute inset-0 z-0 pointer-events-none ${className}`}>
@@ -112,7 +157,7 @@ export function ScrollDrawingCanvas({
         dpr={[1, 2]}
       >
         <Scene
-          points={points}
+          points={normalizedPoints}
           color={color}
           triggerSelector={triggerSelector}
           start={start}

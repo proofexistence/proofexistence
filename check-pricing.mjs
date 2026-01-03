@@ -39,9 +39,17 @@ async function main() {
 
   console.log('=== ProofRecorder v4 Pricing (Mainnet) ===');
   console.log('baseFeeNative:', ethers.formatEther(baseFeeNative), 'POL');
-  console.log('pricePerSecondNative:', ethers.formatEther(pricePerSecondNative), 'POL');
+  console.log(
+    'pricePerSecondNative:',
+    ethers.formatEther(pricePerSecondNative),
+    'POL'
+  );
   console.log('baseFeeTime26:', ethers.formatEther(baseFeeTime26), 'TIME');
-  console.log('pricePerSecondTime26:', ethers.formatEther(pricePerSecondTime26), 'TIME');
+  console.log(
+    'pricePerSecondTime26:',
+    ethers.formatEther(pricePerSecondTime26),
+    'TIME'
+  );
   console.log('freeAllowance:', freeAllowance.toString(), 'seconds');
   console.log('');
   console.log('=== Example Costs ===');

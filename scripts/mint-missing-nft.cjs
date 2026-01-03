@@ -86,7 +86,10 @@ async function main() {
   console.log('');
 
   console.log('='.repeat(60));
-  console.log('✅ DONE! Token #' + (supplyAfter - 1n).toString() + ' minted for', USER_ADDRESS);
+  console.log(
+    '✅ DONE! Token #' + (supplyAfter - 1n).toString() + ' minted for',
+    USER_ADDRESS
+  );
   console.log('='.repeat(60));
 }
 
