@@ -218,8 +218,8 @@ export function Navbar() {
 
         {/* ------------------- MOBILE VIEW (md:hidden) ------------------- */}
         <div className="flex md:hidden w-full items-center justify-between pointer-events-auto">
-          {/* Mobile Logo Pill */}
-          <Link href="/" className="flex items-center">
+          {/* Mobile Logo - Fixed width for balance */}
+          <Link href="/" className="flex items-center w-10">
             <Image
               src="/proof_existence_logo.webp"
               alt="Proof of Existence"
@@ -229,13 +229,18 @@ export function Navbar() {
             />
           </Link>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2.5 bg-black/10 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white/10 transition-colors"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          {/* Center spacer for Find My Star (rendered by cosmos-canvas) */}
+          <div className="flex-1" />
+
+          {/* Mobile Menu Toggle - Fixed width for balance */}
+          <div className="w-10 flex justify-end">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 bg-black/10 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white/10 transition-colors"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </nav>
 
