@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import { Web3Auth } from '@web3auth/modal';
-import { ADAPTER_EVENTS, WALLET_ADAPTERS, type IProvider } from '@web3auth/base';
+import { ADAPTER_EVENTS, type IProvider } from '@web3auth/base';
 import { web3AuthConfig, chainConfig } from './config';
 import { ethers } from 'ethers';
 
@@ -120,33 +120,24 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
             navigator.userAgent
           );
 
+        console.log('[Web3Auth] Initializing...', {
+          isMobile,
+          clientId: web3AuthConfig.clientId ? 'present' : 'missing',
+          network: web3AuthConfig.web3AuthNetwork,
+        });
+
         const web3authInstance = new Web3Auth({
           clientId: web3AuthConfig.clientId,
           web3AuthNetwork: web3AuthConfig.web3AuthNetwork,
           // @ts-expect-error - chainConfig exists in IWeb3AuthCoreOptions but not in modal's Web3AuthOptions
           chainConfig,
+          // Use redirect mode on mobile to avoid popup blockers
+          uxMode: isMobile ? 'redirect' : 'popup',
           uiConfig: {
             appName: 'Proof of Existence',
             mode: 'dark',
             loginMethodsOrder: ['google', 'twitter', 'email_passwordless'],
           },
-          // On mobile, disable external wallet adapters during init to prevent
-          // MetaMask deep link triggering on page load. Users can still connect
-          // via social logins (Google, Twitter, email) on mobile.
-          ...(isMobile && {
-            modalConfig: {
-              // Hide WalletConnect on mobile to prevent wallet detection
-              [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
-                label: 'WalletConnect',
-                showOnModal: false,
-              },
-              // Hide Coinbase wallet on mobile
-              [WALLET_ADAPTERS.COINBASE]: {
-                label: 'Coinbase',
-                showOnModal: false,
-              },
-            },
-          }),
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {
@@ -175,10 +166,12 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           console.warn('[Web3Auth] Adapter error:', error);
         });
 
+        console.log('[Web3Auth] Calling init()...');
         await web3authInstance.init().catch((initError) => {
           // Catch init errors but don't throw - allow app to continue
           console.warn('[Web3Auth] Init warning:', initError);
         });
+        console.log('[Web3Auth] Init complete, status:', web3authInstance.status);
         setWeb3auth(web3authInstance);
 
         // Check if already connected (session restore)
@@ -224,7 +217,9 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     }
     try {
       setIsLoggingIn(true);
+      console.log('[Web3Auth] Calling connect(), status:', web3auth.status);
       const web3authProvider = await web3auth.connect();
+      console.log('[Web3Auth] Connect complete, provider:', !!web3authProvider);
       setProvider(web3authProvider);
       await fetchUserData(web3auth);
     } catch (error) {
