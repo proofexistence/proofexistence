@@ -206,21 +206,28 @@ export function CosmosCanvas({
       </Canvas>
 
       {/* UI Overlay */}
-      {/* Top Controls Container - Navbar Level */}
-      <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 mt-6 flex items-center gap-2 pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-2">
-          <CosmosSearch
-            trails={validTrails}
-            onSelect={(t) => {
-              selectStar(t);
-              setIsSearchActive(false);
-            }}
-            externalActive={isSearchActive}
-            onToggle={setIsSearchActive}
-          />
-          {/* Mobile: Show My Star button next to search if search NOT active */}
+      {/* Top Controls - Mobile: Full width bar, Desktop: Centered */}
+      <div className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6 pointer-events-none">
+        <div className="flex items-center justify-between md:justify-center gap-3 max-w-screen-lg mx-auto">
+          {/* Search */}
+          <div className="pointer-events-auto flex-1 md:flex-none">
+            <CosmosSearch
+              trails={validTrails}
+              onSelect={(t) => {
+                selectStar(t);
+                setIsSearchActive(false);
+              }}
+              externalActive={isSearchActive}
+              onToggle={setIsSearchActive}
+            />
+          </div>
+          {/* Mobile: Show My Star button when search is NOT active */}
           <div
-            className={`md:hidden transition-all duration-300 ${isSearchActive ? 'opacity-0 scale-90 pointer-events-none w-0 overflow-hidden' : 'opacity-100 scale-100 w-auto'}`}
+            className={`md:hidden pointer-events-auto transition-all duration-200 ${
+              isSearchActive
+                ? 'opacity-0 scale-90 pointer-events-none absolute'
+                : 'opacity-100 scale-100'
+            }`}
           >
             <FindMeButton trails={validTrails} onFocus={selectStar} compact />
           </div>
@@ -370,12 +377,14 @@ function FindMeButton({
       t.walletAddress.toLowerCase() === walletAddress.toLowerCase()
   );
 
-  if (myTrails.length === 0)
+  if (myTrails.length === 0) {
+    if (compact) return null; // Hide on mobile if no trails
     return (
-      <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-white/30 text-xs text-center backdrop-blur-sm">
-        You are an observer (No Visual Trail)
+      <div className="px-4 py-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full text-white/30 text-xs text-center">
+        No stars yet
       </div>
     );
+  }
 
   const handleNext = () => {
     const nextIndex = (currentIndex + 1) % myTrails.length;
@@ -392,31 +401,43 @@ function FindMeButton({
   // If there are multiple stars, show navigation controls
   if (myTrails.length > 1) {
     return (
-      <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md rounded-full p-1 border border-white/10 shadow-lg shadow-purple-900/20">
+      <div
+        className={`flex items-center bg-black/40 backdrop-blur-xl rounded-full border border-white/10 shadow-lg shadow-black/30 ${
+          compact ? 'gap-0 p-0.5' : 'gap-1 p-1'
+        }`}
+      >
         <button
           onClick={handlePrev}
-          className="p-3 md:p-2 hover:bg-white/10 rounded-full transition-colors group touch-manipulation"
+          className={`${compact ? 'p-2' : 'p-2.5 md:p-2'} hover:bg-white/10 rounded-full transition-colors group touch-manipulation`}
           aria-label="Previous Star"
         >
-          <ChevronLeft className="w-5 h-5 md:w-4 md:h-4 text-cyan-400 group-hover:text-cyan-300" />
+          <ChevronLeft
+            className={`${compact ? 'w-4 h-4' : 'w-5 h-5 md:w-4 md:h-4'} text-cyan-400 group-hover:text-cyan-300`}
+          />
         </button>
 
         <button
           onClick={() => onFocus(myTrails[currentIndex])}
-          className="px-4 py-2 bg-[linear-gradient(to_bottom_right,#0CC9F2,#4877DA,#7E44DB)] hover:brightness-110 text-white text-sm font-bold rounded-full transition-all flex items-center gap-2 touch-manipulation"
+          className={`${
+            compact ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'
+          } bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:brightness-110 text-white font-semibold rounded-full transition-all flex items-center gap-2 touch-manipulation`}
         >
           <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
           <span>
-            Star {currentIndex + 1}/{myTrails.length}
+            {compact
+              ? `${currentIndex + 1}/${myTrails.length}`
+              : `Star ${currentIndex + 1}/${myTrails.length}`}
           </span>
         </button>
 
         <button
           onClick={handleNext}
-          className="p-3 md:p-2 hover:bg-white/10 rounded-full transition-colors group touch-manipulation"
+          className={`${compact ? 'p-2' : 'p-2.5 md:p-2'} hover:bg-white/10 rounded-full transition-colors group touch-manipulation`}
           aria-label="Next Star"
         >
-          <ChevronRight className="w-5 h-5 md:w-4 md:h-4 text-cyan-400 group-hover:text-cyan-300" />
+          <ChevronRight
+            className={`${compact ? 'w-4 h-4' : 'w-5 h-5 md:w-4 md:h-4'} text-cyan-400 group-hover:text-cyan-300`}
+          />
         </button>
       </div>
     );
@@ -427,13 +448,11 @@ function FindMeButton({
     <button
       onClick={() => onFocus(myTrails[0])}
       className={`${
-        compact
-          ? 'px-4 py-1.5 text-sm'
-          : 'px-6 py-3 md:py-2 text-sm md:text-base'
-      } bg-[linear-gradient(to_bottom_right,#0CC9F2,#4877DA,#7E44DB)] hover:brightness-110 text-white rounded-full font-bold shadow-lg shadow-purple-900/50 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 group touch-manipulation`}
+        compact ? 'px-4 py-2.5 text-sm' : 'px-5 py-2.5 text-sm'
+      } bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:brightness-110 text-white rounded-full font-semibold shadow-lg shadow-purple-900/30 transition-all active:scale-95 flex items-center gap-2 touch-manipulation`}
     >
       <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-      <span>Find My Star</span>
+      <span>{compact ? 'My Star' : 'Find My Star'}</span>
     </button>
   );
 }

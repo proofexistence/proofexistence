@@ -54,16 +54,17 @@ export function CosmosSearch({
     return (
       <button
         onClick={() => setActive(true)}
-        className="p-2.5 bg-black/10 hover:bg-black/20 backdrop-blur-md border border-white/10 rounded-full text-white/70 transition-all hover:scale-105 active:scale-95 touch-manipulation hover:border-white/20 shadow-lg shadow-black/20"
+        className="flex items-center gap-2 px-4 py-2.5 bg-black/40 hover:bg-black/60 backdrop-blur-xl border border-white/10 rounded-full text-white/60 hover:text-white/80 transition-all active:scale-95 touch-manipulation hover:border-white/20 shadow-lg shadow-black/30"
         aria-label="Search Cosmos"
       >
-        <Search className="w-5 h-5" />
+        <Search className="w-4 h-4" />
+        <span className="text-sm hidden sm:inline">Search</span>
       </button>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2 w-[calc(100vw-2rem)] md:w-full md:max-w-sm animate-in fade-in slide-in-from-bottom-2 duration-200 origin-top-left">
+    <div className="flex flex-col gap-2 w-full md:w-80 animate-in fade-in duration-150">
       <div className="relative group">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           <Search className="w-4 h-4 text-white/40 group-focus-within:text-cyan-400 transition-colors" />
@@ -73,7 +74,7 @@ export function CosmosSearch({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search stars, users..."
-          className="w-full bg-black/80 border border-white/10 focus:border-cyan-500/50 rounded-xl py-3 pl-10 pr-10 text-base md:text-sm text-white placeholder:text-white/20 outline-none backdrop-blur-md shadow-2xl shadow-black/50 transition-all"
+          className="w-full bg-black/60 backdrop-blur-xl border border-white/20 focus:border-cyan-500/50 rounded-full py-2.5 pl-10 pr-10 text-sm text-white placeholder:text-white/30 outline-none shadow-xl shadow-black/40 transition-all"
           autoFocus
         />
         <button
@@ -88,7 +89,7 @@ export function CosmosSearch({
       </div>
 
       {query.length >= 2 && (
-        <div className="bg-black/90 border border-white/10 rounded-xl overflow-hidden backdrop-blur-xl shadow-2xl flex flex-col">
+        <div className="bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
           {filteredTrails.length === 0 ? (
             <div className="p-4 text-center text-white/30 text-xs">
               No signals found in the void.
@@ -99,26 +100,25 @@ export function CosmosSearch({
                 key={trail.id}
                 onClick={() => {
                   onSelect(trail);
-                  setQuery(''); // Clear query but keep active? Or close?
-                  // active state might need to be managed by parent if we want to hide it
+                  setQuery('');
                 }}
-                className="flex items-start gap-3 p-3 text-left hover:bg-white/5 transition-colors border-b last:border-0 border-white/5 group"
+                className="flex items-center gap-3 w-full p-3 text-left hover:bg-white/5 active:bg-white/10 transition-colors border-b last:border-0 border-white/5 group"
               >
-                <div className="mt-1 p-1.5 rounded-lg bg-white/5 group-hover:bg-cyan-500/20 group-hover:text-cyan-400 text-white/40 transition-colors">
+                <div className="p-2 rounded-full bg-white/5 group-hover:bg-cyan-500/20 text-white/40 group-hover:text-cyan-400 transition-colors">
                   {trail.userName ? (
-                    <User className="w-3 h-3" />
+                    <User className="w-4 h-4" />
                   ) : (
-                    <Database className="w-3 h-3" />
+                    <Database className="w-4 h-4" />
                   )}
                 </div>
-                <div>
-                  <div className="text-white text-sm font-medium leading-none mb-1 group-hover:text-cyan-100 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <div className="text-white text-sm font-medium truncate group-hover:text-cyan-100 transition-colors">
                     {trail.title || 'Untitled Time'}
                   </div>
-                  <div className="text-white/40 text-[10px] font-mono">
+                  <div className="text-white/40 text-xs font-mono truncate">
                     {trail.userName ||
                       (trail.walletAddress
-                        ? `${trail.walletAddress.slice(0, 6)}...`
+                        ? `${trail.walletAddress.slice(0, 6)}...${trail.walletAddress.slice(-4)}`
                         : 'Unknown')}
                   </div>
                 </div>
