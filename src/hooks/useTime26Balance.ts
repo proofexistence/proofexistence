@@ -35,8 +35,8 @@ export function useTime26Balance() {
   );
 
   return {
-    balance: data?.balance.formatted ?? '0',
-    balanceRaw: data?.balance.raw ?? '0',
+    balance: data?.balance?.formatted ?? '0',
+    balanceRaw: data?.balance?.raw ?? '0',
     walletAddress: data?.walletAddress,
     stats: data?.stats,
     recentRewards: data?.recentRewards ?? [],

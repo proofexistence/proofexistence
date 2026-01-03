@@ -11,9 +11,15 @@ import {
   X,
   Globe,
   LineSquiggle,
-  Settings,
+  Wallet,
   User,
-  Gift,
+  Settings,
+  LogOut,
+  Key,
+  Copy,
+  Check,
+  Share2,
+  RefreshCw,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -21,13 +27,42 @@ import { useUserProfile } from '@/hooks/use-user-profile';
 import { isLaunchTime } from '@/lib/launch-config';
 import { NavbarCountdown } from './navbar-countdown';
 import { MobileConnectButton } from '@/components/auth/mobile-connect-button';
-import { ReferralDialog } from '@/components/ui/referral-dialog';
+import { WalletDropdown, ExportKeyDialog } from '@/components/wallet';
+import { useNetworkInfo } from '@/hooks/use-network-info';
+import { useWalletBalances } from '@/hooks/use-wallet-balances';
+import { useTime26Balance } from '@/hooks/useTime26Balance';
 
 export function Navbar() {
   const { profile, isLoading, isAuthenticated } = useUserProfile();
-  const { logout } = useWeb3Auth();
+  const { logout, isExternalWallet } = useWeb3Auth();
+  const network = useNetworkInfo();
+  const {
+    pol,
+    time26,
+    isLoading: balancesLoading,
+    refresh: refreshBalances,
+  } = useWalletBalances();
+  const { balance: pendingBalance } = useTime26Balance();
 
   const handleSignOut = () => logout();
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [referralCopied, setReferralCopied] = useState(false);
+  const [addressCopied, setAddressCopied] = useState(false);
+
+  const handleCopyReferral = async () => {
+    if (!profile?.referralCode) return;
+    const referralLink = `${window.location.origin}?ref=${profile.referralCode}`;
+    await navigator.clipboard.writeText(referralLink);
+    setReferralCopied(true);
+    setTimeout(() => setReferralCopied(false), 2000);
+  };
+
+  const handleCopyAddress = async () => {
+    if (!profile?.walletAddress) return;
+    await navigator.clipboard.writeText(profile.walletAddress);
+    setAddressCopied(true);
+    setTimeout(() => setAddressCopied(false), 2000);
+  };
 
   const ready = !isLoading;
   const authenticated = isAuthenticated;
@@ -36,7 +71,6 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [launched, setLaunched] = useState(false);
-  const [isReferralOpen, setIsReferralOpen] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -112,40 +146,8 @@ export function Navbar() {
     },
   ];
 
-  const profileLink = {
-    name: 'Profile',
-    href: profile?.username
-      ? `/u/${profile.username}`
-      : profile?.walletAddress
-        ? `/u/${profile.walletAddress}`
-        : '#',
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-      </svg>
-    ),
-  };
-
-  // Dashboard removed from desktop right nav
-  const rightNavLinks: { name: string; href: string; icon: React.ReactNode }[] =
-    [];
-
-  // Combine for mobile menu
-  const mobileNavLinks = [
-    ...leftNavLinks,
-    ...(authenticated ? [...rightNavLinks, profileLink] : []),
-  ];
+  // Mobile nav links - just the main navigation, wallet section is separate
+  const mobileNavLinks = [...leftNavLinks];
 
   return (
     <>
@@ -208,103 +210,9 @@ export function Navbar() {
             {!pathname?.startsWith('/cosmos') && <NavbarCountdown />}
           </div>
 
-          {/* Right Pill: Auth Actions & Right Nav Links */}
-          <div className="pointer-events-auto flex items-center gap-2">
-            {ready && authenticated ? (
-              <div className="relative group">
-                <div className="flex items-center gap-1 p-1 pl-1.5 pr-1.5 bg-black/10 backdrop-blur-md border border-white/10 rounded-full shadow-lg shadow-black/20 hover:border-white/20 transition-all duration-300">
-                  {/* Right Nav Links (Desktop) */}
-                  <div className="flex items-center gap-1">
-                    {rightNavLinks.map((link) => (
-                      <Link
-                        key={link.name}
-                        href={link.href}
-                        className="px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-                      >
-                        {link.name}
-                      </Link>
-                    ))}
-                  </div>
-
-                  <Link
-                    href={profileLink.href}
-                    className="flex items-center gap-1.5 pl-1.5 pr-2 py-0.5 rounded-full hover:bg-white/5 transition-colors group-hover:bg-white/5"
-                  >
-                    <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/5 overflow-hidden relative">
-                      {profile?.imageUrl ? (
-                        <Image
-                          src={profile.imageUrl}
-                          alt="Profile"
-                          fill
-                          sizes="28px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <User className="w-4 h-4 text-zinc-400" />
-                      )}
-                    </div>
-                    <span className="text-sm font-mono text-zinc-300">
-                      {profile?.displayLabel || 'Connected'}
-                    </span>
-                  </Link>
-                </div>
-
-                <div className="absolute right-0 top-full mt-2 w-48 py-2 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                  <div className="px-4 py-2 border-b border-white/10">
-                    <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1">
-                      Connected
-                    </div>
-                    <div className="text-xs font-mono text-zinc-300 truncate">
-                      {profile?.walletAddress}
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setIsReferralOpen(true)}
-                    className="w-full text-left px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
-                  >
-                    <Gift className="w-3.5 h-3.5" />
-                    Invite Friends
-                  </button>
-                  <Link
-                    href="/settings"
-                    className="w-full text-left px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
-                  >
-                    <Settings className="w-3.5 h-3.5" />
-                    Settings
-                  </Link>
-                  <button
-                    onClick={async () => {
-                      await handleSignOut();
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors flex items-center gap-2"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                      <polyline points="16 17 21 12 16 7"></polyline>
-                      <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Log Out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <MobileConnectButton>
-                <button className="px-5 py-2.5 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-200 hover:scale-105 transition-all shadow-lg shadow-white/10">
-                  Login
-                </button>
-              </MobileConnectButton>
-            )}
+          {/* Right: Wallet Dropdown */}
+          <div className="pointer-events-auto">
+            <WalletDropdown />
           </div>
         </div>
 
@@ -409,27 +317,209 @@ export function Navbar() {
             )}
 
             {/* Divider */}
-            <div className="h-px bg-white/10 w-full mb-8" />
+            <div className="h-px bg-white/10 w-full mb-6" />
 
-            {/* Auth Section */}
+            {/* Wallet Section */}
             <div className="mt-auto">
               {ready && authenticated ? (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                    <div className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">
-                      Connected Wallet
+                  {/* Wallet Card */}
+                  <div className="rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 overflow-hidden">
+                    {/* Header with Avatar & Name */}
+                    <div className="p-4 flex items-center gap-3 border-b border-white/10">
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
+                        {profile?.imageUrl ? (
+                          <Image
+                            src={profile.imageUrl}
+                            alt="Profile"
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center">
+                            <User className="w-6 h-6 text-white/70" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <Wallet className="w-4 h-4 text-zinc-400" />
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                              network.isTestnet
+                                ? 'bg-amber-500/20 text-amber-300'
+                                : 'bg-purple-500/20 text-purple-300'
+                            }`}
+                          >
+                            {network.shortName}
+                          </span>
+                        </div>
+                        {profile?.displayName && (
+                          <div className="text-base font-semibold text-white truncate mt-1">
+                            {profile.displayName}
+                          </div>
+                        )}
+                        {profile?.username && (
+                          <div className="text-sm text-zinc-400 truncate">
+                            @{profile.username}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="font-mono text-zinc-200 break-all text-sm">
-                      {profile?.walletAddress}
+
+                    {/* Wallet Address */}
+                    <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                      <span className="text-xs font-mono text-zinc-400">
+                        {profile?.walletAddress?.slice(0, 8)}...
+                        {profile?.walletAddress?.slice(-6)}
+                      </span>
+                      <button
+                        onClick={handleCopyAddress}
+                        className="text-zinc-500 hover:text-white transition-colors"
+                      >
+                        {addressCopied ? (
+                          <Check className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Balances */}
+                    <div className="px-4 py-3 border-b border-white/10">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                          Balances
+                        </span>
+                        <button
+                          onClick={refreshBalances}
+                          disabled={balancesLoading}
+                          className="text-zinc-500 hover:text-white transition-colors"
+                        >
+                          <RefreshCw
+                            className={`w-3.5 h-3.5 ${balancesLoading ? 'animate-spin' : ''}`}
+                          />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 rounded-xl bg-white/5">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                              <span className="text-[8px] font-bold text-white">
+                                P
+                              </span>
+                            </div>
+                            <span className="text-xs text-zinc-400">POL</span>
+                          </div>
+                          <div className="text-lg font-mono font-semibold text-white">
+                            {balancesLoading ? '-' : pol.formatted}
+                          </div>
+                        </div>
+                        <div className="p-3 rounded-xl bg-white/5">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                              <span className="text-[8px] font-bold text-white">
+                                T
+                              </span>
+                            </div>
+                            <span className="text-xs text-zinc-400">
+                              TIME26
+                            </span>
+                          </div>
+                          <div className="text-lg font-mono font-semibold text-white">
+                            {balancesLoading ? '-' : time26.formatted}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pending Rewards */}
+                    {pendingBalance && pendingBalance !== '0' && (
+                      <div className="px-4 py-3 border-b border-white/10">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                            <span className="text-xs text-zinc-400">
+                              Pending Rewards
+                            </span>
+                          </div>
+                          <span className="text-sm font-mono font-semibold text-green-400">
+                            +{pendingBalance} T26
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Referral */}
+                    {profile?.referralCode && (
+                      <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Share2 className="w-4 h-4 text-zinc-500" />
+                          <span className="text-xs text-zinc-400">
+                            Referral
+                          </span>
+                        </div>
+                        <button
+                          onClick={handleCopyReferral}
+                          className="flex items-center gap-1.5 px-2 py-1 text-xs font-mono bg-white/5 hover:bg-white/10 text-zinc-300 rounded-lg transition-colors"
+                        >
+                          {profile.referralCode}
+                          {referralCopied ? (
+                            <Check className="w-3 h-3 text-green-400" />
+                          ) : (
+                            <Copy className="w-3 h-3" />
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Action Links */}
+                    <div className="p-2">
+                      <Link
+                        href={
+                          profile?.username
+                            ? `/u/${profile.username}`
+                            : `/u/${profile?.walletAddress}`
+                        }
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
+                      >
+                        <User className="w-4 h-4" />
+                        View Profile
+                      </Link>
+                      {!isExternalWallet && (
+                        <button
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setShowExportDialog(true);
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                          <Key className="w-4 h-4" />
+                          Export Private Key
+                        </button>
+                      )}
+                      <Link
+                        href="/settings"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Settings
+                      </Link>
                     </div>
                   </div>
+
+                  {/* Logout Button */}
                   <button
                     onClick={async () => {
                       await handleSignOut();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors"
+                    className="w-full py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2"
                   >
+                    <LogOut className="w-4 h-4" />
                     Log Out
                   </button>
                 </div>
@@ -444,11 +534,11 @@ export function Navbar() {
                 >
                   <button
                     onClick={() => {
-                      // Close the mobile menu when the connect button is clicked
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-4 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-colors"
+                    className="w-full py-4 rounded-xl bg-white text-black font-semibold hover:bg-zinc-100 transition-colors flex items-center justify-center gap-2"
                   >
+                    <Wallet className="w-5 h-5" />
                     Connect Wallet
                   </button>
                 </MobileConnectButton>
@@ -458,8 +548,11 @@ export function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Referral Dialog */}
-      <ReferralDialog open={isReferralOpen} onOpenChange={setIsReferralOpen} />
+      {/* Export Key Dialog */}
+      <ExportKeyDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+      />
     </>
   );
 }

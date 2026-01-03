@@ -31,6 +31,8 @@ interface Web3AuthContextType {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   getIdToken: () => Promise<string | null>;
+  exportPrivateKey: () => Promise<string | null>;
+  isExternalWallet: boolean;
 }
 
 const Web3AuthContext = createContext<Web3AuthContextType | null>(null);
@@ -252,6 +254,73 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     return null;
   };
 
+  // Export private key (only available for social login users with MPC wallets)
+  const exportPrivateKey = async (): Promise<string | null> => {
+    if (!web3auth) {
+      console.warn('[Web3Auth] Web3Auth not initialized');
+      throw new Error('Wallet not initialized. Please try again.');
+    }
+
+    if (!web3auth.connected || !web3auth.provider) {
+      console.warn('[Web3Auth] Not connected or no provider');
+      throw new Error('Wallet not connected. Please reconnect and try again.');
+    }
+
+    try {
+      // Check if this is a social login (MPC wallet) - external wallets don't support export
+      let userInfo;
+      try {
+        userInfo = await web3auth.getUserInfo();
+      } catch {
+        // getUserInfo fails for external wallets
+        throw new Error(
+          'Private key export is only available for social login users. External wallet users can export keys from their wallet app.'
+        );
+      }
+
+      if (!userInfo?.email && !userInfo?.name) {
+        throw new Error(
+          'Private key export is only available for social login users. External wallet users can export keys from their wallet app.'
+        );
+      }
+
+      console.log('[Web3Auth] Requesting private key export...');
+
+      // Request private key from Web3Auth provider
+      // This uses the openlogin adapter's capability to export the key
+      const privateKey = (await web3auth.provider.request({
+        method: 'eth_private_key',
+      })) as string;
+
+      if (!privateKey) {
+        throw new Error('Failed to retrieve private key from provider');
+      }
+
+      console.log('[Web3Auth] Private key exported successfully');
+      return privateKey;
+    } catch (error) {
+      console.error('[Web3Auth] Private key export failed:', error);
+      // Provide user-friendly error messages
+      if (error instanceof Error) {
+        if (error.message.includes('User closed')) {
+          throw new Error('Export cancelled by user');
+        }
+        if (
+          error.message.includes('not supported') ||
+          error.message.includes('Method not found')
+        ) {
+          throw new Error(
+            'Private key export is not supported for your login method. Please use the wallet app to export your key.'
+          );
+        }
+      }
+      throw error;
+    }
+  };
+
+  // Detect if user is using an external wallet (MetaMask, etc.)
+  const isExternalWallet = !!(user?.walletAddress && !user?.email);
+
   return (
     <Web3AuthContext.Provider
       value={{
@@ -263,6 +332,8 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         getIdToken,
+        exportPrivateKey,
+        isExternalWallet,
       }}
     >
       {children}
@@ -280,6 +351,8 @@ const defaultContext: Web3AuthContextType = {
   login: async () => {},
   logout: async () => {},
   getIdToken: async () => null,
+  exportPrivateKey: async () => null,
+  isExternalWallet: false,
 };
 
 export function useWeb3Auth() {

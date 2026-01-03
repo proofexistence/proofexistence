@@ -299,7 +299,11 @@ const CanvasCapture = ({
 
 // ... imports
 import { BRANDS, BrandTheme } from './themes';
-import { AvatarDropdown } from './avatar-dropdown';
+import {
+  WalletDropdown,
+  MintConfirmationDialog,
+  type MintConfirmationData,
+} from '@/components/wallet';
 import { isTestnet } from '@/lib/contracts';
 
 // Helper to switch network
@@ -437,6 +441,14 @@ export function POECanvas() {
   const [time26Cost, setTime26Cost] = useState<string>('... TIME');
   const [nativeCost, setNativeCost] = useState<string>('... POL');
   const [nativeCostUsd, setNativeCostUsd] = useState<string>('');
+
+  // Mint confirmation for non-Web3 users
+  const [showMintConfirmation, setShowMintConfirmation] = useState(false);
+  const [mintConfirmationData, setMintConfirmationData] =
+    useState<MintConfirmationData | null>(null);
+  const mintConfirmResolveRef = useRef<((confirmed: boolean) => void) | null>(
+    null
+  );
   const screenshotRef = useRef<string | null>(null); // Ref to access latest data
   const captureRef = useRef<{ capture: () => string } | null>(null);
   const completedSessionRef = useRef<{
@@ -996,7 +1008,46 @@ export function POECanvas() {
             // console.log('Client-side Mint Confirmed', txHash);
           } else {
             // SERVER-SIDE MINTING (Openfort embedded wallet)
-            // No wallet popup needed - transaction is signed automatically
+            // Show confirmation dialog for non-Web3 users
+            setLoadingStatus('Preparing transaction details...');
+
+            // Fetch costs for confirmation dialog
+            const RPC_URL =
+              process.env.NEXT_PUBLIC_RPC_URL ||
+              'https://rpc-amoy.polygon.technology';
+            const confirmProvider = new ethers.JsonRpcProvider(RPC_URL);
+            const confirmPoeContract = new ethers.Contract(
+              PROOF_OF_EXISTENCE_ADDRESS,
+              PROOF_OF_EXISTENCE_ABI,
+              confirmProvider
+            );
+            const confirmNativeCost =
+              await confirmPoeContract.calculateCostNative(
+                Math.floor(session.duration)
+              );
+            const confirmTime26Cost =
+              await confirmPoeContract.calculateCostTime26(
+                Math.floor(session.duration)
+              );
+
+            // Request user confirmation
+            const confirmed = await requestMintConfirmation({
+              duration: session.duration,
+              paymentMethod: (data.paymentMethod || 'NATIVE') as
+                | 'NATIVE'
+                | 'TIME26',
+              nativeCost: confirmNativeCost,
+              time26Cost: confirmTime26Cost,
+            });
+
+            if (!confirmed) {
+              // User cancelled - stop the minting process
+              setIsSubmitting(false);
+              setLoadingStatus(undefined);
+              return;
+            }
+
+            // Proceed with minting
             setLoadingStatus(
               'Minting via embedded wallet (no approval needed)...'
             );
@@ -1183,6 +1234,34 @@ export function POECanvas() {
     setTrailColor(color);
   }, []);
 
+  // Request mint confirmation for non-Web3 users
+  const requestMintConfirmation = useCallback(
+    (data: MintConfirmationData): Promise<boolean> => {
+      return new Promise((resolve) => {
+        mintConfirmResolveRef.current = resolve;
+        setMintConfirmationData(data);
+        setShowMintConfirmation(true);
+      });
+    },
+    []
+  );
+
+  const handleMintConfirmationClose = useCallback((open: boolean) => {
+    if (!open && mintConfirmResolveRef.current) {
+      mintConfirmResolveRef.current(false);
+      mintConfirmResolveRef.current = null;
+    }
+    setShowMintConfirmation(open);
+  }, []);
+
+  const handleMintConfirm = useCallback(() => {
+    if (mintConfirmResolveRef.current) {
+      mintConfirmResolveRef.current(true);
+      mintConfirmResolveRef.current = null;
+    }
+    setShowMintConfirmation(false);
+  }, []);
+
   // Zoom Handlers
 
   // Fetch Contract Data Effect
@@ -1347,7 +1426,7 @@ export function POECanvas() {
             trailColor={trailColor}
             onColorChange={handleColorChange}
           />
-          <AvatarDropdown />
+          <WalletDropdown />
         </div>
 
         <Instructions
@@ -1431,6 +1510,15 @@ export function POECanvas() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Mint Confirmation Dialog for non-Web3 users */}
+        <MintConfirmationDialog
+          open={showMintConfirmation}
+          onOpenChange={handleMintConfirmationClose}
+          data={mintConfirmationData}
+          onConfirm={handleMintConfirm}
+          isProcessing={isSubmitting && showMintConfirmation}
+        />
       </div>
     </div>
   );
