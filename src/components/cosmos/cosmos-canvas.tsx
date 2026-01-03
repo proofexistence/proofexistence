@@ -207,7 +207,7 @@ export function CosmosCanvas({
 
       {/* UI Overlay */}
       {/* Mobile: Search at navbar level (between logo and hamburger) */}
-      <div className="md:hidden fixed top-3 left-0 right-0 z-[55] px-14 pointer-events-none">
+      <div className="md:hidden fixed top-3 left-0 right-0 z-[55] px-14 py-3 pointer-events-none">
         <div className="flex items-center justify-center">
           <div className="pointer-events-auto">
             <CosmosSearch
@@ -224,7 +224,7 @@ export function CosmosCanvas({
       </div>
 
       {/* Desktop: Search centered below navbar */}
-      <div className="hidden md:block fixed top-20 left-0 right-0 z-40 px-6 pointer-events-none">
+      <div className="hidden md:block fixed md:top-4 left-0 right-0 z-[55] px-6 md:py-4 pointer-events-none">
         <div className="flex items-center justify-center max-w-screen-lg mx-auto">
           <div className="pointer-events-auto">
             <CosmosSearch

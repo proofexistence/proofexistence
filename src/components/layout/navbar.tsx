@@ -400,7 +400,11 @@ export function Navbar() {
                         <button
                           onClick={refreshBalances}
                           disabled={balancesLoading}
-                          className="text-zinc-500 hover:text-white transition-colors"
+                          className={`transition-colors ${
+                            balancesLoading
+                              ? 'text-green-400'
+                              : 'text-zinc-500 hover:text-white'
+                          }`}
                         >
                           <RefreshCw
                             className={`w-3.5 h-3.5 ${balancesLoading ? 'animate-spin' : ''}`}

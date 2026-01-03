@@ -15,7 +15,9 @@ export function WalletBalances() {
         <button
           onClick={refresh}
           disabled={isLoading}
-          className="text-zinc-500 hover:text-white transition-colors disabled:opacity-50"
+          className={`transition-colors ${
+            isLoading ? 'text-green-400' : 'text-zinc-500 hover:text-white'
+          }`}
           title="Refresh balances"
         >
           <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
