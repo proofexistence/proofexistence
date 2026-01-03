@@ -135,14 +135,14 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           // via social logins (Google, Twitter, email) on mobile.
           ...(isMobile && {
             modalConfig: {
-              // Hide WalletConnect on mobile
+              // Hide WalletConnect on mobile to prevent wallet detection
               [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
                 label: 'WalletConnect',
                 showOnModal: false,
               },
-              // Hide injected wallets (MetaMask, etc.) on mobile
-              [WALLET_ADAPTERS.INJECTED]: {
-                label: 'Injected',
+              // Hide Coinbase wallet on mobile
+              [WALLET_ADAPTERS.COINBASE]: {
+                label: 'Coinbase',
                 showOnModal: false,
               },
             },

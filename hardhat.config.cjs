@@ -46,8 +46,6 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: {
-      polygon: POLYGONSCAN_API_KEY,
-    },
+    apiKey: POLYGONSCAN_API_KEY, // Etherscan v2 API uses single key
   },
 };
