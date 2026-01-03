@@ -96,11 +96,11 @@ export async function GET(req: NextRequest) {
     // console.log('[Settle] TX confirmed in block:', receipt.blockNumber);
 
     // 6. Update Database
-    // Mark sessions as SETTLED
+    // Mark sessions as SETTLED with the batch settlement txHash
     const sessionIds = pendingSessions.map((s) => s.id);
     await db
       .update(sessions)
-      .set({ status: 'SETTLED' })
+      .set({ status: 'SETTLED', txHash: tx.hash })
       .where(inArray(sessions.id, sessionIds));
 
     // Record Daily Snapshot
