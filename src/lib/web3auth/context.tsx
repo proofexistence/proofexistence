@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import { Web3Auth } from '@web3auth/modal';
-import { ADAPTER_EVENTS, type IProvider } from '@web3auth/base';
+import { ADAPTER_EVENTS, WALLET_ADAPTERS, type IProvider } from '@web3auth/base';
 import { web3AuthConfig, chainConfig } from './config';
 import { ethers } from 'ethers';
 
@@ -114,6 +114,12 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
+        // Detect mobile browser to prevent auto MetaMask deep link on page load
+        const isMobile =
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          );
+
         const web3authInstance = new Web3Auth({
           clientId: web3AuthConfig.clientId,
           web3AuthNetwork: web3AuthConfig.web3AuthNetwork,
@@ -124,6 +130,23 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
             mode: 'dark',
             loginMethodsOrder: ['google', 'twitter', 'email_passwordless'],
           },
+          // On mobile, disable external wallet adapters during init to prevent
+          // MetaMask deep link triggering on page load. Users can still connect
+          // via social logins (Google, Twitter, email) on mobile.
+          ...(isMobile && {
+            modalConfig: {
+              // Hide WalletConnect on mobile
+              [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
+                label: 'WalletConnect',
+                showOnModal: false,
+              },
+              // Hide injected wallets (MetaMask, etc.) on mobile
+              [WALLET_ADAPTERS.INJECTED]: {
+                label: 'Injected',
+                showOnModal: false,
+              },
+            },
+          }),
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {

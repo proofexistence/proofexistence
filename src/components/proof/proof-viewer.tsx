@@ -140,16 +140,20 @@ export function ProofViewer({
       color: (raw.color || session.color || '#A855F7') as string,
     };
   }, [session.trailData, session.color]);
-  const date = new Date(session.createdAt as string).toLocaleDateString(
-    'en-US',
-    {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }
-  );
+
+  // Format date on client-side only to avoid hydration mismatch (server/client timezone differences)
+  const [date, setDate] = useState<string>('');
+  useEffect(() => {
+    setDate(
+      new Date(session.createdAt as string).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    );
+  }, [session.createdAt]);
 
   const handleExit = () => {
     // Smart Exit:

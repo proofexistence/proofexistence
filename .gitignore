@@ -54,6 +54,7 @@ bun.lockb
 .cursorrules
 .claude/
 .claude
+.claude_settings.json
 
 
 CLAUDE.md
@@ -71,3 +72,6 @@ docs/
 # Hardhat (generated files)
 /artifacts/
 /cache/
+
+# Auto Claude data directory
+.auto-claude/
