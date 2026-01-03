@@ -1,6 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
+import { useWeb3Auth } from '@/lib/web3auth/context';
 
 interface BalanceData {
   balance: {
@@ -22,11 +23,23 @@ interface BalanceData {
   }>;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 export function useTime26Balance() {
+  const { user, isConnected } = useWeb3Auth();
+  const walletAddress = user?.walletAddress;
+
+  const fetcher = async (url: string) => {
+    if (!walletAddress) return null;
+    const res = await fetch(url, {
+      headers: {
+        'X-Wallet-Address': walletAddress,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch balance');
+    return res.json();
+  };
+
   const { data, error, isLoading, mutate } = useSWR<BalanceData>(
-    '/api/user/balance',
+    isConnected && walletAddress ? '/api/user/balance' : null,
     fetcher,
     {
       refreshInterval: 60000, // Refresh every minute
