@@ -206,18 +206,9 @@ export function CosmosCanvas({
       </Canvas>
 
       {/* UI Overlay */}
-      {/* Mobile: Find My Star at navbar level (between logo and hamburger) */}
-      <div className="md:hidden fixed top-3 left-0 right-0 z-[55] px-4 pointer-events-none">
+      {/* Mobile: Search at navbar level (between logo and hamburger) */}
+      <div className="md:hidden fixed top-3 left-0 right-0 z-[55] px-14 pointer-events-none">
         <div className="flex items-center justify-center">
-          <div className="pointer-events-auto">
-            <FindMeButton trails={validTrails} onFocus={selectStar} compact />
-          </div>
-        </div>
-      </div>
-
-      {/* Search - Below navbar, left aligned on mobile */}
-      <div className="fixed top-16 md:top-20 left-0 right-0 z-40 px-4 md:px-6 pointer-events-none">
-        <div className="flex items-center justify-start md:justify-center max-w-screen-lg mx-auto">
           <div className="pointer-events-auto">
             <CosmosSearch
               trails={validTrails}
@@ -228,6 +219,32 @@ export function CosmosCanvas({
               externalActive={isSearchActive}
               onToggle={setIsSearchActive}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop: Search centered below navbar */}
+      <div className="hidden md:block fixed top-20 left-0 right-0 z-40 px-6 pointer-events-none">
+        <div className="flex items-center justify-center max-w-screen-lg mx-auto">
+          <div className="pointer-events-auto">
+            <CosmosSearch
+              trails={validTrails}
+              onSelect={(t) => {
+                selectStar(t);
+                setIsSearchActive(false);
+              }}
+              externalActive={isSearchActive}
+              onToggle={setIsSearchActive}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile: Find My Star below navbar, left aligned */}
+      <div className="md:hidden fixed top-16 left-0 right-0 z-40 px-4 pointer-events-none">
+        <div className="flex items-center justify-start">
+          <div className="pointer-events-auto">
+            <FindMeButton trails={validTrails} onFocus={selectStar} compact />
           </div>
         </div>
       </div>
