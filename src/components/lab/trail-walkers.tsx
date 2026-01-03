@@ -584,7 +584,10 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
         if (shouldAdd) {
           // Get next trail if available (no looping - each session shown once)
           let trail: Trail | null = null;
-          if (sortedTrails.length > 0 && currentTrailIndexRef.current < sortedTrails.length) {
+          if (
+            sortedTrails.length > 0 &&
+            currentTrailIndexRef.current < sortedTrails.length
+          ) {
             trail = sortedTrails[currentTrailIndexRef.current];
             currentTrailIndexRef.current++;
 
@@ -708,7 +711,10 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
 
           <button
             onClick={() => {
-              const newIndex = Math.min(dayGroups.length - 1, currentDayIndex + 1);
+              const newIndex = Math.min(
+                dayGroups.length - 1,
+                currentDayIndex + 1
+              );
               setCurrentDayIndex(newIndex);
               jumpToDay(newIndex, true); // Manual jump - clear walkers
             }}
@@ -748,7 +754,8 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
         </div>
         {dayGroups.length > 0 && (
           <div className="text-white/10">
-            {dayGroups[0]?.date.getFullYear()} - {dayGroups[dayGroups.length - 1]?.date.getFullYear()}
+            {dayGroups[0]?.date.getFullYear()} -{' '}
+            {dayGroups[dayGroups.length - 1]?.date.getFullYear()}
           </div>
         )}
       </div>

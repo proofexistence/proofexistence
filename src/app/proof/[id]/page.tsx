@@ -96,8 +96,29 @@ export async function generateMetadata({
   ogUrl.searchParams.set('date', dateStr);
   ogUrl.searchParams.set('id', session.id);
 
-  if (session.previewUrl) {
-    ogUrl.searchParams.set('image', session.previewUrl);
+  let finalImage = session.previewUrl;
+
+  // 1. Prioritize Arweave Image (Permanent Proof)
+  if (session.ipfsHash) {
+    try {
+      const metadataUrl = `https://gateway.irys.xyz/${session.ipfsHash}`;
+      const res = await fetch(metadataUrl, { next: { revalidate: 3600 } }); // Cache for 1 hour
+      if (res.ok) {
+        const metadata = await res.json();
+        if (metadata.image) {
+          // Resolve Arweave protocols to gateway
+          finalImage = metadata.image
+            .replace('ar://', 'https://gateway.irys.xyz/')
+            .replace('https://arweave.net/', 'https://gateway.irys.xyz/');
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to fetch Arweave metadata for OG:', e);
+    }
+  }
+
+  if (finalImage) {
+    ogUrl.searchParams.set('image', finalImage);
   }
   if (session.user) {
     const authorName =

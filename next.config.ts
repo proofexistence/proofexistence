@@ -38,6 +38,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'sprofile.line-scdn.net', // Line (alternative)
       },
+      {
+        protocol: 'https',
+        hostname: 'gateway.irys.xyz',
+      },
     ],
   },
   compress: true,
