@@ -384,14 +384,14 @@ export function ProofViewer({
     >
       {/* Header Overlay */}
       <div className="absolute top-8 left-0 w-full p-6 z-10 flex justify-between items-start pointer-events-none">
-        <div className="animate-in slide-in-from-top-4 fade-in duration-700 max-w-xl">
+        <div className="animate-in slide-in-from-top-4 fade-in duration-700 max-w-xl mr-12 md:mr-0">
           {/* Title & Badge */}
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-start gap-3 mb-2">
             <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg font-mono tracking-tight">
               {session.title || `PROOF #${session.id.slice(0, 8)}`}
             </h1>
             <div
-              className={`px-3 py-1 rounded-full text-[10px] font-bold border backdrop-blur-md uppercase tracking-wider
+              className={`px-3 py-1 rounded-full text-[10px] font-bold border backdrop-blur-md uppercase tracking-wider shrink-0 mt-2
                         ${
                           session.status === 'MINTED'
                             ? 'bg-purple-500/20 text-purple-200 border-purple-500/50'
@@ -493,17 +493,17 @@ export function ProofViewer({
       </div>
 
       {/* Controls Overlay (Bottom Right) */}
-      <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-3 pointer-events-auto animate-in fade-in duration-700 delay-300">
+      <div className="fixed bottom-8 right-6 z-50 flex flex-col gap-3 pointer-events-auto animate-in fade-in duration-700 delay-300">
         {/* Spin Toggle */}
         <button
           onClick={() => setIsSpinning(!isSpinning)}
-          className="p-3 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-105 active:scale-95 group relative"
+          className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-105 active:scale-95 group relative"
           title={isSpinning ? 'Pause Rotation' : 'Resume Rotation'}
         >
           {isSpinning ? (
-            <Pause size={24} />
+            <Pause size={20} />
           ) : (
-            <Play size={24} className="ml-0.5" />
+            <Play size={20} className="ml-0.5" />
           )}
         </button>
 
@@ -514,22 +514,14 @@ export function ProofViewer({
               setShowShareMenu(!showShareMenu);
               setShowMenu(false);
             }}
-            className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full shadow-lg shadow-purple-500/30 transition-all hover:scale-105 active:scale-95"
+            className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full shadow-lg shadow-purple-500/30 transition-all hover:scale-105 active:scale-95"
             title="Share"
           >
-            {linkCopied ? <Check size={24} /> : <Share2 size={24} />}
+            {linkCopied ? <Check size={20} /> : <Share2 size={20} />}
           </button>
 
           {showShareMenu && (
             <div className="absolute bottom-full right-0 mb-3 w-52 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-200">
-              <button
-                onClick={() => handleShare('native')}
-                className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
-              >
-                <Share2 size={16} />
-                Share
-              </button>
-              <div className="h-px bg-white/10" />
               <button
                 onClick={() => handleShare('copy')}
                 className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
@@ -552,14 +544,6 @@ export function ProofViewer({
                 </svg>
                 Post on X
               </button>
-              <div className="h-px bg-white/10" />
-              <button
-                onClick={() => handleShare('download')}
-                className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
-              >
-                <Download size={16} />
-                Download Image
-              </button>
             </div>
           )}
         </div>
@@ -571,10 +555,10 @@ export function ProofViewer({
               setShowMenu(!showMenu);
               setShowShareMenu(false);
             }}
-            className="p-3 bg-white text-black hover:bg-zinc-200 rounded-full shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95"
+            className="p-2 bg-white text-black hover:bg-zinc-200 rounded-full shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95"
             title="Take Screenshot"
           >
-            <Camera size={24} />
+            <Camera size={20} />
           </button>
 
           {showMenu && (
@@ -584,7 +568,7 @@ export function ProofViewer({
                 className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2"
               >
                 <Download size={16} />
-                Art Only
+                Without Title
               </button>
               <div className="h-px bg-white/10" />
               <button
