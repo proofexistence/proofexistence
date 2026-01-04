@@ -135,11 +135,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           chainConfig,
           // Use redirect mode on mobile to avoid popup blockers
           uxMode: isMobile ? 'redirect' : 'popup',
-          uiConfig: {
-            appName: 'Proof of Existence',
-            mode: 'dark',
-            loginMethodsOrder: ['google', 'twitter', 'email_passwordless'],
-          },
+
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {
@@ -348,8 +344,8 @@ const defaultContext: Web3AuthContextType = {
   isLoggingIn: false,
   isConnected: false,
   user: null,
-  login: async () => {},
-  logout: async () => {},
+  login: async () => { },
+  logout: async () => { },
   getIdToken: async () => null,
   exportPrivateKey: async () => null,
   isExternalWallet: false,
