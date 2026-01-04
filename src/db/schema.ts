@@ -34,8 +34,8 @@ export const users = pgTable(
     referralCode: varchar('referral_code', { length: 10 }).unique(), // Short hash of wallet
     referredBy: uuid('referred_by'), // ID of the user who referred this user
 
-    // TIME26 Token Balance (off-chain tracking for rewards)
-    time26Balance: decimal('time26_balance', { precision: 36, scale: 18 })
+    // TIME26 Token Balance (off-chain tracking for rewards, in wei)
+    time26Balance: decimal('time26_balance', { precision: 78, scale: 0 })
       .default('0')
       .notNull(),
 
@@ -175,9 +175,9 @@ export const dailySnapshots = pgTable('daily_snapshots', {
   dayId: varchar('day_id', { length: 10 }).primaryKey(), // Format: "YYYY-MM-DD"
   merkleRoot: varchar('merkle_root', { length: 66 }).notNull(),
   totalRewards: decimal('total_rewards', {
-    precision: 36,
-    scale: 18,
-  }).notNull(),
+    precision: 78,
+    scale: 0,
+  }).notNull(), // in wei
   participantCount: integer('participant_count').notNull(),
   txHash: varchar('tx_hash', { length: 66 }), // On-chain settlement tx
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -189,21 +189,21 @@ export const dailySnapshots = pgTable('daily_snapshots', {
 // ============================================================================
 export const dailyRewards = pgTable('daily_rewards', {
   dayId: varchar('day_id', { length: 10 }).primaryKey(), // Format: "YYYY-MM-DD"
-  totalBudget: decimal('total_budget', { precision: 36, scale: 18 }).notNull(), // Total TIME26 available for the day
+  totalBudget: decimal('total_budget', { precision: 78, scale: 0 }).notNull(), // Total TIME26 available (in wei)
   totalSeconds: integer('total_seconds').notNull(), // Total drawing seconds across all users
   totalDistributed: decimal('total_distributed', {
-    precision: 36,
-    scale: 18,
-  }).notNull(), // Actually distributed
+    precision: 78,
+    scale: 0,
+  }).notNull(), // Actually distributed (in wei)
   participantCount: integer('participant_count').notNull(),
   contractBalanceBefore: decimal('contract_balance_before', {
-    precision: 36,
-    scale: 18,
-  }), // For auditing
+    precision: 78,
+    scale: 0,
+  }), // For auditing (in wei)
   contractBalanceAfter: decimal('contract_balance_after', {
-    precision: 36,
-    scale: 18,
-  }), // For auditing
+    precision: 78,
+    scale: 0,
+  }), // For auditing (in wei)
   settledAt: timestamp('settled_at').defaultNow().notNull(),
 });
 
@@ -222,15 +222,15 @@ export const userDailyRewards = pgTable(
     totalSeconds: integer('total_seconds').notNull(), // User's drawing seconds
     exclusiveSeconds: integer('exclusive_seconds').notNull(), // Seconds drawing alone
     sharedSeconds: integer('shared_seconds').notNull(), // Seconds overlapping with others
-    baseReward: decimal('base_reward', { precision: 36, scale: 18 }).notNull(), // From time-weighted distribution
+    baseReward: decimal('base_reward', { precision: 78, scale: 0 }).notNull(), // From time-weighted distribution (in wei)
     bonusReward: decimal('bonus_reward', {
-      precision: 36,
-      scale: 18,
-    }).notNull(), // From leftover pool
+      precision: 78,
+      scale: 0,
+    }).notNull(), // From leftover pool (in wei)
     totalReward: decimal('total_reward', {
-      precision: 36,
-      scale: 18,
-    }).notNull(),
+      precision: 78,
+      scale: 0,
+    }).notNull(), // Total reward (in wei)
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [
@@ -251,7 +251,7 @@ export const bonusRewards = pgTable(
     userId: uuid('user_id')
       .references(() => users.id)
       .notNull(),
-    amount: decimal('amount', { precision: 36, scale: 18 }).notNull(),
+    amount: decimal('amount', { precision: 78, scale: 0 }).notNull(), // in wei
     type: varchar('type', { length: 50 }).notNull(), // 'ranking' | 'referral' | 'airdrop' | 'contest' | 'kol'
     description: varchar('description', { length: 500 }),
     txHash: varchar('tx_hash', { length: 66 }), // Safe transaction hash

@@ -246,38 +246,39 @@ async function runRewards(): Promise<{
       console.warn('[Daily Cron] Could not fetch contract balance:', err);
     }
 
-    // Database transaction
-    await db.transaction(async (tx) => {
-      await tx.insert(dailyRewards).values({
+    // Insert daily summary first (acts as lock - PK constraint prevents duplicates)
+    await db.insert(dailyRewards).values({
+      dayId,
+      totalBudget: rewardResult.totalBudget,
+      totalSeconds: rewardResult.totalSeconds,
+      totalDistributed: rewardResult.totalDistributed,
+      participantCount: rewardResult.participantCount,
+      contractBalanceBefore,
+      contractBalanceAfter: null,
+    });
+
+    // Insert per-user rewards and update balances
+    // Note: neon-http doesn't support transactions, so we do individual inserts
+    // The dailyRewards PK insert above prevents duplicate processing
+    for (const userReward of rewardResult.userRewards) {
+      await db.insert(userDailyRewards).values({
+        userId: userReward.userId,
         dayId,
-        totalBudget: rewardResult.totalBudget,
-        totalSeconds: rewardResult.totalSeconds,
-        totalDistributed: rewardResult.totalDistributed,
-        participantCount: rewardResult.participantCount,
-        contractBalanceBefore,
-        contractBalanceAfter: null,
+        totalSeconds: userReward.totalSeconds,
+        exclusiveSeconds: userReward.exclusiveSeconds,
+        sharedSeconds: userReward.sharedSeconds,
+        baseReward: userReward.baseReward,
+        bonusReward: userReward.bonusReward,
+        totalReward: userReward.totalReward,
       });
 
-      for (const userReward of rewardResult.userRewards) {
-        await tx.insert(userDailyRewards).values({
-          userId: userReward.userId,
-          dayId,
-          totalSeconds: userReward.totalSeconds,
-          exclusiveSeconds: userReward.exclusiveSeconds,
-          sharedSeconds: userReward.sharedSeconds,
-          baseReward: userReward.baseReward,
-          bonusReward: userReward.bonusReward,
-          totalReward: userReward.totalReward,
-        });
-
-        await tx
-          .update(users)
-          .set({
-            time26Balance: sql`${users.time26Balance} + ${userReward.totalReward}::numeric`,
-          })
-          .where(eq(users.id, userReward.userId));
-      }
-    });
+      await db
+        .update(users)
+        .set({
+          time26Balance: sql`${users.time26Balance} + ${userReward.totalReward}::numeric`,
+        })
+        .where(eq(users.id, userReward.userId));
+    }
 
     return {
       success: true,

@@ -43,6 +43,13 @@
       "when": 1767367652003,
       "tag": "0005_careless_pestilence",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1767501544753,
+      "tag": "0006_even_kree",
+      "breakpoints": true
     }
   ]
 }

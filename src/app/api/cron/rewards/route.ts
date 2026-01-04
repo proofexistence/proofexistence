@@ -109,42 +109,40 @@ export async function GET(req: NextRequest) {
       console.warn('[Rewards Cron] Could not fetch contract balance:', err);
     }
 
-    // 7. Begin database transaction
-    await db.transaction(async (tx) => {
-      // 7a. Record daily summary
-      await tx.insert(dailyRewards).values({
+    // 7. Record daily summary (PK constraint prevents duplicates)
+    await db.insert(dailyRewards).values({
+      dayId,
+      totalBudget: rewardResult.totalBudget,
+      totalSeconds: rewardResult.totalSeconds,
+      totalDistributed: rewardResult.totalDistributed,
+      participantCount: rewardResult.participantCount,
+      contractBalanceBefore,
+      contractBalanceAfter: null, // Will be updated after claims
+    });
+
+    // 8. Record per-user rewards and update balances
+    // Note: neon-http doesn't support transactions, so we do individual inserts
+    for (const userReward of rewardResult.userRewards) {
+      // Record reward breakdown
+      await db.insert(userDailyRewards).values({
+        userId: userReward.userId,
         dayId,
-        totalBudget: rewardResult.totalBudget,
-        totalSeconds: rewardResult.totalSeconds,
-        totalDistributed: rewardResult.totalDistributed,
-        participantCount: rewardResult.participantCount,
-        contractBalanceBefore,
-        contractBalanceAfter: null, // Will be updated after claims
+        totalSeconds: userReward.totalSeconds,
+        exclusiveSeconds: userReward.exclusiveSeconds,
+        sharedSeconds: userReward.sharedSeconds,
+        baseReward: userReward.baseReward,
+        bonusReward: userReward.bonusReward,
+        totalReward: userReward.totalReward,
       });
 
-      // 7b. Record per-user rewards and update balances
-      for (const userReward of rewardResult.userRewards) {
-        // Record reward breakdown
-        await tx.insert(userDailyRewards).values({
-          userId: userReward.userId,
-          dayId,
-          totalSeconds: userReward.totalSeconds,
-          exclusiveSeconds: userReward.exclusiveSeconds,
-          sharedSeconds: userReward.sharedSeconds,
-          baseReward: userReward.baseReward,
-          bonusReward: userReward.bonusReward,
-          totalReward: userReward.totalReward,
-        });
-
-        // Update user's off-chain balance
-        await tx
-          .update(users)
-          .set({
-            time26Balance: sql`${users.time26Balance} + ${userReward.totalReward}::numeric`,
-          })
-          .where(eq(users.id, userReward.userId));
-      }
-    });
+      // Update user's off-chain balance
+      await db
+        .update(users)
+        .set({
+          time26Balance: sql`${users.time26Balance} + ${userReward.totalReward}::numeric`,
+        })
+        .where(eq(users.id, userReward.userId));
+    }
 
     // console.log(`[Rewards Cron] Settlement complete for ${dayId}`);
 
