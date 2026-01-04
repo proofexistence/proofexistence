@@ -135,12 +135,8 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           chainConfig,
           // Use redirect mode on mobile to avoid popup blockers
           uxMode: isMobile ? 'redirect' : 'popup',
-          uiConfig: {
-            appName: 'Proof of Existence',
-            mode: 'dark',
-            uxMode: isMobile ? 'redirect' : 'popup',
-          },
-          // Note: walletServicesConfig removed to avoid 403 on Base plan
+          // Note: uiConfig and walletServicesConfig removed to avoid 403 on Base plan
+          // (appName triggers whitelabel check, walletServicesConfig triggers wallet services check)
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {
