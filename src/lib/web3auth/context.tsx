@@ -135,7 +135,17 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           chainConfig,
           // Use redirect mode on mobile to avoid popup blockers
           uxMode: isMobile ? 'redirect' : 'popup',
-
+          // Disable Wallet Services to avoid 403 Forbidden on Base plan
+          // @ts-expect-error - walletServicesConfig might not be in the type definition
+          walletServicesConfig: {
+            setShowWalletServices: false,
+            hideNftDisplay: true,
+            hideTokenDisplay: true,
+            hideTransfers: true,
+            hideTopup: true,
+            hideSwap: true,
+            hideReceive: true,
+          },
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {
