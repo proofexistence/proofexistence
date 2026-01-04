@@ -138,8 +138,9 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           uiConfig: {
             appName: 'Proof of Existence',
             mode: 'dark',
-            loginMethodsOrder: ['google', 'twitter', 'email_passwordless'],
+            uxMode: isMobile ? 'redirect' : 'popup',
           },
+          // Note: walletServicesConfig removed to avoid 403 on Base plan
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {
