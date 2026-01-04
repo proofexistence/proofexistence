@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { Web3Auth } from '@web3auth/modal';
 import { ADAPTER_EVENTS, type IProvider } from '@web3auth/base';
-import { web3AuthConfig } from './config';
+import { web3AuthConfig, chainConfig } from './config';
 import { ethers } from 'ethers';
 
 export interface Web3AuthUser {
@@ -131,24 +131,12 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         const web3authInstance = new Web3Auth({
           clientId: web3AuthConfig.clientId,
           web3AuthNetwork: web3AuthConfig.web3AuthNetwork,
-          // chainConfig, // Removed in Web3Auth v10, manage in dashboard or use privateKeyProvider
-          uiConfig: {
-            // Use redirect mode on mobile to avoid popup blockers
-            mode: 'dark',
-            uxMode: isMobile ? 'redirect' : 'popup',
-          },
-          // Disable Wallet Services to avoid 403 Forbidden on Base plan
-
-          walletServicesConfig: {
-            whiteLabel: {
-              hideNftDisplay: true,
-              hideTokenDisplay: true,
-              hideTransfers: true,
-              hideTopup: true,
-              hideSwap: true,
-              hideReceive: true,
-            },
-          },
+          // @ts-expect-error - chainConfig exists in IWeb3AuthCoreOptions but not in modal's Web3AuthOptions
+          chainConfig,
+          // Use redirect mode on mobile to avoid popup blockers
+          uxMode: isMobile ? 'redirect' : 'popup',
+          // Note: uiConfig and walletServicesConfig removed to avoid 403 on Base plan
+          // (appName triggers whitelabel check, walletServicesConfig triggers wallet services check)
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {
