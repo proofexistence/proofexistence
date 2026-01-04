@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
     if (id || searchParams.get('image')) {
       let session = null;
 
-      // Priority: Construct from params if image is provided (avoids fetch)
-      if (searchParams.get('image')) {
+      // Priority: Construct from params if title is provided (avoids fetch)
+      if (searchParams.get('title')) {
         session = {
           id: id || 'preview',
           createdAt: searchParams.get('date') || new Date().toISOString(),
