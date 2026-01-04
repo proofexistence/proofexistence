@@ -131,7 +131,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         const web3authInstance = new Web3Auth({
           clientId: web3AuthConfig.clientId,
           web3AuthNetwork: web3AuthConfig.web3AuthNetwork,
-          // @ts-expect-error - chainConfig exists in IWeb3AuthCoreOptions but not in modal's Web3AuthOptions
           chainConfig,
           // Use redirect mode on mobile to avoid popup blockers
           uxMode: isMobile ? 'redirect' : 'popup',
