@@ -2,7 +2,7 @@ import { getRecentProofs } from '@/lib/db/queries/get-recent-proofs';
 import { ExploreClient } from '@/components/explore/explore-client';
 import { db } from '@/db';
 import { sessions } from '@/db/schema';
-import { inArray, sql } from 'drizzle-orm';
+import { inArray, sql, and, eq } from 'drizzle-orm';
 
 export const metadata = {
   title: 'Explore | Proof of Existence',
@@ -16,11 +16,16 @@ export default async function ExplorePage() {
   // Fetch initial proofs server-side
   const proofs = await getRecentProofs(20);
 
-  // Get total count for initial load
+  // Get total count for initial load (exclude hidden sessions)
   const totalResult = await db
     .select({ count: sql<number>`count(*)` })
     .from(sessions)
-    .where(inArray(sessions.status, ['MINTED', 'SETTLED']));
+    .where(
+      and(
+        inArray(sessions.status, ['MINTED', 'SETTLED']),
+        eq(sessions.hidden, 0)
+      )
+    );
 
   const total = Number(totalResult[0]?.count || 0);
 

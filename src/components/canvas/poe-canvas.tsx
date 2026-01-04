@@ -467,12 +467,16 @@ export function POECanvas() {
     onAction?: () => void;
     cancelLabel?: string;
     onCancel?: () => void;
+    shareSessionId?: string; // For share button
     isError?: boolean;
   }>({
     isOpen: false,
     title: '',
     description: '',
   });
+
+  // Share menu state for success dialog
+  const [showSuccessShareMenu, setShowSuccessShareMenu] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -783,11 +787,12 @@ export function POECanvas() {
 
           // Close submission modal explicitly before success dialog
           setShowSubmissionModal(false);
+          setShowSuccessShareMenu(false);
           setDialogState({
             isOpen: true,
             title: 'Proof Submitted!',
             description:
-              'Proof Submitted! It will be included in the daily snapshot. Would you like to create another or view your proof?',
+              'Proof Submitted! It will be included in the daily snapshot.',
             actionLabel: 'Create Another',
             onAction: () => {
               setShowSubmissionModal(false); // Force close
@@ -803,6 +808,7 @@ export function POECanvas() {
               setDialogState((prev) => ({ ...prev, isOpen: false }));
               router.push(`/proof/${sessionId}`);
             },
+            shareSessionId: sessionId || undefined,
           });
         } else {
           // INSTANT
@@ -1098,6 +1104,7 @@ export function POECanvas() {
 
           // Show Success Dialog
           setShowSubmissionModal(false); // Close submission modal FIRST
+          setShowSuccessShareMenu(false);
           setDialogState({
             isOpen: true,
             title: 'Perpetual Proof Minted!',
@@ -1129,9 +1136,6 @@ export function POECanvas() {
                     </a>
                   )}
                 </span>
-                <span className="text-sm mt-2">
-                  Would you like to create another or view your proof?
-                </span>
               </span>
             ),
             actionLabel: 'Create Another',
@@ -1151,6 +1155,7 @@ export function POECanvas() {
               setDialogState((prev) => ({ ...prev, isOpen: false }));
               router.push(`/proof/${sessionId}`);
             },
+            shareSessionId: sessionId || undefined,
           });
         }
       } catch (err: unknown) {
@@ -1476,7 +1481,10 @@ export function POECanvas() {
         <AlertDialog
           open={dialogState.isOpen}
           onOpenChange={(open) => {
-            if (!open) setDialogState((prev) => ({ ...prev, isOpen: false }));
+            if (!open) {
+              setDialogState((prev) => ({ ...prev, isOpen: false }));
+              setShowSuccessShareMenu(false);
+            }
           }}
         >
           <AlertDialogContent className="bg-black/90 border-white/10 text-white">
@@ -1490,7 +1498,127 @@ export function POECanvas() {
                 {dialogState.description}
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
+            <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+              {/* Share Button with Dropdown */}
+              {dialogState.shareSessionId && (
+                <div className="relative w-full sm:w-auto">
+                  <button
+                    onClick={() =>
+                      setShowSuccessShareMenu(!showSuccessShareMenu)
+                    }
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-pink-500 to-purple-500 hover:brightness-110 text-white text-sm font-medium transition-all"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <circle cx="18" cy="5" r="3" />
+                      <circle cx="6" cy="12" r="3" />
+                      <circle cx="18" cy="19" r="3" />
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                    </svg>
+                    Share
+                  </button>
+                  {showSuccessShareMenu && (
+                    <div className="absolute bottom-full left-0 mb-2 w-48 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 animate-in zoom-in-95 fade-in duration-200">
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/proof/${dialogState.shareSessionId}`;
+                          navigator.clipboard.writeText(url);
+                          setShowSuccessShareMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                        </svg>
+                        Copy Link
+                      </button>
+                      <div className="h-px bg-white/10" />
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/proof/${dialogState.shareSessionId}`;
+                          const text =
+                            'Check out my proof of existence on POE 2026';
+                          window.open(
+                            `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+                            '_blank'
+                          );
+                          setShowSuccessShareMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                        Post on X
+                      </button>
+                      <div className="h-px bg-white/10" />
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/proof/${dialogState.shareSessionId}`;
+                          const text =
+                            'Check out my proof of existence on POE 2026';
+                          window.open(
+                            `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+                            '_blank'
+                          );
+                          setShowSuccessShareMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068V12c.012-3.574.89-6.466 2.628-8.605C5.9 1.302 8.55.12 12.021.12c3.417 0 6.03 1.181 7.789 3.516 1.63 2.166 2.475 5.053 2.524 8.595l.001.024c-.049 3.542-.894 6.429-2.524 8.595-1.76 2.335-4.373 3.516-7.79 3.516l-.835-.366z" />
+                        </svg>
+                        Post on Threads
+                      </button>
+                      <div className="h-px bg-white/10" />
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/proof/${dialogState.shareSessionId}`;
+                          navigator.clipboard.writeText(url);
+                          window.open('https://instagram.com', '_blank');
+                          setShowSuccessShareMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-3"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                        </svg>
+                        Post on Instagram
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               {dialogState.cancelLabel && (
                 <AlertDialogCancel
                   className="bg-transparent border-white/20 text-white hover:bg-white/10 hover:text-white"

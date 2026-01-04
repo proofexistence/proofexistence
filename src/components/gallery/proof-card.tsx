@@ -11,9 +11,10 @@ import {
   Share2,
   Eye,
   EyeOff,
+  Link2,
 } from 'lucide-react';
 import { NFTThumbnail } from './nft-thumbnail';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useSavedProofs } from '@/hooks/use-saved-proofs';
 import { useLikes } from '@/hooks/use-likes';
@@ -80,8 +81,26 @@ export function ProofCard({
 
   // Share State
   const [isCopied, setIsCopied] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const shareMenuRef = useRef<HTMLDivElement>(null);
 
   const { isAuthenticated } = useUserProfile();
+
+  // Close share menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        shareMenuRef.current &&
+        !shareMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowShareMenu(false);
+      }
+    };
+    if (showShareMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showShareMenu]);
   const { login, user } = useWeb3Auth();
   const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
 
@@ -151,12 +170,51 @@ export function ProofCard({
   // Check if this proof is hidden
   const isHidden = hidden === 1;
 
-  const handleShare = (e: React.MouseEvent) => {
+  const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/proof/${id}`;
+  const displayTitle = title || `Proof #${shortId}`;
+  const shareText = `Check out this proof of existence: "${displayTitle}" on POE 2026`;
+
+  const handleShare = async (
+    e: React.MouseEvent,
+    mode: 'toggle' | 'copy' | 'twitter' | 'threads' | 'instagram' = 'toggle'
+  ) => {
     e.preventDefault();
-    const url = `${window.location.origin}/proof/${id}`;
-    navigator.clipboard.writeText(url);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    e.stopPropagation();
+
+    if (mode === 'toggle') {
+      setShowShareMenu(!showShareMenu);
+      return;
+    }
+
+    setShowShareMenu(false);
+
+    switch (mode) {
+      case 'copy':
+        await navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+        break;
+      case 'twitter':
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+          '_blank',
+          'noopener,noreferrer'
+        );
+        break;
+      case 'threads':
+        window.open(
+          `https://www.threads.net/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+          '_blank',
+          'noopener,noreferrer'
+        );
+        break;
+      case 'instagram':
+        await navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+        window.open('https://instagram.com', '_blank', 'noopener,noreferrer');
+        break;
+    }
   };
 
   // Status Badge Logic
@@ -322,17 +380,76 @@ export function ProofCard({
         </button>
 
         {/* Share */}
-        <button
-          onClick={handleShare}
-          className="flex items-center justify-center w-8 h-8 -mr-1 text-zinc-500 hover:text-white transition-colors"
-          title="Copy Link"
-        >
-          {isCopied ? (
-            <Check className="w-4 h-4 text-emerald-500" />
-          ) : (
-            <Share2 className="w-4 h-4" />
+        <div ref={shareMenuRef} className="relative">
+          <button
+            onClick={(e) => handleShare(e, 'toggle')}
+            className="flex items-center justify-center w-8 h-8 -mr-1 text-zinc-500 hover:text-white transition-colors"
+            title="Share"
+          >
+            {isCopied ? (
+              <Check className="w-4 h-4 text-emerald-500" />
+            ) : (
+              <Share2 className="w-4 h-4" />
+            )}
+          </button>
+
+          {showShareMenu && (
+            <div className="absolute bottom-full right-0 mb-2 w-44 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 animate-in zoom-in-95 fade-in duration-200">
+              <button
+                onClick={(e) => handleShare(e, 'copy')}
+                className="w-full text-left px-3 py-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5"
+              >
+                <Link2 className="w-3.5 h-3.5" />
+                Copy Link
+              </button>
+              <div className="h-px bg-white/10" />
+              <button
+                onClick={(e) => handleShare(e, 'twitter')}
+                className="w-full text-left px-3 py-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Post on X
+              </button>
+              <div className="h-px bg-white/10" />
+              <button
+                onClick={(e) => handleShare(e, 'threads')}
+                className="w-full text-left px-3 py-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068V12c.012-3.574.89-6.466 2.628-8.605C5.9 1.302 8.55.12 12.021.12c3.417 0 6.03 1.181 7.789 3.516 1.63 2.166 2.475 5.053 2.524 8.595l.001.024c-.049 3.542-.894 6.429-2.524 8.595-1.76 2.335-4.373 3.516-7.79 3.516l-.835-.366zm-.165-2.002c2.688 0 4.736-.879 6.089-2.614 1.261-1.619 1.929-3.974 1.977-6.999v-.003c-.048-3.032-.716-5.387-1.977-7.006C16.757 3.641 14.709 2.762 12.021 2.762c-2.719 0-4.785.881-6.145 2.618-1.261 1.612-1.929 3.962-1.977 6.988v.018c.048 3.012.716 5.358 1.977 6.969 1.36 1.737 3.426 2.618 6.145 2.618v.025zM8.08 15.879c-.24 0-.48-.088-.662-.264-.372-.36-.383-.956-.022-1.328l5.5-5.665c.361-.371.957-.382 1.328-.022.372.361.383.956.022 1.328l-5.5 5.665c-.184.19-.43.286-.666.286zm7.14.001c-.236 0-.471-.094-.647-.282l-5.5-5.883c-.35-.374-.33-.97.044-1.32.374-.35.97-.33 1.32.045l5.5 5.882c.35.374.33.97-.044 1.32-.18.168-.41.252-.64.252l-.033-.014z" />
+                </svg>
+                Post on Threads
+              </button>
+              <div className="h-px bg-white/10" />
+              <button
+                onClick={(e) => handleShare(e, 'instagram')}
+                className="w-full text-left px-3 py-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                </svg>
+                Post on Instagram
+              </button>
+            </div>
           )}
-        </button>
+        </div>
 
         {/* Visibility Toggle (Owner Only) */}
         {isOwner && (

@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { sessions, users } from '@/db/schema';
-import { desc, inArray, eq } from 'drizzle-orm';
+import { desc, inArray, eq, and } from 'drizzle-orm';
 
 export async function getRecentProofs(limit = 50) {
   try {
@@ -22,7 +22,12 @@ export async function getRecentProofs(limit = 50) {
       })
       .from(sessions)
       .leftJoin(users, eq(sessions.userId, users.id))
-      .where(inArray(sessions.status, ['MINTED', 'SETTLED', 'PENDING']))
+      .where(
+        and(
+          inArray(sessions.status, ['MINTED', 'SETTLED', 'PENDING']),
+          eq(sessions.hidden, 0)
+        )
+      )
       .orderBy(desc(sessions.createdAt))
       .limit(limit);
 
