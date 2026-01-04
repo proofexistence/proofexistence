@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -60,12 +61,26 @@ export async function POST(req: Request) {
       });
     }
 
-    // Create new user
+    // Generate username from email or wallet
     const username = email
       ? email.split('@')[0].replace(/[^a-zA-Z0-9_-]/g, '')
       : `user_${walletAddress.slice(-8).toLowerCase()}`;
 
     const referralCode = ethers.id(walletAddress).slice(2, 10);
+
+    // Resolve Referrer (if code provided in cookie)
+    let referredByUserId: string | null = null;
+    const cookieStore = await cookies();
+    const referredByCode = cookieStore.get('referral_code')?.value;
+
+    if (referredByCode) {
+      const referrer = await db.query.users.findFirst({
+        where: eq(users.referralCode, referredByCode),
+      });
+      if (referrer) {
+        referredByUserId = referrer.id;
+      }
+    }
 
     const [newUser] = await db
       .insert(users)
@@ -77,6 +92,7 @@ export async function POST(req: Request) {
         avatarUrl: avatarUrl || null,
         username,
         referralCode,
+        referredBy: referredByUserId,
       })
       .returning();
 

@@ -406,13 +406,12 @@ export function ProofViewer({
             </h1>
             <div
               className={`px-3 py-1 rounded-full text-[10px] font-bold border backdrop-blur-md uppercase tracking-wider shrink-0 mt-2
-                        ${
-                          session.status === 'MINTED'
-                            ? 'bg-purple-500/20 text-purple-200 border-purple-500/50'
-                            : session.status === 'SETTLED'
-                              ? 'bg-blue-500/20 text-blue-300 border-blue-500/50'
-                              : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50'
-                        }`}
+                        ${session.status === 'MINTED'
+                  ? 'bg-purple-500/20 text-purple-200 border-purple-500/50'
+                  : session.status === 'SETTLED'
+                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/50'
+                    : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50'
+                }`}
             >
               {session.status as string}
             </div>
@@ -429,11 +428,14 @@ export function ProofViewer({
                   <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 p-[1px]">
                     <div className="relative w-full h-full rounded-full bg-black overflow-hidden flex items-center justify-center">
                       {session.user?.avatarUrl ? (
-                        <img
-                          src={session.user.avatarUrl}
-                          alt={authorName}
-                          className="w-full h-full object-cover"
-                        />
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={session.user.avatarUrl}
+                            alt={authorName}
+                            className="w-full h-full object-cover"
+                          />
+                        </>
                       ) : (
                         <span className="text-sm">👤</span>
                       )}
@@ -452,11 +454,14 @@ export function ProofViewer({
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
                     {session.user?.avatarUrl ? (
-                      <img
-                        src={session.user.avatarUrl}
-                        alt={authorName}
-                        className="w-full h-full object-cover"
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={session.user.avatarUrl}
+                          alt={authorName}
+                          className="w-full h-full object-cover"
+                        />
+                      </>
                     ) : (
                       <span className="text-sm">👤</span>
                     )}

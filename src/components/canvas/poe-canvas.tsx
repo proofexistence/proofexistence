@@ -700,6 +700,34 @@ export function POECanvas() {
     [getAuthHeaders]
   );
 
+  // Request mint confirmation for non-Web3 users
+  const requestMintConfirmation = useCallback(
+    (data: MintConfirmationData): Promise<boolean> => {
+      return new Promise((resolve) => {
+        mintConfirmResolveRef.current = resolve;
+        setMintConfirmationData(data);
+        setShowMintConfirmation(true);
+      });
+    },
+    []
+  );
+
+  const handleMintConfirmationClose = useCallback((open: boolean) => {
+    if (!open && mintConfirmResolveRef.current) {
+      mintConfirmResolveRef.current(false);
+      mintConfirmResolveRef.current = null;
+    }
+    setShowMintConfirmation(open);
+  }, []);
+
+  const handleMintConfirm = useCallback(() => {
+    if (mintConfirmResolveRef.current) {
+      mintConfirmResolveRef.current(true);
+      mintConfirmResolveRef.current = null;
+    }
+    setShowMintConfirmation(false);
+  }, []);
+
   // Handle Modal Selection
   const handleProofSelection = useCallback(
     async (
@@ -1219,6 +1247,7 @@ export function POECanvas() {
       existingArweaveTxId,
       deleteSession,
       setLoadingStatus,
+      requestMintConfirmation,
     ]
   );
 
@@ -1239,33 +1268,7 @@ export function POECanvas() {
     setTrailColor(color);
   }, []);
 
-  // Request mint confirmation for non-Web3 users
-  const requestMintConfirmation = useCallback(
-    (data: MintConfirmationData): Promise<boolean> => {
-      return new Promise((resolve) => {
-        mintConfirmResolveRef.current = resolve;
-        setMintConfirmationData(data);
-        setShowMintConfirmation(true);
-      });
-    },
-    []
-  );
 
-  const handleMintConfirmationClose = useCallback((open: boolean) => {
-    if (!open && mintConfirmResolveRef.current) {
-      mintConfirmResolveRef.current(false);
-      mintConfirmResolveRef.current = null;
-    }
-    setShowMintConfirmation(open);
-  }, []);
-
-  const handleMintConfirm = useCallback(() => {
-    if (mintConfirmResolveRef.current) {
-      mintConfirmResolveRef.current(true);
-      mintConfirmResolveRef.current = null;
-    }
-    setShowMintConfirmation(false);
-  }, []);
 
   // Zoom Handlers
 

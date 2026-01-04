@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -65,6 +66,20 @@ export async function POST(req: Request) {
     const username = `user_${walletAddress.slice(-8).toLowerCase()}`;
     const referralCode = ethers.id(walletAddress).slice(2, 10);
 
+    // Resolve Referrer (if code provided in cookie)
+    let referredByUserId: string | null = null;
+    const cookieStore = await cookies();
+    const referredByCode = cookieStore.get('referral_code')?.value;
+
+    if (referredByCode) {
+      const referrer = await db.query.users.findFirst({
+        where: eq(users.referralCode, referredByCode),
+      });
+      if (referrer) {
+        referredByUserId = referrer.id;
+      }
+    }
+
     await db.insert(users).values({
       clerkId: null,
       walletAddress,
@@ -72,7 +87,7 @@ export async function POST(req: Request) {
       name: null,
       username,
       referralCode,
-      referredBy: null,
+      referredBy: referredByUserId,
     });
 
     return NextResponse.json({
