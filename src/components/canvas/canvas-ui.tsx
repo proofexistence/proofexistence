@@ -2,7 +2,6 @@
 
 import { TRAIL_COLORS } from './light-trail';
 import { MIN_SESSION_DURATION } from '@/types/session';
-import { Highlighter } from '../ui/highlighter';
 import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
@@ -24,23 +23,113 @@ interface TimerDisplayProps {
   duration: number;
   isRecording: boolean;
   isValid: boolean;
+  isPaused?: boolean;
+  onClear?: () => void;
+  onFinish?: () => void;
 }
 
 export function TimerDisplay({
   duration,
   isRecording,
   isValid,
+  isPaused = false,
+  onClear,
+  onFinish,
 }: TimerDisplayProps) {
   const getIndicatorClass = () => {
+    if (isPaused)
+      return 'bg-amber-500 animate-pulse shadow-lg shadow-amber-500/50';
     if (!isRecording) return 'bg-gray-500';
     if (isValid)
       return 'bg-green-500 animate-pulse shadow-lg shadow-green-500/50';
     return 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50';
   };
 
+  // When paused, show expanded timer with controls
+  if (isPaused) {
+    return (
+      <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 pointer-events-auto">
+        <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-4 py-3 border border-amber-500/20 shadow-lg shadow-amber-500/10 transition-all duration-300 animate-in fade-in zoom-in-95">
+          {/* Timer row */}
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div
+              className={`w-3 h-3 rounded-full border border-white/30 transition-colors duration-300 ${getIndicatorClass()}`}
+            />
+            <span className="text-white font-mono text-lg tracking-wider">
+              {formatTime(duration)}
+            </span>
+            <span className="text-amber-300 text-xs font-medium px-2 py-0.5 bg-amber-500/20 rounded-full">
+              PAUSED
+            </span>
+          </div>
+          {/* Hint text */}
+          <p className="text-white/40 text-[10px] text-center mb-3">
+            Click canvas to continue
+            {!isValid && ` • ${MIN_SESSION_DURATION}s min`}
+          </p>
+          {/* Buttons row */}
+          <div className="flex gap-2 justify-center">
+            {onClear && (
+              <button
+                onClick={onClear}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                  bg-white/10 border border-white/20 text-white/70 hover:bg-white/20 hover:text-white
+                  backdrop-blur-md transition-all active:scale-95"
+              >
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Restart
+              </button>
+            )}
+            {onFinish && (
+              <button
+                onClick={onFinish}
+                disabled={!isValid}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                  backdrop-blur-md transition-all
+                  ${
+                    isValid
+                      ? 'bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/30 active:scale-95'
+                      : 'bg-zinc-800/50 border border-zinc-700/30 text-zinc-500 cursor-not-allowed opacity-50'
+                  }`}
+              >
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Done
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Normal timer display
   return (
     <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 pointer-events-none">
-      <div className="bg-black/20 backdrop-blur-xl rounded-full px-3 py-1.5 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 border border-white/10 shadow-lg shadow-black/20 transition-all duration-300">
+      <div className="bg-black/30 backdrop-blur-xl rounded-full px-3 py-1.5 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 border border-white/10 shadow-lg shadow-black/20 transition-all duration-300">
         <div
           className={`w-3 h-3 rounded-full border border-white/30 transition-colors duration-300 ${getIndicatorClass()}`}
         />
@@ -107,17 +196,47 @@ interface ActionButtonsProps {
 
 export function ActionButtons({ onClear, onSubmit }: ActionButtonsProps) {
   return (
-    <div className="flex gap-3 pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
+    <div className="flex gap-2 pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
       <button
         onClick={onClear}
-        className="h-10 flex items-center justify-center bg-black/40 hover:bg-black/60 backdrop-blur-xl text-white font-medium px-4 rounded-xl transition-all border border-white/10 hover:border-white/20 active:scale-95"
+        className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium
+          bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white
+          backdrop-blur-md transition-all active:scale-95"
       >
-        Clear & Start
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
+        </svg>
+        Restart
       </button>
       <button
         onClick={onSubmit}
-        className="h-10 flex items-center justify-center bg-[linear-gradient(to_bottom_right,#0CC9F2,#4877DA,#7E44DB)] hover:brightness-110 backdrop-blur-xl text-white font-medium px-6 rounded-xl transition-all border border-purple-400/30 hover:border-purple-400/50 shadow-lg shadow-purple-500/20 active:scale-95"
+        className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium
+          bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/30
+          backdrop-blur-md transition-all shadow-lg shadow-emerald-500/10 active:scale-95"
       >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
         Submit Proof
       </button>
     </div>
@@ -211,10 +330,54 @@ export function ExitControls({ onExit }: ExitControlsProps) {
   );
 }
 
+// -- Component: Glassmorphism Button --
+interface GlassButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+  variant?: 'primary' | 'secondary' | 'danger';
+  children: React.ReactNode;
+}
+
+function GlassButton({
+  onClick,
+  disabled = false,
+  variant = 'primary',
+  children,
+}: GlassButtonProps) {
+  const variantStyles = {
+    primary:
+      'bg-emerald-500/20 border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/30 hover:border-emerald-400/50 shadow-emerald-500/20',
+    secondary:
+      'bg-white/10 border-white/20 text-white/80 hover:bg-white/20 hover:border-white/30 hover:text-white',
+    danger:
+      'bg-red-500/20 border-red-400/30 text-red-300 hover:bg-red-500/30 hover:border-red-400/50 shadow-red-500/20',
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`
+        flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium
+        backdrop-blur-md border transition-all duration-200 shadow-lg
+        ${
+          disabled
+            ? 'bg-zinc-800/50 border-zinc-700/30 text-zinc-500 cursor-not-allowed opacity-50'
+            : variantStyles[variant]
+        }
+        ${!disabled && 'active:scale-95'}
+      `}
+    >
+      {children}
+    </button>
+  );
+}
+
 // -- Component: Instructions / Status --
 interface InstructionsProps {
   isRecording: boolean;
   isReady: boolean;
+  isPaused?: boolean;
   onClear?: () => void;
   onSubmit?: () => void;
   themeName?: string;
@@ -223,75 +386,142 @@ interface InstructionsProps {
 export function Instructions({
   isRecording,
   isReady,
+  isPaused = false,
   onClear,
   onSubmit,
   themeName,
 }: InstructionsProps) {
-  const positionClass = isRecording
-    ? 'absolute top-24 md:top-32 left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-4 w-full px-4'
-    : 'absolute bottom-12 left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-4 w-full px-4';
+  // Position changes based on state
+  // Paused state uses pointer-events-none on container so clicks pass through to canvas
+  const getPositionClass = () => {
+    if (isRecording) {
+      return 'absolute top-24 md:top-32 left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-4 w-full px-4';
+    }
+    if (isPaused) {
+      return 'absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-none flex flex-col items-center gap-4 w-full px-4';
+    }
+    return 'absolute bottom-12 left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-4 w-full px-4';
+  };
 
   return (
-    <div className={positionClass}>
-      {!isReady && !isRecording && (
-        <div className="bg-black/20 backdrop-blur-xl rounded-2xl px-8 py-5 border border-white/10 shadow-lg shadow-black/20 text-center animate-in fade-in zoom-in-95 duration-500">
-          <p className="text-white text-lg font-light mb-2 flex items-center gap-2 justify-center">
-            <Highlighter action="underline" color="#D8B4FE">
-              Click and hold
-            </Highlighter>{' '}
-            to draw
+    <div className={getPositionClass()}>
+      {/* Idle state - not recording, not paused, not ready */}
+      {!isReady && !isRecording && !isPaused && (
+        <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-6 py-4 border border-white/10 shadow-lg shadow-black/30 text-center animate-in fade-in zoom-in-95 duration-500">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-400/30 flex items-center justify-center">
+              <svg
+                className="w-4 h-4 text-purple-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                />
+              </svg>
+            </div>
+            <p className="text-white text-base font-medium">
+              Click & hold to draw
+            </p>
+          </div>
+          <p className="text-white/50 text-xs mb-3">
+            Draw for at least{' '}
+            <span className="text-purple-300 font-medium">
+              {MIN_SESSION_DURATION}s
+            </span>{' '}
+            to create a proof
           </p>
-          <p className="text-white/60 text-sm">
-            Create a light trail for{' '}
-            <Highlighter action="highlight" color="#A855F7">
-              at least 10s
-            </Highlighter>{' '}
-            to generate a proof
-          </p>
-          <div className="mt-4 pt-4 border-t border-white/10">
-            <p className="text-white/40 text-xs font-mono">
-              Theme: {themeName || 'Default'} (Ctrl + B to cycle)
+          <div className="pt-3 border-t border-white/5">
+            <p className="text-white/30 text-[10px] font-mono">
+              Theme: {themeName || 'Default'} • Ctrl+B to cycle
             </p>
           </div>
         </div>
       )}
 
+      {/* Recording state - actively drawing */}
       {isRecording && (
         <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="bg-black/20 backdrop-blur-xl rounded-2xl px-6 py-3 border border-white/10 shadow-lg shadow-black/20">
-            <p className="text-white/80 text-sm font-light flex items-center gap-2">
-              <span>🖱️</span> Release to stop • Move cursor to draw
+          <div className="bg-black/30 backdrop-blur-xl rounded-xl px-4 py-2.5 border border-green-500/20 shadow-lg shadow-green-500/10">
+            <p className="text-white/70 text-xs font-medium flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              Recording • Release to pause
             </p>
           </div>
         </div>
       )}
 
+      {/* Paused state - controls are now in the timer at the top */}
+      {/* This section intentionally left empty - see TimerDisplay for pause controls */}
+
+      {/* Ready state - session finished, can submit */}
       {isReady && !isRecording && (
-        <div className="bg-black/20 backdrop-blur-xl rounded-2xl px-8 py-5 border border-white/10 shadow-lg shadow-black/20 text-center animate-in fade-in zoom-in-95 duration-500">
-          <p className="text-transparent bg-clip-text bg-[linear-gradient(to_right,#0CC9F2,#4877DA,#7E44DB)] text-lg font-bold mb-2 flex items-center gap-2 justify-center">
-            <svg
-              className="w-5 h-5 text-[#0CC9F2]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            Proof recorded!
-          </p>
-          <div className="hidden md:block">
-            <p className="text-white/60 text-sm">
-              Use buttons above to Submit or Clear & Start new
+        <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-6 py-4 border border-cyan-500/20 shadow-lg shadow-cyan-500/10 text-center animate-in fade-in zoom-in-95 duration-500">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center">
+              <svg
+                className="w-4 h-4 text-cyan-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <p className="text-cyan-300 text-base font-medium">
+              Ready to submit!
             </p>
           </div>
-          <div className="block md:hidden mt-4">
+          <div className="hidden md:block">
+            <p className="text-white/50 text-xs">
+              Use buttons above to submit or restart
+            </p>
+          </div>
+          <div className="block md:hidden mt-3">
             {onClear && onSubmit && (
-              <ActionButtons onClear={onClear} onSubmit={onSubmit} />
+              <div className="flex gap-2 justify-center">
+                <GlassButton onClick={onClear} variant="secondary">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Restart
+                </GlassButton>
+                <GlassButton onClick={onSubmit} variant="primary">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Submit
+                </GlassButton>
+              </div>
             )}
           </div>
         </div>
@@ -328,27 +558,73 @@ export function ClearConfirmModal({
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-50 animate-in fade-in duration-200">
       <div
-        className="bg-black/60 backdrop-blur-sm absolute inset-0"
+        className="bg-black/40 backdrop-blur-sm absolute inset-0"
         onClick={onCancel}
       />
-      <div className="bg-black/80 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl shadow-black/40 z-10 max-w-sm mx-4 transform transition-all scale-100">
-        <h3 className="text-white text-lg font-medium mb-3">
-          Start New Drawing?
-        </h3>
-        <p className="text-white/70 text-sm mb-5">
-          This will clear your current trail. Would you like to continue?
+      <div className="bg-black/30 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-lg shadow-black/30 z-10 max-w-sm mx-4 animate-in fade-in zoom-in-95 duration-300">
+        {/* Header with icon */}
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-400/30 flex items-center justify-center">
+            <svg
+              className="w-5 h-5 text-amber-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </div>
+          <h3 className="text-white text-lg font-medium">Start New Drawing?</h3>
+        </div>
+        <p className="text-white/50 text-sm text-center mb-5">
+          This will clear your current trail and reset the timer.
         </p>
-        <div className="flex gap-3">
+        <div className="flex gap-2 justify-center">
           <button
             onClick={onCancel}
-            className="flex-1 bg-black/40 hover:bg-black/60 text-white font-medium px-4 py-2.5 rounded-lg transition-all border border-white/10 hover:border-white/20"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium
+              bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white
+              backdrop-blur-md transition-all active:scale-95"
           >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
             Keep Trail
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 bg-[linear-gradient(to_bottom_right,#0CC9F2,#4877DA,#7E44DB)] hover:brightness-110 text-white font-medium px-4 py-2.5 rounded-lg transition-all shadow-lg hover:shadow-purple-500/25"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium
+              bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/30
+              backdrop-blur-md transition-all shadow-lg shadow-cyan-500/10 active:scale-95"
           >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
             Clear & Start
           </button>
         </div>

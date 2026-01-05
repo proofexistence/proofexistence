@@ -4,6 +4,7 @@ import { useRef, useCallback } from 'react';
 import {
   TrailPoint,
   SessionState,
+  DrawingState,
   MIN_SESSION_DURATION,
 } from '@/types/session';
 
@@ -12,60 +13,133 @@ const INITIAL_STATE: SessionState = {
   startTime: null,
   duration: 0,
   points: [],
-  sectorId: 1, // Default sector
+  sectorId: 1,
+  // Multi-stroke support
+  drawingState: 'idle',
+  strokeStartTime: null,
+  cumulativeDrawingMs: 0,
 };
 
 export function useTrailRecorder() {
-  const stateRef = useRef<SessionState>(INITIAL_STATE);
+  const stateRef = useRef<SessionState>({ ...INITIAL_STATE });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Start recording a new session
-  const startRecording = useCallback(() => {
-    stateRef.current = {
-      ...INITIAL_STATE,
-      isRecording: true,
-      startTime: Date.now(),
-      points: [],
-    };
+  // Start or stop the duration update interval
+  const startTimerInterval = useCallback(() => {
+    if (intervalRef.current) return; // Already running
 
-    // Update duration every 100ms
     intervalRef.current = setInterval(() => {
-      if (stateRef.current.startTime) {
+      if (
+        stateRef.current.drawingState === 'drawing' &&
+        stateRef.current.strokeStartTime
+      ) {
+        const strokeElapsed = Date.now() - stateRef.current.strokeStartTime;
         stateRef.current.duration =
-          (Date.now() - stateRef.current.startTime) / 1000;
+          (stateRef.current.cumulativeDrawingMs + strokeElapsed) / 1000;
       }
     }, 100);
-
-    return stateRef.current;
   }, []);
 
-  // Stop recording and return the session data
-  const stopRecording = useCallback(() => {
+  const stopTimerInterval = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+  }, []);
 
-    const finalState = { ...stateRef.current };
-    finalState.isRecording = false;
+  // Start a new stroke (or start first stroke of session)
+  const startStroke = useCallback(() => {
+    const now = Date.now();
+    const currentState = stateRef.current.drawingState;
 
-    if (finalState.startTime) {
-      finalState.duration = (Date.now() - finalState.startTime) / 1000;
+    if (currentState === 'idle') {
+      // First stroke - initialize new session
+      stateRef.current = {
+        ...INITIAL_STATE,
+        isRecording: true,
+        startTime: now,
+        strokeStartTime: now,
+        drawingState: 'drawing',
+        points: [],
+        sectorId: stateRef.current.sectorId, // Preserve sectorId
+      };
+    } else if (currentState === 'paused') {
+      // Resuming from pause - add stroke boundary marker
+      stateRef.current.points.push({ x: 0, y: 0, z: 0, t: -1 });
+      stateRef.current.strokeStartTime = now;
+      stateRef.current.drawingState = 'drawing';
+      stateRef.current.isRecording = true;
+    }
+    // If already 'drawing' or 'done', do nothing
+
+    startTimerInterval();
+    return stateRef.current;
+  }, [startTimerInterval]);
+
+  // End current stroke (pause)
+  const endStroke = useCallback(() => {
+    if (stateRef.current.drawingState !== 'drawing') {
+      return stateRef.current;
     }
 
-    stateRef.current = INITIAL_STATE;
+    const now = Date.now();
+    const strokeDuration = stateRef.current.strokeStartTime
+      ? now - stateRef.current.strokeStartTime
+      : 0;
+
+    // Accumulate drawing time
+    stateRef.current.cumulativeDrawingMs += strokeDuration;
+    stateRef.current.duration = stateRef.current.cumulativeDrawingMs / 1000;
+    stateRef.current.drawingState = 'paused';
+    stateRef.current.strokeStartTime = null;
+    stateRef.current.isRecording = false;
+
+    stopTimerInterval();
+    return { ...stateRef.current };
+  }, [stopTimerInterval]);
+
+  // Finish session completely (called when user clicks "Done")
+  const finishSession = useCallback(() => {
+    // If currently drawing, end the stroke first
+    if (stateRef.current.drawingState === 'drawing') {
+      endStroke();
+    }
+
+    stateRef.current.drawingState = 'done';
+    stateRef.current.isRecording = false;
+
+    const finalState = { ...stateRef.current };
     return finalState;
-  }, []);
+  }, [endStroke]);
+
+  // Reset to initial state (for clearing)
+  const resetSession = useCallback(() => {
+    stopTimerInterval();
+    stateRef.current = {
+      ...INITIAL_STATE,
+      sectorId: stateRef.current.sectorId,
+    };
+    return stateRef.current;
+  }, [stopTimerInterval]);
 
   // Record a new trail point (called on mouse/touch move)
   const recordPoint = useCallback((x: number, y: number, z: number = 0) => {
-    if (!stateRef.current.isRecording || !stateRef.current.startTime) return;
+    if (
+      stateRef.current.drawingState !== 'drawing' ||
+      !stateRef.current.strokeStartTime
+    ) {
+      return;
+    }
+
+    // Calculate time: cumulative + current stroke elapsed
+    const strokeElapsed = Date.now() - stateRef.current.strokeStartTime;
+    const totalElapsed = stateRef.current.cumulativeDrawingMs + strokeElapsed;
 
     const point: TrailPoint = {
       x,
       y,
       z,
-      t: Date.now() - stateRef.current.startTime,
+      t: totalElapsed,
     };
 
     stateRef.current.points.push(point);
@@ -76,9 +150,21 @@ export function useTrailRecorder() {
     return stateRef.current.duration >= MIN_SESSION_DURATION;
   }, []);
 
+  // Check if session has enough points
+  const isValidPoints = useCallback(() => {
+    // Count actual points (exclude boundary markers)
+    const actualPoints = stateRef.current.points.filter((p) => p.t !== -1);
+    return actualPoints.length >= 5;
+  }, []);
+
   // Get current state (for UI updates)
   const getState = useCallback(() => {
     return { ...stateRef.current };
+  }, []);
+
+  // Get current drawing state
+  const getDrawingState = useCallback((): DrawingState => {
+    return stateRef.current.drawingState;
   }, []);
 
   // Set the sector ID
@@ -87,8 +173,17 @@ export function useTrailRecorder() {
   }, []);
 
   return {
-    startRecording,
-    stopRecording,
+    // Multi-stroke functions (new)
+    startStroke,
+    endStroke,
+    finishSession,
+    resetSession,
+    getDrawingState,
+    isValidPoints,
+    // Legacy aliases for backward compatibility
+    startRecording: startStroke,
+    stopRecording: finishSession,
+    // Shared functions
     recordPoint,
     isValidDuration,
     getState,

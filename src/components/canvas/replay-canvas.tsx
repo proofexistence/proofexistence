@@ -6,7 +6,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { type TrailPoint } from '@/types/session';
-import { SpaceBackground } from './light-trail';
+import { SpaceBackground, splitIntoStrokes } from './light-trail';
 import { ParticleSystem } from './particles';
 
 export interface ReplayCanvasRef {
@@ -42,7 +42,75 @@ const CanvasCapture = forwardRef<CanvasCaptureRef, unknown>((_, ref) => {
 });
 CanvasCapture.displayName = 'CanvasCapture';
 
-// Main renderer using TubeGeometry
+// Process points: filter duplicates and smooth
+function processPoints(points: TrailPoint[], size: number): TrailPoint[] {
+  if (points.length < 2) return [];
+  const uniquePoints: TrailPoint[] = [points[0]];
+  let lastPoint = points[0];
+
+  const minDistance = size * 0.5;
+
+  for (let i = 1; i < points.length; i++) {
+    const p = points[i];
+    const dist = Math.sqrt(
+      Math.pow(p.x - lastPoint.x, 2) +
+        Math.pow(p.y - lastPoint.y, 2) +
+        Math.pow(p.z - lastPoint.z, 2)
+    );
+    if (dist > minDistance) {
+      uniquePoints.push(p);
+      lastPoint = p;
+    }
+  }
+  return uniquePoints;
+}
+
+// Single stroke renderer for replay
+function StrokeRenderer({
+  points,
+  size,
+  color,
+}: {
+  points: TrailPoint[];
+  size: number;
+  color: string;
+}) {
+  const processedPoints = useMemo(
+    () => processPoints(points, size),
+    [points, size]
+  );
+
+  const curve = useMemo(() => {
+    if (processedPoints.length < 2) return null;
+    const vectors = processedPoints.map(
+      (p) => new THREE.Vector3(p.x, p.y, p.z)
+    );
+    return new THREE.CatmullRomCurve3(vectors);
+  }, [processedPoints]);
+
+  const geometry = useMemo(() => {
+    if (!curve) return null;
+    const tubularSegments = Math.min(processedPoints.length * 8, 2000);
+    return new THREE.TubeGeometry(curve, tubularSegments, size, 8, false);
+  }, [curve, processedPoints.length, size]);
+
+  if (!geometry) return null;
+
+  return (
+    <mesh geometry={geometry}>
+      <meshStandardMaterial
+        color="#000000"
+        emissive={new THREE.Color(color).multiplyScalar(8)}
+        emissiveIntensity={0.5}
+        toneMapped={false}
+        transparent
+        opacity={0.8}
+      />
+    </mesh>
+  );
+}
+
+// Main renderer using TubeGeometry (supports multi-stroke)
 function TrailRenderer({
   points,
   size = 0.2,
@@ -54,69 +122,30 @@ function TrailRenderer({
   isSpinning?: boolean;
   color?: string;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
 
-  // Filter and smooth points to prevent TubeGeometry errors
-  const processedPoints = useMemo(() => {
-    if (points.length < 2) return [];
-    const uniquePoints: TrailPoint[] = [points[0]];
-    let lastPoint = points[0];
-
-    // Filter points that are too close (min distance scaled by size)
-    const minDistance = size * 0.5;
-
-    for (let i = 1; i < points.length; i++) {
-      const p = points[i];
-      const dist = Math.sqrt(
-        Math.pow(p.x - lastPoint.x, 2) +
-          Math.pow(p.y - lastPoint.y, 2) +
-          Math.pow(p.z - lastPoint.z, 2)
-      );
-      if (dist > minDistance) {
-        // Threshold
-        uniquePoints.push(p);
-        lastPoint = p;
-      }
-    }
-    return uniquePoints;
-  }, [points, size]);
-
-  // Convert points to CatmullRomCurve3 for smooth path
-  const curve = useMemo(() => {
-    if (processedPoints.length < 2) return null;
-    const vectors = processedPoints.map(
-      (p) => new THREE.Vector3(p.x, p.y, p.z)
-    );
-    return new THREE.CatmullRomCurve3(vectors);
-  }, [processedPoints]);
-
-  // Create geometry based on the full curve
-  const geometry = useMemo(() => {
-    if (!curve) return null;
-    // Increase segments for smoother look on larger scales
-    const tubularSegments = Math.min(processedPoints.length * 8, 2000);
-    return new THREE.TubeGeometry(curve, tubularSegments, size, 8, false);
-  }, [curve, processedPoints.length, size]);
+  // Split points into strokes (supports multi-stroke sessions)
+  const strokes = useMemo(() => splitIntoStrokes(points), [points]);
 
   useFrame((state, delta) => {
-    if (meshRef.current && isSpinning) {
-      meshRef.current.rotation.y += delta * 0.2;
+    if (groupRef.current && isSpinning) {
+      groupRef.current.rotation.y += delta * 0.2;
     }
   });
 
-  if (!geometry) return null;
+  if (strokes.length === 0) return null;
 
   return (
-    <mesh ref={meshRef} geometry={geometry}>
-      <meshStandardMaterial
-        color="#000000"
-        emissive={new THREE.Color(color).multiplyScalar(8)}
-        emissiveIntensity={0.5}
-        toneMapped={false}
-        transparent
-        opacity={0.8}
-      />
-    </mesh>
+    <group ref={groupRef}>
+      {strokes.map((strokePoints, index) => (
+        <StrokeRenderer
+          key={index}
+          points={strokePoints}
+          size={size}
+          color={color}
+        />
+      ))}
+    </group>
   );
 }
 

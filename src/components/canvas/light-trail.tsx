@@ -10,40 +10,67 @@ interface LightTrailProps {
   color?: string;
 }
 
-export function LightTrail({
-  points,
-  color = '#7C3AED',
-  autoRotate = false, // Default to no rotation for easier drawing
-}: LightTrailProps & { autoRotate?: boolean }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+// Split points array into separate strokes at t=-1 boundary markers
+export function splitIntoStrokes(points: TrailPoint[]): TrailPoint[][] {
+  if (points.length === 0) return [];
 
-  // Filter and smooth points (shared logic with ReplayCanvas)
-  const processedPoints = useMemo(() => {
-    if (points.length < 2) return [];
-    const uniquePoints: TrailPoint[] = [points[0]];
-    let lastPoint = points[0];
+  const strokes: TrailPoint[][] = [];
+  let currentStroke: TrailPoint[] = [];
 
-    // Fixed radius for recording view
-    // Reduced to 0.02 for finer detail
-    const radius = 0.02;
-    const minDistance = radius * 0.5;
-
-    for (let i = 1; i < points.length; i++) {
-      const p = points[i];
-      const dist = Math.sqrt(
-        Math.pow(p.x - lastPoint.x, 2) +
-          Math.pow(p.y - lastPoint.y, 2) +
-          Math.pow(p.z - lastPoint.z, 2)
-      );
-      if (dist > minDistance) {
-        uniquePoints.push(p);
-        lastPoint = p;
+  for (const point of points) {
+    if (point.t === -1) {
+      // Marker found - save current stroke and start new one
+      if (currentStroke.length >= 2) {
+        strokes.push(currentStroke);
       }
+      currentStroke = [];
+    } else {
+      currentStroke.push(point);
     }
-    return uniquePoints;
-  }, [points]);
+  }
 
-  // Create curve
+  // Don't forget the last stroke
+  if (currentStroke.length >= 2) {
+    strokes.push(currentStroke);
+  }
+
+  return strokes;
+}
+
+// Process points: filter duplicates and smooth
+function processPoints(points: TrailPoint[]): TrailPoint[] {
+  if (points.length < 2) return [];
+  const uniquePoints: TrailPoint[] = [points[0]];
+  let lastPoint = points[0];
+
+  const radius = 0.02;
+  const minDistance = radius * 0.5;
+
+  for (let i = 1; i < points.length; i++) {
+    const p = points[i];
+    const dist = Math.sqrt(
+      Math.pow(p.x - lastPoint.x, 2) +
+        Math.pow(p.y - lastPoint.y, 2) +
+        Math.pow(p.z - lastPoint.z, 2)
+    );
+    if (dist > minDistance) {
+      uniquePoints.push(p);
+      lastPoint = p;
+    }
+  }
+  return uniquePoints;
+}
+
+// Single stroke renderer component
+function StrokeRenderer({
+  points,
+  color,
+}: {
+  points: TrailPoint[];
+  color: string;
+}) {
+  const processedPoints = useMemo(() => processPoints(points), [points]);
+
   const curve = useMemo(() => {
     if (processedPoints.length < 2) return null;
     const vectors = processedPoints.map(
@@ -52,33 +79,53 @@ export function LightTrail({
     return new THREE.CatmullRomCurve3(vectors);
   }, [processedPoints]);
 
-  // Create geometry
   const geometry = useMemo(() => {
     if (!curve) return null;
     const tubularSegments = Math.min(processedPoints.length * 8, 2000);
     return new THREE.TubeGeometry(curve, tubularSegments, 0.02, 8, false);
   }, [curve, processedPoints.length]);
 
-  // Rotate slowly like the replay view (only if enabled)
-  useFrame((state, delta) => {
-    if (meshRef.current && autoRotate) {
-      meshRef.current.rotation.y += delta * 0.2;
-    }
-  });
-
   if (!geometry) return null;
 
   return (
-    <mesh ref={meshRef} geometry={geometry}>
+    <mesh geometry={geometry}>
       <meshStandardMaterial
         color="#000000"
-        emissive={new THREE.Color(color).multiplyScalar(10)} // boost for HDR glow
+        emissive={new THREE.Color(color).multiplyScalar(10)}
         emissiveIntensity={0.5}
         toneMapped={false}
         transparent
         opacity={0.8}
       />
     </mesh>
+  );
+}
+
+export function LightTrail({
+  points,
+  color = '#7C3AED',
+  autoRotate = false,
+}: LightTrailProps & { autoRotate?: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  // Split points into strokes (supports multi-stroke sessions)
+  const strokes = useMemo(() => splitIntoStrokes(points), [points]);
+
+  // Rotate slowly like the replay view (only if enabled)
+  useFrame((state, delta) => {
+    if (groupRef.current && autoRotate) {
+      groupRef.current.rotation.y += delta * 0.2;
+    }
+  });
+
+  if (strokes.length === 0) return null;
+
+  return (
+    <group ref={groupRef}>
+      {strokes.map((strokePoints, index) => (
+        <StrokeRenderer key={index} points={strokePoints} color={color} />
+      ))}
+    </group>
   );
 }
 

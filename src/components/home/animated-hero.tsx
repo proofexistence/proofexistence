@@ -157,7 +157,7 @@ export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
         <Link
           ref={ctaRef}
           href="/cosmos"
-          className="group px-8 py-3 mb-12 bg-[linear-gradient(to_right,#0CC9F2,#4877DA,#7E44DB)] hover:brightness-110 text-white rounded-full font-bold shadow-lg shadow-purple-900/50 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden"
+          className="group px-8 py-3 mb-12 bg-cyan-500/20 hover:bg-cyan-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-cyan-400/30 hover:border-cyan-400/50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden"
         >
           <span className="relative z-10">Explore Cosmos</span>
           <svg

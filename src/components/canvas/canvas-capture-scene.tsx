@@ -1,11 +1,11 @@
 'use client';
 
 import { useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import * as THREE from 'three';
 import { TrailPoint } from '@/types/session';
 import { PerspectiveCamera } from '@react-three/drei';
-import { SpaceBackground } from './light-trail';
+import { SpaceBackground, splitIntoStrokes } from './light-trail';
 import { ParticleSystem } from './particles';
 
 // Reusing the exact visual style from ReplayCanvas
@@ -30,53 +30,21 @@ export function CaptureScene({
   );
 }
 
-function CaptureContent({
+// Single stroke renderer for capture
+function StrokeRenderer({
   points,
+  tubeRadius,
   color,
 }: {
   points: TrailPoint[];
-  color?: string;
+  tubeRadius: number;
+  color: string;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const { viewport } = useThree();
-
-  // 1. Calculate Bounds & Center
-  const bounds = useMemo(() => {
-    if (points.length === 0)
-      return { center: [0, 0, 0], radius: 10, maxDim: 10 };
-
-    let minX = Infinity,
-      minY = Infinity,
-      minZ = Infinity;
-    let maxX = -Infinity,
-      maxY = -Infinity,
-      maxZ = -Infinity;
-
-    points.forEach((p) => {
-      minX = Math.min(minX, p.x);
-      minY = Math.min(minY, p.y);
-      minZ = Math.min(minZ, p.z);
-      maxX = Math.max(maxX, p.x);
-      maxY = Math.max(maxY, p.y);
-      maxZ = Math.max(maxZ, p.z);
-    });
-
-    const center = [(minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2];
-    // Radius encompassing the object
-    const radius = Math.max(maxX - minX, maxY - minY, maxZ - minZ);
-
-    return { center, radius, minX, maxX, minY, maxY };
-  }, [points]);
-
-  // 2. Fixed Tube Radius (Match LightTrail.tsx)
-  const tubeRadius = 0.025; // Fixed world-unit radius
-
-  // 3. Process Points (Smoothing)
+  // Process Points (Smoothing)
   const processedPoints = useMemo(() => {
     if (points.length < 2) return [];
     const uniquePoints: TrailPoint[] = [points[0]];
     let lastPoint = points[0];
-    // Match LightTrail smoothing logic
     const minDistance = tubeRadius * 0.5;
 
     for (let i = 1; i < points.length; i++) {
@@ -94,7 +62,7 @@ function CaptureContent({
     return uniquePoints;
   }, [points, tubeRadius]);
 
-  // 4. Generate Geometry
+  // Generate Geometry
   const curve = useMemo(() => {
     if (processedPoints.length < 2) return null;
     const vectors = processedPoints.map(
@@ -109,45 +77,101 @@ function CaptureContent({
     return new THREE.TubeGeometry(curve, tubularSegments, tubeRadius, 8, false);
   }, [curve, processedPoints.length, tubeRadius]);
 
-  // 5. Auto-Position Camera
-  const cameraZ = useMemo(() => {
-    const fov = 60; // Must match the camera prop below
-    const padding = 1.2; // 20% padding around the object
+  if (!geometry) return null;
 
-    // Aspect ratio adjustment for mobile/portrait
-    // Since we crop to a square, if viewport is portrait (width < height),
-    // the width is the limiting factor for the crop.
+  return (
+    <mesh geometry={geometry}>
+      <meshStandardMaterial
+        color="#000000"
+        emissive={new THREE.Color(color).multiplyScalar(8)}
+        emissiveIntensity={0.5}
+        toneMapped={false}
+        transparent
+        opacity={0.8}
+      />
+    </mesh>
+  );
+}
+
+function CaptureContent({
+  points,
+  color,
+}: {
+  points: TrailPoint[];
+  color?: string;
+}) {
+  const { viewport } = useThree();
+
+  // Split points into strokes (supports multi-stroke sessions)
+  const strokes = useMemo(() => splitIntoStrokes(points), [points]);
+
+  // 1. Calculate Bounds & Center (excluding boundary markers)
+  const bounds = useMemo(() => {
+    // Filter out boundary markers (t === -1) for bounds calculation
+    const actualPoints = points.filter((p) => p.t !== -1);
+
+    if (actualPoints.length === 0) return { center: [0, 0, 0], radius: 10 };
+
+    let minX = Infinity,
+      minY = Infinity,
+      minZ = Infinity;
+    let maxX = -Infinity,
+      maxY = -Infinity,
+      maxZ = -Infinity;
+
+    actualPoints.forEach((p) => {
+      minX = Math.min(minX, p.x);
+      minY = Math.min(minY, p.y);
+      minZ = Math.min(minZ, p.z);
+      maxX = Math.max(maxX, p.x);
+      maxY = Math.max(maxY, p.y);
+      maxZ = Math.max(maxZ, p.z);
+    });
+
+    const center = [(minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2];
+    const radius = Math.max(maxX - minX, maxY - minY, maxZ - minZ);
+
+    return { center, radius };
+  }, [points]);
+
+  // 2. Fixed Tube Radius (Match LightTrail.tsx)
+  const tubeRadius = 0.025;
+
+  // 3. Auto-Position Camera
+  const cameraZ = useMemo(() => {
+    const fov = 60;
+    const padding = 1.2;
     const aspect = viewport.aspect;
     const zoomFactor = aspect < 1 ? 1 / aspect : 1;
 
-    // Calculate distance needed to fit the radius within FOV, adjusting for minimal dimension
     const dist =
       (bounds.radius * 0.6 * padding * zoomFactor) /
       Math.tan((fov * Math.PI) / 360);
 
-    return Math.max(10, dist); // Minimum distance
+    return Math.max(10, dist);
   }, [bounds.radius, viewport.aspect]);
 
-  if (!geometry) return null;
+  if (strokes.length === 0) return null;
 
   return (
     <>
       <group
         position={
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          [-bounds.center[0], -bounds.center[1], -bounds.center[2]] as any
+          [-bounds.center[0], -bounds.center[1], -bounds.center[2]] as [
+            number,
+            number,
+            number,
+          ]
         }
       >
-        <mesh ref={meshRef} geometry={geometry}>
-          <meshStandardMaterial
-            color="#000000"
-            emissive={new THREE.Color(color || '#A855F7').multiplyScalar(8)}
-            emissiveIntensity={0.5}
-            toneMapped={false}
-            transparent
-            opacity={0.8}
+        {strokes.map((strokePoints, index) => (
+          <StrokeRenderer
+            key={index}
+            points={strokePoints}
+            tubeRadius={tubeRadius}
+            color={color || '#A855F7'}
           />
-        </mesh>
+        ))}
       </group>
 
       {/* Locked Camera for Capture */}

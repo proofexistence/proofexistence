@@ -6,13 +6,20 @@ export interface TrailPoint {
   t: number; // timestamp in ms from session start
 }
 
+// Drawing state for multi-stroke support
+export type DrawingState = 'idle' | 'drawing' | 'paused' | 'done';
+
 // Session state for managing light trail recording
 export interface SessionState {
   isRecording: boolean;
   startTime: number | null;
-  duration: number; // in seconds
+  duration: number; // in seconds (cumulative drawing time only)
   points: TrailPoint[];
   sectorId: number;
+  // Multi-stroke support
+  drawingState: DrawingState;
+  strokeStartTime: number | null; // Start time of current stroke
+  cumulativeDrawingMs: number; // Total drawing time in ms (excludes pauses)
 }
 
 // Minimum duration for a valid session (10 seconds)

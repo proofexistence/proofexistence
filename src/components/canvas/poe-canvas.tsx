@@ -26,16 +26,6 @@ import {
   ClearConfirmModal,
   SubmissionModal,
 } from './canvas-ui';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { useTrailRecorder } from '@/hooks/use-trail-recorder';
 import { useGravity } from '@/hooks/use-gravity';
 import { TrailPoint, MIN_SESSION_DURATION } from '@/types/session';
@@ -404,15 +394,19 @@ export function POECanvas() {
   // ... existing hooks ...
 
   const {
-    startRecording,
-    stopRecording,
+    startStroke,
+    endStroke,
+    finishSession,
+    resetSession,
     recordPoint,
     isValidDuration,
     getState,
+    getDrawingState,
   } = useTrailRecorder();
 
   const [isRecording, setIsRecording] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [isPaused, setIsPaused] = useState(false); // Multi-stroke: paused between strokes
   const [duration, setDuration] = useState(0);
   const [points, setPoints] = useState<TrailPoint[]>([]);
   const [cursorPosition, setCursorPosition] = useState<
@@ -498,7 +492,10 @@ export function POECanvas() {
 
   // Clear existing trail (user then clicks to start new one)
   const clearTrail = useCallback(() => {
+    resetSession(); // Reset the recorder state
     setIsReady(false);
+    setIsPaused(false);
+    setIsRecording(false);
     setPoints([]);
     setDuration(0);
     setIsValid(false);
@@ -509,44 +506,69 @@ export function POECanvas() {
     screenshotRef.current = null;
     setCurrentSessionId(null);
     setExistingArweaveTxId(null);
-  }, []);
+  }, [resetSession]);
 
   // Callback when camera reset is complete
   const handleCameraReset = useCallback(() => {
     setShouldResetCamera(false);
   }, []);
 
-  // Drag-to-Draw Handlers
+  // Drag-to-Draw Handlers (Multi-stroke support)
   const handlePointerDown = useCallback(() => {
-    // If there's an existing trail, do nothing - user must clear first
-    if (points.length > 0 && isReady) return;
+    // If session is done/ready, do nothing - user must clear first
+    if (isReady) return;
 
-    // Start recording
-    startRecording();
-    setIsRecording(true);
-    setIsReady(false);
-    setPoints([]);
-    setDuration(0);
-    setIsValid(false);
-    completedSessionRef.current = null;
-    setCurrentSessionId(null);
-    setExistingArweaveTxId(null);
-  }, [points.length, isReady, startRecording]);
+    const drawingState = getDrawingState();
+
+    if (drawingState === 'idle') {
+      // First stroke - start fresh session
+      startStroke();
+      setIsRecording(true);
+      setIsPaused(false);
+      setPoints([]);
+      setDuration(0);
+      setIsValid(false);
+      completedSessionRef.current = null;
+      setCurrentSessionId(null);
+      setExistingArweaveTxId(null);
+    } else if (drawingState === 'paused') {
+      // Resume drawing - continue from pause
+      startStroke();
+      setIsRecording(true);
+      setIsPaused(false);
+    }
+    // If already 'drawing' or 'done', do nothing
+  }, [isReady, getDrawingState, startStroke]);
 
   const handlePointerUp = useCallback(() => {
     if (!isRecording) return;
 
-    // Stop recording
-    const session = stopRecording();
+    // End current stroke (pause, don't finish session)
+    const session = endStroke();
     setIsRecording(false);
+    setIsPaused(true);
 
-    // Verify minimum duration AND minimum point count to avoid ghost stars
-    if (
+    // Update UI with current state
+    setDuration(session.duration);
+    setPoints([...session.points]);
+    setIsValid(
       session.duration >= MIN_SESSION_DURATION &&
-      session.points.length >= 5
-    ) {
+        session.points.filter((p) => p.t !== -1).length >= 5
+    );
+  }, [isRecording, endStroke]);
+
+  // Handler for "Done" button - finishes the session
+  const handleFinishDrawing = useCallback(() => {
+    const drawingState = getDrawingState();
+    if (drawingState !== 'paused') return;
+
+    const session = finishSession();
+    setIsPaused(false);
+
+    // Validate and prepare for submission
+    const actualPoints = session.points.filter((p) => p.t !== -1);
+    if (session.duration >= MIN_SESSION_DURATION && actualPoints.length >= 5) {
       setIsReady(true);
-      // Save session for submission
       completedSessionRef.current = {
         duration: session.duration,
         points: session.points,
@@ -554,18 +576,11 @@ export function POECanvas() {
         color: trailColor,
       };
     } else {
-      // Session too short or too few points, discard
-      if (
-        session.points.length < 5 &&
-        session.duration >= MIN_SESSION_DURATION
-      ) {
-        // Discarding session: too few points
-      }
-      setPoints([]);
-      setDuration(0);
-      completedSessionRef.current = null;
+      // Session invalid - show message but keep trail for user to see
+      // They can continue drawing or clear
+      setIsPaused(true); // Go back to paused state
     }
-  }, [isRecording, stopRecording, trailColor]);
+  }, [getDrawingState, finishSession, trailColor]);
 
   // Capture Mode handling
   const [captureMode, setCaptureMode] = useState(false);
@@ -1268,8 +1283,6 @@ export function POECanvas() {
     setTrailColor(color);
   }, []);
 
-
-
   // Zoom Handlers
 
   // Fetch Contract Data Effect
@@ -1419,6 +1432,9 @@ export function POECanvas() {
           duration={duration}
           isRecording={isRecording}
           isValid={isValid}
+          isPaused={isPaused}
+          onClear={() => setShowClearConfirm(true)}
+          onFinish={handleFinishDrawing}
         />
 
         <div className="absolute top-6 right-4 md:top-8 md:right-6 flex flex-col md:flex-row gap-3 items-end md:items-center z-40 pointer-events-none">
@@ -1440,6 +1456,7 @@ export function POECanvas() {
         <Instructions
           isRecording={isRecording}
           isReady={isReady}
+          isPaused={isPaused}
           onClear={() => setShowClearConfirm(true)}
           onSubmit={handleComplete}
           themeName={currentTheme.name}
@@ -1481,39 +1498,32 @@ export function POECanvas() {
           onCancel={() => setShowClearConfirm(false)}
         />
 
-        <AlertDialog
-          open={dialogState.isOpen}
-          onOpenChange={(open) => {
-            if (!open) {
-              setDialogState((prev) => ({ ...prev, isOpen: false }));
-              setShowSuccessShareMenu(false);
-            }
-          }}
-        >
-          <AlertDialogContent className="bg-black/90 border-white/10 text-white">
-            <AlertDialogHeader>
-              <AlertDialogTitle
-                className={dialogState.isError ? 'text-red-500' : 'text-white'}
-              >
-                {dialogState.title}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-white/70">
-                {dialogState.description}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-              {/* Share Button with Dropdown */}
+        {/* Custom Result Dialog */}
+        {dialogState.isOpen && (
+          <div className="fixed inset-0 flex items-center justify-center z-[100] pointer-events-auto animate-in fade-in duration-200">
+            <div
+              className="bg-black/40 backdrop-blur-sm absolute inset-0 cursor-pointer"
+              onClick={() => {
+                setDialogState((prev) => ({ ...prev, isOpen: false }));
+                setShowSuccessShareMenu(false);
+              }}
+            />
+            <div className="bg-black/30 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-lg shadow-black/30 z-10 max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-300 relative pointer-events-auto">
+              {/* Share Button - Top Right */}
               {dialogState.shareSessionId && (
-                <div className="relative w-full sm:w-auto">
+                <div className="absolute top-4 right-4 z-10">
                   <button
                     onClick={() =>
                       setShowSuccessShareMenu(!showSuccessShareMenu)
                     }
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-pink-500 to-purple-500 hover:brightness-110 text-white text-sm font-medium transition-all"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg
+                      bg-white/10 border border-white/20 text-white/70 hover:bg-white/20 hover:text-white
+                      backdrop-blur-md transition-all active:scale-95"
+                    title="Share"
                   >
                     <svg
-                      width="16"
-                      height="16"
+                      width="14"
+                      height="14"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -1525,10 +1535,9 @@ export function POECanvas() {
                       <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
                       <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                     </svg>
-                    Share
                   </button>
                   {showSuccessShareMenu && (
-                    <div className="absolute bottom-full left-0 mb-2 w-48 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 animate-in zoom-in-95 fade-in duration-200">
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 animate-in zoom-in-95 fade-in duration-200">
                       <button
                         onClick={() => {
                           const url = `${window.location.origin}/proof/${dialogState.shareSessionId}`;
@@ -1622,25 +1631,55 @@ export function POECanvas() {
                   )}
                 </div>
               )}
-              {dialogState.cancelLabel && (
-                <AlertDialogCancel
-                  className="bg-transparent border-white/20 text-white hover:bg-white/10 hover:text-white"
-                  onClick={dialogState.onCancel}
+
+              {/* Header */}
+              <div className="pr-10">
+                <h3
+                  className={`text-lg font-medium mb-2 ${dialogState.isError ? 'text-red-400' : 'text-white'}`}
                 >
-                  {dialogState.cancelLabel}
-                </AlertDialogCancel>
-              )}
-              {dialogState.actionLabel && (
-                <AlertDialogAction
-                  className="bg-[linear-gradient(to_bottom_right,#0CC9F2,#4877DA,#7E44DB)] hover:brightness-110 text-white border-0"
-                  onClick={dialogState.onAction}
-                >
-                  {dialogState.actionLabel}
-                </AlertDialogAction>
-              )}
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+                  {dialogState.title}
+                </h3>
+                <p className="text-white/50 text-sm mb-5">
+                  {dialogState.description}
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="flex gap-3 justify-end mt-2">
+                {dialogState.cancelLabel && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dialogState.onCancel?.();
+                    }}
+                    className="px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
+                      bg-white/10 border border-white/20 text-white/80
+                      hover:bg-white/20 hover:text-white
+                      transition-all active:scale-95"
+                  >
+                    {dialogState.cancelLabel}
+                  </button>
+                )}
+                {dialogState.actionLabel && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dialogState.onAction?.();
+                    }}
+                    className="px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
+                      bg-cyan-500/20 border border-cyan-400/30 text-cyan-300
+                      hover:bg-cyan-500/30 hover:border-cyan-400/50
+                      transition-all shadow-lg shadow-cyan-500/10 active:scale-95"
+                  >
+                    {dialogState.actionLabel}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Mint Confirmation Dialog for non-Web3 users */}
         <MintConfirmationDialog
