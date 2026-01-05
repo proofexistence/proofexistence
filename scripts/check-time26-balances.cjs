@@ -57,14 +57,24 @@ async function main() {
     totalAccounted = totalAccounted + balance;
     const formatted = ethers.formatUnits(balance, 18);
     const percentage = Number((balance * 10000n) / totalSupply) / 100;
-    console.log(`${name.padEnd(25)} ${formatted.padStart(20)} TIME26 (${percentage.toFixed(2)}%)`);
+    console.log(
+      `${name.padEnd(25)} ${formatted.padStart(20)} TIME26 (${percentage.toFixed(2)}%)`
+    );
   }
 
   console.log('-'.repeat(60));
-  console.log(`Total Accounted:`.padEnd(25), ethers.formatUnits(totalAccounted, 18).padStart(20), 'TIME26');
+  console.log(
+    `Total Accounted:`.padEnd(25),
+    ethers.formatUnits(totalAccounted, 18).padStart(20),
+    'TIME26'
+  );
 
   const unaccounted = totalSupply - totalAccounted;
-  console.log(`Unaccounted:`.padEnd(25), ethers.formatUnits(unaccounted, 18).padStart(20), 'TIME26');
+  console.log(
+    `Unaccounted:`.padEnd(25),
+    ethers.formatUnits(unaccounted, 18).padStart(20),
+    'TIME26'
+  );
   console.log('');
 
   // Check ProofRecorder v4 config

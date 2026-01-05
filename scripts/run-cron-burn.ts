@@ -9,7 +9,10 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.local' });
 
-function generateRewardLeaf(walletAddress: string, cumulativeAmount: string): Buffer {
+function generateRewardLeaf(
+  walletAddress: string,
+  cumulativeAmount: string
+): Buffer {
   const packed = ethers.solidityPacked(
     ['address', 'uint256'],
     [walletAddress, cumulativeAmount]
@@ -24,7 +27,7 @@ async function main() {
     ? '0xA0b6b101Cde5FeF3458C820928d1202A281001cd'
     : '0x72Ac729a8f6efb68A5d6765EC375aC4578a3c756';
   const rpcUrl = isTestnet
-    ? (process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc-amoy.polygon.technology')
+    ? process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc-amoy.polygon.technology'
     : 'https://polygon-rpc.com';
 
   console.log('Network:', isTestnet ? 'Amoy Testnet' : 'Polygon Mainnet');
@@ -55,11 +58,19 @@ async function main() {
   // Show entries
   console.log('\nUser entries:');
   for (const e of entries) {
-    console.log('  ' + e.walletAddress + ': ' + ethers.formatEther(e.cumulativeAmount) + ' TIME26');
+    console.log(
+      '  ' +
+        e.walletAddress +
+        ': ' +
+        ethers.formatEther(e.cumulativeAmount) +
+        ' TIME26'
+    );
   }
 
   // 3. Generate merkle tree
-  const leaves = entries.map((e) => generateRewardLeaf(e.walletAddress, e.cumulativeAmount));
+  const leaves = entries.map((e) =>
+    generateRewardLeaf(e.walletAddress, e.cumulativeAmount)
+  );
   const tree = new MerkleTree(leaves, ethers.keccak256, {
     sortPairs: true,
     hashLeaves: false,
@@ -70,17 +81,22 @@ async function main() {
 
   // 4. Check current on-chain root
   const provider = new ethers.JsonRpcProvider(rpcUrl);
-  const privateKey = process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
+  const privateKey =
+    process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
   if (!privateKey) {
     throw new Error('OPERATOR_PRIVATE_KEY or PRIVATE_KEY not set');
   }
   const wallet = new ethers.Wallet(privateKey, provider);
   console.log('Wallet:', wallet.address);
 
-  const proofRecorder = new ethers.Contract(proofRecorderAddress, [
-    'function rewardsMerkleRoot() view returns (bytes32)',
-    'function setRewardsMerkleRoot(bytes32 newRoot) external',
-  ], wallet);
+  const proofRecorder = new ethers.Contract(
+    proofRecorderAddress,
+    [
+      'function rewardsMerkleRoot() view returns (bytes32)',
+      'function setRewardsMerkleRoot(bytes32 newRoot) external',
+    ],
+    wallet
+  );
 
   const currentRoot = await proofRecorder.rewardsMerkleRoot();
   console.log('Current on-chain root:', currentRoot);

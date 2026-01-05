@@ -21,7 +21,7 @@ async function check() {
 
   // Use network-appropriate RPC
   const rpcUrl = isTestnet
-    ? (process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc-amoy.polygon.technology')
+    ? process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc-amoy.polygon.technology'
     : 'https://polygon-rpc.com';
 
   console.log('Network:', isTestnet ? 'Amoy Testnet' : 'Polygon Mainnet');
@@ -29,7 +29,11 @@ async function check() {
   console.log('Contract:', contractAddress);
 
   const provider = new ethers.JsonRpcProvider(rpcUrl);
-  const contract = new ethers.Contract(contractAddress, PROOF_RECORDER_ABI, provider);
+  const contract = new ethers.Contract(
+    contractAddress,
+    PROOF_RECORDER_ABI,
+    provider
+  );
 
   try {
     // Check if contract exists
@@ -51,11 +55,14 @@ async function check() {
     console.log('Treasury:', treasury);
 
     // Check if our wallet is the operator
-    const privateKey = process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
+    const privateKey =
+      process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
     const wallet = new ethers.Wallet(privateKey);
     console.log('\nOur wallet:', wallet.address);
-    console.log('Is operator?', wallet.address.toLowerCase() === operator.toLowerCase());
-
+    console.log(
+      'Is operator?',
+      wallet.address.toLowerCase() === operator.toLowerCase()
+    );
   } catch (err) {
     console.error('Error:', err.message);
   }

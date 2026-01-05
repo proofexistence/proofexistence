@@ -16,10 +16,7 @@ import { db } from '@/db';
 import { users, dailyRewards, userDailyRewards } from '@/db/schema';
 import { gt, desc, sql, eq } from 'drizzle-orm';
 import { ethers } from 'ethers';
-import {
-  PROOF_RECORDER_ADDRESS,
-  TIME26_ADDRESS,
-} from '@/lib/contracts';
+import { PROOF_RECORDER_ADDRESS, TIME26_ADDRESS } from '@/lib/contracts';
 import { createPolygonProvider } from '@/lib/provider';
 
 export const dynamic = 'force-dynamic';
@@ -57,15 +54,23 @@ export async function GET(req: NextRequest) {
     // ============================================================
     // 1. Contract Balances
     // ============================================================
-    const time26Contract = new ethers.Contract(TIME26_ADDRESS, [
-      'function balanceOf(address) view returns (uint256)',
-      'function totalSupply() view returns (uint256)',
-    ], provider);
+    const time26Contract = new ethers.Contract(
+      TIME26_ADDRESS,
+      [
+        'function balanceOf(address) view returns (uint256)',
+        'function totalSupply() view returns (uint256)',
+      ],
+      provider
+    );
 
-    const proofRecorder = new ethers.Contract(PROOF_RECORDER_ADDRESS, [
-      'function totalClaimed(address) view returns (uint256)',
-      'function rewardsMerkleRoot() view returns (bytes32)',
-    ], provider);
+    const proofRecorder = new ethers.Contract(
+      PROOF_RECORDER_ADDRESS,
+      [
+        'function totalClaimed(address) view returns (uint256)',
+        'function rewardsMerkleRoot() view returns (bytes32)',
+      ],
+      provider
+    );
 
     const [contractBalance, totalSupply, merkleRoot] = await Promise.all([
       time26Contract.balanceOf(PROOF_RECORDER_ADDRESS),
@@ -76,7 +81,8 @@ export async function GET(req: NextRequest) {
     // Get operator wallet balance
     let operatorBalance = '0';
     let operatorAddress = '';
-    const operatorPrivateKey = process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
+    const operatorPrivateKey =
+      process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
     if (operatorPrivateKey) {
       const operatorWallet = new ethers.Wallet(operatorPrivateKey);
       operatorAddress = operatorWallet.address;
@@ -120,7 +126,8 @@ export async function GET(req: NextRequest) {
         const dbBalance = BigInt(u.time26Balance || '0');
         const pendingBurn = u.time26PendingBurn || '0';
         const claimedBigInt = BigInt(claimed.toString());
-        const claimable = dbBalance > claimedBigInt ? dbBalance - claimedBigInt : BigInt(0);
+        const claimable =
+          dbBalance > claimedBigInt ? dbBalance - claimedBigInt : BigInt(0);
 
         return {
           id: u.id,
@@ -229,7 +236,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       timestamp: new Date().toISOString(),
-      network: process.env.NEXT_PUBLIC_IS_TESTNET === 'true' ? 'Amoy Testnet' : 'Polygon Mainnet',
+      network:
+        process.env.NEXT_PUBLIC_IS_TESTNET === 'true'
+          ? 'Amoy Testnet'
+          : 'Polygon Mainnet',
       contracts: {
         proofRecorder: PROOF_RECORDER_ADDRESS,
         time26: TIME26_ADDRESS,
@@ -245,7 +255,8 @@ export async function GET(req: NextRequest) {
         balance: irysBalance,
         balanceFormatted: ethers.formatEther(irysBalance),
         network: irysNetwork,
-        hasEnoughBalance: BigInt(irysBalance || '0') >= ethers.parseEther('0.01'),
+        hasEnoughBalance:
+          BigInt(irysBalance || '0') >= ethers.parseEther('0.01'),
       },
       contractBalance: {
         raw: contractBalance.toString(),
@@ -294,7 +305,8 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('[Admin Rewards Status] Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
       { error: 'Failed to fetch rewards status', details: errorMessage },
       { status: 500 }

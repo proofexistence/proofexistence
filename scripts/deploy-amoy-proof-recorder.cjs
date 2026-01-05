@@ -139,10 +139,26 @@ async function main() {
 
   console.log('  ProofRecorder:');
   console.log('    Address:', proofRecorderAddress);
-  console.log('    Owner:', prOwner, prOwner.toLowerCase() === OWNER.toLowerCase() ? '✅' : '❌');
-  console.log('    Treasury:', prTreasury, prTreasury.toLowerCase() === TREASURY.toLowerCase() ? '✅' : '❌');
-  console.log('    Operator:', prOperator, prOperator.toLowerCase() === OPERATOR.toLowerCase() ? '✅' : '❌');
-  console.log('    Time26:', prTime26, prTime26.toLowerCase() === TIME26_ADDRESS.toLowerCase() ? '✅' : '❌');
+  console.log(
+    '    Owner:',
+    prOwner,
+    prOwner.toLowerCase() === OWNER.toLowerCase() ? '✅' : '❌'
+  );
+  console.log(
+    '    Treasury:',
+    prTreasury,
+    prTreasury.toLowerCase() === TREASURY.toLowerCase() ? '✅' : '❌'
+  );
+  console.log(
+    '    Operator:',
+    prOperator,
+    prOperator.toLowerCase() === OPERATOR.toLowerCase() ? '✅' : '❌'
+  );
+  console.log(
+    '    Time26:',
+    prTime26,
+    prTime26.toLowerCase() === TIME26_ADDRESS.toLowerCase() ? '✅' : '❌'
+  );
   console.log('');
 
   // ============================================================
@@ -161,7 +177,9 @@ async function main() {
   console.log(`   ? '${proofRecorderAddress}'`);
   console.log('');
   console.log('2. Verify contract on Amoy Polygonscan:');
-  console.log(`   npx hardhat verify --network amoy ${proofRecorderAddress} "${TIME26_ADDRESS}" "${TREASURY}" "${OPERATOR}" "${OWNER}"`);
+  console.log(
+    `   npx hardhat verify --network amoy ${proofRecorderAddress} "${TIME26_ADDRESS}" "${TREASURY}" "${OPERATOR}" "${OWNER}"`
+  );
   console.log('');
   console.log('3. Fund the contract with TIME26 for rewards:');
   console.log(`   Transfer TIME26 to: ${proofRecorderAddress}`);

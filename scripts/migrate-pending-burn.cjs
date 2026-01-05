@@ -8,7 +8,7 @@
 
 const { neon } = require('@neondatabase/serverless');
 require('dotenv').config({
-  path: process.argv[2] === 'production' ? '.env.production' : '.env.local'
+  path: process.argv[2] === 'production' ? '.env.production' : '.env.local',
 });
 
 const sql = neon(process.env.DATABASE_URL);
@@ -26,7 +26,7 @@ async function migrateColumn() {
       AND column_name IN ('time26_spent', 'time26_pending_burn')
     `;
 
-    const existingColumns = result.map(r => r.column_name);
+    const existingColumns = result.map((r) => r.column_name);
     console.log('Existing columns:', existingColumns);
 
     const hasSpent = existingColumns.includes('time26_spent');
@@ -43,7 +43,9 @@ async function migrateColumn() {
     } else if (hasPendingBurn && hasSpent) {
       // Both exist - drop old one
       await sql`ALTER TABLE users DROP COLUMN time26_spent`;
-      console.log('✓ Dropped redundant time26_spent column (time26_pending_burn already exists)');
+      console.log(
+        '✓ Dropped redundant time26_spent column (time26_pending_burn already exists)'
+      );
     } else {
       console.log('✓ time26_pending_burn already exists, no changes needed');
     }

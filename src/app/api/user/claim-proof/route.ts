@@ -136,10 +136,12 @@ export async function GET() {
     // Calculate claimable
     const cumulativeAmount = BigInt(userEntry.cumulativeAmount);
     const claimed = BigInt(alreadyClaimed);
-    const claimableAmount = cumulativeAmount > claimed ? cumulativeAmount - claimed : BigInt(0);
+    const claimableAmount =
+      cumulativeAmount > claimed ? cumulativeAmount - claimed : BigInt(0);
 
     // Check if merkle root matches on-chain
-    const rootMatches = treeData.root.toLowerCase() === onChainRoot.toLowerCase();
+    const rootMatches =
+      treeData.root.toLowerCase() === onChainRoot.toLowerCase();
 
     return NextResponse.json({
       claimable: claimableAmount > 0 && rootMatches,

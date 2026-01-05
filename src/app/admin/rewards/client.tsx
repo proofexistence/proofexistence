@@ -50,7 +50,11 @@ interface RewardsStatus {
   summary: {
     totalDbBalance: { raw: string; formatted: string; description: string };
     totalPendingBurn: { raw: string; formatted: string; description: string };
-    totalOnChainClaimed: { raw: string; formatted: string; description: string };
+    totalOnChainClaimed: {
+      raw: string;
+      formatted: string;
+      description: string;
+    };
     totalClaimable: { raw: string; formatted: string; description: string };
     totalDistributed: { raw: string; formatted: string; description: string };
     surplus: { raw: string; formatted: string; description: string };
@@ -198,7 +202,9 @@ export function AdminRewardsClient() {
         <div className="max-w-md mx-auto">
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-8 text-center">
             <ShieldX className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-red-400 mb-2">Access Denied</h2>
+            <h2 className="text-2xl font-bold text-red-400 mb-2">
+              Access Denied
+            </h2>
             <p className="text-zinc-400 mb-4">
               You don&apos;t have permission to access the admin panel.
             </p>
@@ -223,7 +229,9 @@ export function AdminRewardsClient() {
         <div className="max-w-6xl mx-auto">
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
             <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-red-400">Error Loading Data</h2>
+            <h2 className="text-xl font-bold text-red-400">
+              Error Loading Data
+            </h2>
             <p className="text-zinc-400 mt-2">{error}</p>
             <button
               onClick={fetchData}
@@ -247,7 +255,8 @@ export function AdminRewardsClient() {
           <div>
             <h1 className="text-2xl font-bold">Rewards Admin</h1>
             <p className="text-zinc-500 text-sm">
-              {data.network} • Last updated: {new Date(data.timestamp).toLocaleString()}
+              {data.network} • Last updated:{' '}
+              {new Date(data.timestamp).toLocaleString()}
             </p>
           </div>
           <button
@@ -301,9 +310,13 @@ export function AdminRewardsClient() {
                 : 'bg-red-500/10 border-red-500/20'
             }`}
           >
-            <Server className={`w-8 h-8 shrink-0 ${data.operator.hasEnoughGas ? 'text-green-400' : 'text-red-400'}`} />
+            <Server
+              className={`w-8 h-8 shrink-0 ${data.operator.hasEnoughGas ? 'text-green-400' : 'text-red-400'}`}
+            />
             <div className="min-w-0">
-              <div className={`font-bold ${data.operator.hasEnoughGas ? 'text-green-400' : 'text-red-400'}`}>
+              <div
+                className={`font-bold ${data.operator.hasEnoughGas ? 'text-green-400' : 'text-red-400'}`}
+              >
                 Operator {data.operator.hasEnoughGas ? 'OK' : 'Low Gas!'}
               </div>
               <div className="text-sm text-zinc-400 truncate">
@@ -320,13 +333,18 @@ export function AdminRewardsClient() {
                 : 'bg-amber-500/10 border-amber-500/20'
             }`}
           >
-            <Database className={`w-8 h-8 shrink-0 ${data.irys.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`} />
+            <Database
+              className={`w-8 h-8 shrink-0 ${data.irys.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`}
+            />
             <div className="min-w-0">
-              <div className={`font-bold ${data.irys.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`}>
+              <div
+                className={`font-bold ${data.irys.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`}
+              >
                 Irys {data.irys.hasEnoughBalance ? 'OK' : 'Low!'}
               </div>
               <div className="text-sm text-zinc-400 truncate">
-                {formatNumber(data.irys.balanceFormatted, 6)} {data.irys.network || 'N/A'}
+                {formatNumber(data.irys.balanceFormatted, 6)}{' '}
+                {data.irys.network || 'N/A'}
               </div>
             </div>
           </div>
@@ -414,12 +432,15 @@ export function AdminRewardsClient() {
               >
                 {shortenAddress(data.operator.address)}
               </a>
-              <span className="ml-2 text-zinc-500">({formatNumber(data.operator.balanceFormatted, 4)} POL)</span>
+              <span className="ml-2 text-zinc-500">
+                ({formatNumber(data.operator.balanceFormatted, 4)} POL)
+              </span>
             </div>
             <div>
               <span className="text-zinc-500">Irys Balance:</span>
               <span className="ml-2 font-mono text-zinc-400">
-                {formatNumber(data.irys.balanceFormatted, 6)} ({data.irys.network || 'N/A'})
+                {formatNumber(data.irys.balanceFormatted, 6)} (
+                {data.irys.network || 'N/A'})
               </span>
             </div>
             <div className="md:col-span-2">
@@ -436,7 +457,9 @@ export function AdminRewardsClient() {
           <div className="p-4 border-b border-zinc-800 flex items-center gap-2">
             <Users className="w-5 h-5 text-zinc-400" />
             <h2 className="text-lg font-bold">User Balances</h2>
-            <span className="text-zinc-500 text-sm">({data.users.length} users)</span>
+            <span className="text-zinc-500 text-sm">
+              ({data.users.length} users)
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -457,7 +480,9 @@ export function AdminRewardsClient() {
                         {shortenAddress(user.walletAddress)}
                       </div>
                       {user.username && (
-                        <div className="text-zinc-500 text-xs">@{user.username}</div>
+                        <div className="text-zinc-500 text-xs">
+                          @{user.username}
+                        </div>
                       )}
                     </td>
                     <td className="text-right px-4 py-3 font-mono">
@@ -500,7 +525,9 @@ export function AdminRewardsClient() {
                 {data.dailyRewards.map((day) => (
                   <tr key={day.dayId} className="hover:bg-zinc-800/30">
                     <td className="px-4 py-3 font-mono">{day.dayId}</td>
-                    <td className="text-right px-4 py-3">{day.participantCount}</td>
+                    <td className="text-right px-4 py-3">
+                      {day.participantCount}
+                    </td>
                     <td className="text-right px-4 py-3 font-mono">
                       {day.totalSeconds.toLocaleString()}
                     </td>
@@ -539,14 +566,21 @@ export function AdminRewardsClient() {
               </thead>
               <tbody className="divide-y divide-zinc-800">
                 {data.recentUserRewards.map((reward, idx) => (
-                  <tr key={`${reward.dayId}-${reward.walletAddress}-${idx}`} className="hover:bg-zinc-800/30">
-                    <td className="px-4 py-3 font-mono text-xs">{reward.dayId}</td>
+                  <tr
+                    key={`${reward.dayId}-${reward.walletAddress}-${idx}`}
+                    className="hover:bg-zinc-800/30"
+                  >
+                    <td className="px-4 py-3 font-mono text-xs">
+                      {reward.dayId}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="font-mono text-xs">
                         {shortenAddress(reward.walletAddress)}
                       </div>
                       {reward.username && (
-                        <div className="text-zinc-500 text-xs">@{reward.username}</div>
+                        <div className="text-zinc-500 text-xs">
+                          @{reward.username}
+                        </div>
                       )}
                     </td>
                     <td className="text-right px-4 py-3 font-mono">
@@ -579,15 +613,19 @@ export function AdminRewardsClient() {
           <h2 className="text-lg font-bold mb-4">Reward Flow Explanation</h2>
           <div className="grid md:grid-cols-4 gap-4 text-sm">
             <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-              <div className="font-bold text-purple-400 mb-2">1. Distribution</div>
+              <div className="font-bold text-purple-400 mb-2">
+                1. Distribution
+              </div>
               <p className="text-zinc-400">
-                Daily cron calculates rewards based on drawing time and adds to DB Balance.
+                Daily cron calculates rewards based on drawing time and adds to
+                DB Balance.
               </p>
             </div>
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
               <div className="font-bold text-red-400 mb-2">2. Burn</div>
               <p className="text-zinc-400">
-                Pending burn amounts are burned from contract. Merkle root is updated.
+                Pending burn amounts are burned from contract. Merkle root is
+                updated.
               </p>
             </div>
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">

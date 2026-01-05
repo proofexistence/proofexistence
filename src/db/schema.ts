@@ -42,7 +42,10 @@ export const users = pgTable(
 
     // TIME26 Pending Burn (spent amount waiting for cron to burn)
     // Reset to 0 after each cron burn
-    time26PendingBurn: decimal('time26_pending_burn', { precision: 78, scale: 0 })
+    time26PendingBurn: decimal('time26_pending_burn', {
+      precision: 78,
+      scale: 0,
+    })
       .default('0')
       .notNull(),
 

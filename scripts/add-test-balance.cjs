@@ -15,7 +15,9 @@ async function addTestBalance() {
   const amount = process.argv[3] || '1000'; // Default 1000 TIME26
 
   if (!walletAddress) {
-    console.error('Usage: node scripts/add-test-balance.cjs <wallet_address> [amount]');
+    console.error(
+      'Usage: node scripts/add-test-balance.cjs <wallet_address> [amount]'
+    );
     process.exit(1);
   }
 
@@ -36,14 +38,18 @@ async function addTestBalance() {
     }
 
     const user = result[0];
-    const balanceFormatted = (BigInt(user.time26_balance) / BigInt(10 ** 18)).toString();
+    const balanceFormatted = (
+      BigInt(user.time26_balance) / BigInt(10 ** 18)
+    ).toString();
 
     console.log('\n✓ Added test balance');
     console.log('  Wallet:', user.wallet_address);
     console.log('  Added:', amount, 'TIME26');
     console.log('  New Balance:', balanceFormatted, 'TIME26');
     console.log('\nNote: Run the cron to update Merkle root before claiming:');
-    console.log('  curl -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/cron/daily');
+    console.log(
+      '  curl -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/cron/daily'
+    );
   } catch (err) {
     console.error('Error:', err);
     process.exit(1);

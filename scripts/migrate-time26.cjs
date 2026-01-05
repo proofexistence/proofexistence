@@ -53,7 +53,10 @@ async function main() {
   console.log('TIME26 MIGRATION & DISTRIBUTION');
   console.log('='.repeat(70));
   console.log('');
-  console.log('Mode:', DRY_RUN ? '🔍 DRY RUN (no transactions)' : '🚀 LIVE (will execute!)');
+  console.log(
+    'Mode:',
+    DRY_RUN ? '🔍 DRY RUN (no transactions)' : '🚀 LIVE (will execute!)'
+  );
   console.log('Deployer:', deployer.address);
   console.log('');
 
@@ -76,9 +79,7 @@ async function main() {
   );
 
   const proofRecorderV4 = await ethers.getContractAt(
-    [
-      'function owner() view returns (address)',
-    ],
+    ['function owner() view returns (address)'],
     PROOF_RECORDER_V4
   );
 
@@ -128,24 +129,59 @@ async function main() {
     total: await time26.totalSupply(),
   };
 
-  console.log('Deployer:'.padEnd(20), ethers.formatUnits(balances.deployer, 18).padStart(20), 'TIME26');
-  console.log('ProofRecorder v3:'.padEnd(20), ethers.formatUnits(balances.v3, 18).padStart(20), 'TIME26');
-  console.log('ProofRecorder v4:'.padEnd(20), ethers.formatUnits(balances.v4, 18).padStart(20), 'TIME26');
-  console.log('Treasury Safe:'.padEnd(20), ethers.formatUnits(balances.treasury, 18).padStart(20), 'TIME26');
+  console.log(
+    'Deployer:'.padEnd(20),
+    ethers.formatUnits(balances.deployer, 18).padStart(20),
+    'TIME26'
+  );
+  console.log(
+    'ProofRecorder v3:'.padEnd(20),
+    ethers.formatUnits(balances.v3, 18).padStart(20),
+    'TIME26'
+  );
+  console.log(
+    'ProofRecorder v4:'.padEnd(20),
+    ethers.formatUnits(balances.v4, 18).padStart(20),
+    'TIME26'
+  );
+  console.log(
+    'Treasury Safe:'.padEnd(20),
+    ethers.formatUnits(balances.treasury, 18).padStart(20),
+    'TIME26'
+  );
   console.log('-'.repeat(70));
 
-  const accounted = balances.deployer + balances.v3 + balances.v4 + balances.treasury;
+  const accounted =
+    balances.deployer + balances.v3 + balances.v4 + balances.treasury;
   const unaccounted = balances.total - accounted;
 
-  console.log('Total Supply:'.padEnd(20), ethers.formatUnits(balances.total, 18).padStart(20), 'TIME26');
-  console.log('Accounted:'.padEnd(20), ethers.formatUnits(accounted, 18).padStart(20), 'TIME26');
-  console.log('Unaccounted:'.padEnd(20), ethers.formatUnits(unaccounted, 18).padStart(20), 'TIME26');
+  console.log(
+    'Total Supply:'.padEnd(20),
+    ethers.formatUnits(balances.total, 18).padStart(20),
+    'TIME26'
+  );
+  console.log(
+    'Accounted:'.padEnd(20),
+    ethers.formatUnits(accounted, 18).padStart(20),
+    'TIME26'
+  );
+  console.log(
+    'Unaccounted:'.padEnd(20),
+    ethers.formatUnits(unaccounted, 18).padStart(20),
+    'TIME26'
+  );
   console.log('');
 
   if (unaccounted > 0n) {
-    console.log('⚠️  WARNING: There are', ethers.formatUnits(unaccounted, 18), 'TIME26 unaccounted for!');
+    console.log(
+      '⚠️  WARNING: There are',
+      ethers.formatUnits(unaccounted, 18),
+      'TIME26 unaccounted for!'
+    );
     console.log('   Check PolygonScan for token holders:');
-    console.log('   https://polygonscan.com/token/0x56C79b61FFc3D826188DB700791F1A7ECb007FD0#balances');
+    console.log(
+      '   https://polygonscan.com/token/0x56C79b61FFc3D826188DB700791F1A7ECb007FD0#balances'
+    );
     console.log('');
   }
 
@@ -156,23 +192,38 @@ async function main() {
   console.log('-'.repeat(70));
 
   if (balances.v3 > 0n) {
-    console.log('📦 FROM ProofRecorder v3:', ethers.formatUnits(balances.v3, 18), 'TIME26');
+    console.log(
+      '📦 FROM ProofRecorder v3:',
+      ethers.formatUnits(balances.v3, 18),
+      'TIME26'
+    );
     console.log('   → Move to ProofRecorder v4 (rewards pool)');
     console.log('');
 
     if (!DRY_RUN && isV3Owner) {
       console.log('   Executing emergencyWithdrawERC20...');
       // First withdraw to deployer
-      const tx1 = await proofRecorderV3.emergencyWithdrawERC20(TIME26, deployer.address, balances.v3);
+      const tx1 = await proofRecorderV3.emergencyWithdrawERC20(
+        TIME26,
+        deployer.address,
+        balances.v3
+      );
       console.log('   TX:', tx1.hash);
       await tx1.wait();
       console.log('   ✅ Withdrawn to deployer');
 
       // Then transfer to v4
-      const tx2 = await time26.transfer(PROOF_RECORDER_V4, DISTRIBUTION.REWARDS_POOL);
+      const tx2 = await time26.transfer(
+        PROOF_RECORDER_V4,
+        DISTRIBUTION.REWARDS_POOL
+      );
       console.log('   TX:', tx2.hash);
       await tx2.wait();
-      console.log('   ✅ Transferred', ethers.formatUnits(DISTRIBUTION.REWARDS_POOL, 18), 'TIME26 to v4');
+      console.log(
+        '   ✅ Transferred',
+        ethers.formatUnits(DISTRIBUTION.REWARDS_POOL, 18),
+        'TIME26 to v4'
+      );
 
       // Any remaining goes to treasury
       const remaining = balances.v3 - DISTRIBUTION.REWARDS_POOL;
@@ -180,15 +231,31 @@ async function main() {
         const tx3 = await time26.transfer(TREASURY_SAFE, remaining);
         console.log('   TX:', tx3.hash);
         await tx3.wait();
-        console.log('   ✅ Transferred', ethers.formatUnits(remaining, 18), 'TIME26 to Treasury');
+        console.log(
+          '   ✅ Transferred',
+          ethers.formatUnits(remaining, 18),
+          'TIME26 to Treasury'
+        );
       }
     } else if (DRY_RUN) {
       console.log('   [DRY RUN] Would execute:');
-      console.log('   1. proofRecorderV3.emergencyWithdrawERC20(TIME26, deployer,', ethers.formatUnits(balances.v3, 18), ')');
-      console.log('   2. time26.transfer(PROOF_RECORDER_V4,', ethers.formatUnits(DISTRIBUTION.REWARDS_POOL, 18), ')');
+      console.log(
+        '   1. proofRecorderV3.emergencyWithdrawERC20(TIME26, deployer,',
+        ethers.formatUnits(balances.v3, 18),
+        ')'
+      );
+      console.log(
+        '   2. time26.transfer(PROOF_RECORDER_V4,',
+        ethers.formatUnits(DISTRIBUTION.REWARDS_POOL, 18),
+        ')'
+      );
       const remaining = balances.v3 - DISTRIBUTION.REWARDS_POOL;
       if (remaining > 0n) {
-        console.log('   3. time26.transfer(TREASURY_SAFE,', ethers.formatUnits(remaining, 18), ')');
+        console.log(
+          '   3. time26.transfer(TREASURY_SAFE,',
+          ethers.formatUnits(remaining, 18),
+          ')'
+        );
       }
     } else {
       console.log('   [SKIPPED] You are not the owner of v3');
@@ -203,8 +270,14 @@ async function main() {
   // ==========================================================================
   console.log('Step 3: Expected final distribution...');
   console.log('-'.repeat(70));
-  console.log('ProofRecorder v4 (Rewards):'.padEnd(35), '31,500,000 TIME26 (65%)');
-  console.log('Liquidity Pool (Uniswap):'.padEnd(35), '10,000,000 TIME26 (21%)');
+  console.log(
+    'ProofRecorder v4 (Rewards):'.padEnd(35),
+    '31,500,000 TIME26 (65%)'
+  );
+  console.log(
+    'Liquidity Pool (Uniswap):'.padEnd(35),
+    '10,000,000 TIME26 (21%)'
+  );
   console.log('Team (with vesting):'.padEnd(35), ' 4,730,400 TIME26 (10%)');
   console.log('Treasury (Operations):'.padEnd(35), ' 2,189,600 TIME26 (4.5%)');
   console.log('-'.repeat(70));
@@ -222,7 +295,9 @@ async function main() {
   console.log('   - Call emergencyWithdrawERC20(TIME26, v4, 31536000e18)');
   console.log('');
   console.log('2. Find the unaccounted 16,884,000 TIME26:');
-  console.log('   - Check: https://polygonscan.com/token/' + TIME26 + '#balances');
+  console.log(
+    '   - Check: https://polygonscan.com/token/' + TIME26 + '#balances'
+  );
   console.log('');
   console.log('3. Set up Team vesting (4,730,400 TIME26):');
   console.log('   - Deploy vesting contract or use Sablier/Hedgey');
