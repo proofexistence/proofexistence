@@ -50,6 +50,13 @@
       "when": 1767501544753,
       "tag": "0006_even_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1767601820412,
+      "tag": "0007_fair_black_crow",
+      "breakpoints": true
     }
   ]
 }

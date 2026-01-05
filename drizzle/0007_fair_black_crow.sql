@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "time26_spent" numeric(78, 0) DEFAULT '0' NOT NULL;

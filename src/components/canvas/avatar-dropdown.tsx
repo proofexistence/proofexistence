@@ -2,10 +2,11 @@
 
 import { useWeb3Auth } from '@/lib/web3auth';
 import { useProfile } from '@/hooks/use-profile';
+import { useClaimTime26 } from '@/hooks/useClaimTime26';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Settings, LogOut, User } from 'lucide-react';
+import { Settings, LogOut, User, Gift, Loader2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function AvatarDropdown() {
@@ -17,7 +18,23 @@ export function AvatarDropdown() {
     logout,
   } = useWeb3Auth();
   const { profile, isLoading: isProfileLoading } = useProfile();
+  const {
+    claimable,
+    claimableFormatted,
+    isClaiming,
+    claimRewards,
+    claimError,
+  } = useClaimTime26();
   const [isOpen, setIsOpen] = useState(false);
+  const [claimSuccess, setClaimSuccess] = useState(false);
+
+  const handleClaim = async () => {
+    const success = await claimRewards();
+    if (success) {
+      setClaimSuccess(true);
+      setTimeout(() => setClaimSuccess(false), 3000);
+    }
+  };
 
   // Only use DB profile data - no fallback to Web3Auth to avoid flickering
   const walletAddress = profile?.walletAddress || user?.walletAddress;
@@ -61,6 +78,13 @@ export function AvatarDropdown() {
             )}
           </Link>
 
+          {/* Claimable Badge */}
+          {claimable && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center border-2 border-black/50 shadow-lg animate-pulse">
+              <Gift className="w-3 h-3 text-white" />
+            </div>
+          )}
+
           {/* Dropdown Menu */}
           <AnimatePresence>
             {isOpen && (
@@ -80,6 +104,44 @@ export function AvatarDropdown() {
                     {walletAddress}
                   </div>
                 </div>
+
+                {/* Claim Rewards Section */}
+                {claimable && (
+                  <div className="px-4 py-3 border-b border-white/10 bg-orange-500/10">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-[10px] text-orange-400 uppercase tracking-wide">
+                          Claimable
+                        </div>
+                        <div className="text-sm font-mono font-semibold text-orange-300">
+                          {claimableFormatted} TIME26
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleClaim}
+                        disabled={isClaiming}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 text-white rounded-lg transition-colors"
+                      >
+                        {isClaiming ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Gift className="w-3 h-3" />
+                        )}
+                        {isClaiming ? 'Claiming...' : 'Claim'}
+                      </button>
+                    </div>
+                    {claimError && (
+                      <div className="mt-2 text-[10px] text-red-400 truncate">
+                        {claimError}
+                      </div>
+                    )}
+                    {claimSuccess && (
+                      <div className="mt-2 text-[10px] text-green-400">
+                        ✓ Claimed successfully!
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <Link
                   href="/settings"

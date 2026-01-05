@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useTime26Balance } from '@/hooks/useTime26Balance';
+import { useClaimTime26 } from '@/hooks/useClaimTime26';
 import { cn } from '@/lib/utils';
 
 interface Time26BalanceCardProps {
@@ -10,6 +12,16 @@ interface Time26BalanceCardProps {
 export function Time26BalanceCard({ className }: Time26BalanceCardProps) {
   const { balance, stats, recentRewards, isLoading, refresh } =
     useTime26Balance();
+  const {
+    claimable,
+    claimableFormatted,
+    alreadyClaimedFormatted,
+    isClaiming,
+    claimRewards,
+    claimError,
+    claimTxHash,
+  } = useClaimTime26();
+  const [showClaimSuccess, setShowClaimSuccess] = useState(false);
 
   if (isLoading) {
     return (
@@ -58,6 +70,73 @@ export function Time26BalanceCard({ className }: Time26BalanceCardProps) {
           <RefreshIcon className="h-5 w-5" />
         </button>
       </div>
+
+      {/* Claim Section */}
+      {claimable && (
+        <div className="mt-4 rounded-lg border border-orange-500/30 bg-orange-500/10 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-orange-400">Claimable Rewards</p>
+              <p className="mt-0.5 font-mono text-lg font-semibold text-orange-300">
+                {claimableFormatted} TIME26
+              </p>
+            </div>
+            <button
+              onClick={async () => {
+                const success = await claimRewards();
+                if (success) {
+                  setShowClaimSuccess(true);
+                  setTimeout(() => setShowClaimSuccess(false), 5000);
+                  refresh();
+                }
+              }}
+              disabled={isClaiming}
+              className={cn(
+                'rounded-lg px-4 py-2 font-medium transition',
+                isClaiming
+                  ? 'cursor-not-allowed bg-orange-500/30 text-orange-300/50'
+                  : 'bg-orange-500 text-white hover:bg-orange-600'
+              )}
+            >
+              {isClaiming ? (
+                <span className="flex items-center gap-2">
+                  <LoadingSpinner className="h-4 w-4" />
+                  Claiming...
+                </span>
+              ) : (
+                'Claim'
+              )}
+            </button>
+          </div>
+          {alreadyClaimedFormatted !== '0' && (
+            <p className="mt-2 text-xs text-white/50">
+              Already claimed: {alreadyClaimedFormatted} TIME26
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Claim Success Message */}
+      {showClaimSuccess && claimTxHash && (
+        <div className="mt-4 rounded-lg border border-green-500/30 bg-green-500/10 p-4">
+          <p className="text-sm text-green-400">Claim successful!</p>
+          <a
+            href={`https://polygonscan.com/tx/${claimTxHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 block truncate text-xs text-green-300 underline"
+          >
+            View transaction →
+          </a>
+        </div>
+      )}
+
+      {/* Claim Error */}
+      {claimError && (
+        <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3">
+          <p className="text-sm text-red-400">{claimError}</p>
+        </div>
+      )}
 
       {/* Stats */}
       {stats && (
@@ -128,6 +207,32 @@ function RefreshIcon({ className }: { className?: string }) {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function LoadingSpinner({ className }: { className?: string }) {
+  return (
+    <svg
+      className={cn('animate-spin', className)}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="3"
+        className="opacity-25"
+      />
+      <path
+        d="M4 12a8 8 0 018-8"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
       />
     </svg>
   );

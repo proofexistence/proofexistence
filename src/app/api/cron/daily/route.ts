@@ -18,8 +18,13 @@ import {
   dailyRewards,
   userDailyRewards,
 } from '@/db/schema';
-import { eq, and, gte, lte, inArray, sql } from 'drizzle-orm';
+import { eq, and, gte, lte, gt, inArray, sql } from 'drizzle-orm';
 import { generateMerkleTree } from '@/lib/merkle';
+import {
+  generateRewardsMerkleTree,
+  getRewardsRoot,
+  type UserRewardEntry,
+} from '@/lib/merkle/rewards';
 import { uploadToIrys } from '@/lib/irys';
 import { ethers } from 'ethers';
 import {
@@ -28,6 +33,7 @@ import {
   TIME26_ADDRESS,
   TIME26_ABI,
   PROOF_RECORDER_ADDRESS,
+  PROOF_RECORDER_ABI,
 } from '@/lib/contracts';
 import {
   createAmoyProvider,
@@ -299,6 +305,166 @@ async function runRewards(): Promise<{
 }
 
 // ============================================================
+// Task 3: Burn Pending TIME26 and Update Rewards Merkle Root
+// ============================================================
+async function runBurnAndMerkle(): Promise<{
+  success: boolean;
+  totalBurned: string;
+  merkleRoot?: string;
+  userCount: number;
+  txHash?: string;
+  error?: string;
+}> {
+  // console.log('[Daily Cron] Running burn and merkle task...');
+
+  try {
+    // 1. Calculate total pending burn across all users
+    const usersWithPendingBurn = await db
+      .select({
+        id: users.id,
+        walletAddress: users.walletAddress,
+        time26PendingBurn: users.time26PendingBurn,
+      })
+      .from(users)
+      .where(gt(users.time26PendingBurn, '0'));
+
+    // Calculate total to burn
+    let totalPendingBurn = BigInt(0);
+    for (const user of usersWithPendingBurn) {
+      totalPendingBurn += BigInt(user.time26PendingBurn);
+    }
+
+    // console.log(
+    //   `[Daily Cron] Found ${usersWithPendingBurn.length} users with pending burn, total: ${formatTime26(totalPendingBurn.toString())}`
+    // );
+
+    // 2. Burn pending TIME26 if any
+    let burnTxHash: string | undefined;
+    if (totalPendingBurn > BigInt(0)) {
+      const provider = createPolygonProvider();
+      const privateKey =
+        process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
+      if (!privateKey) {
+        throw new Error('OPERATOR_PRIVATE_KEY or PRIVATE_KEY not set');
+      }
+      const wallet = new ethers.Wallet(privateKey, provider);
+
+      const proofRecorder = new ethers.Contract(
+        PROOF_RECORDER_ADDRESS,
+        PROOF_RECORDER_ABI,
+        wallet
+      );
+
+      const today = new Date().toISOString().split('T')[0];
+      const reason = `Daily burn ${today}: ${usersWithPendingBurn.length} users`;
+
+      const nonce = await provider.getTransactionCount(
+        wallet.address,
+        'latest'
+      );
+      const feeData = await provider.getFeeData();
+      const gasPrice = feeData.gasPrice ?? BigInt(0);
+      const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
+
+      const tx = await proofRecorder.burnForRewards(
+        totalPendingBurn.toString(),
+        reason,
+        {
+          nonce,
+          gasPrice: adjustedGasPrice,
+          gasLimit: 100000,
+        }
+      );
+      burnTxHash = tx.hash;
+      await waitForTransaction(provider, tx.hash, 1, 60000);
+
+      // Reset pending burn for all users after successful burn
+      for (const user of usersWithPendingBurn) {
+        await db
+          .update(users)
+          .set({ time26PendingBurn: '0' })
+          .where(eq(users.id, user.id));
+      }
+
+      // console.log(`[Daily Cron] Burned ${formatTime26(totalPendingBurn.toString())} TIME26, tx: ${tx.hash}`);
+    }
+
+    // 3. Generate new Merkle tree based on time26Balance
+    // With the new model, balance is already the claimable amount
+    const usersWithBalance = await db
+      .select({
+        walletAddress: users.walletAddress,
+        time26Balance: users.time26Balance,
+      })
+      .from(users)
+      .where(gt(users.time26Balance, '0'));
+
+    if (usersWithBalance.length === 0) {
+      return {
+        success: true,
+        totalBurned: totalPendingBurn.toString(),
+        userCount: 0,
+        txHash: burnTxHash,
+      };
+    }
+
+    // Create merkle entries with balance
+    const entries: UserRewardEntry[] = usersWithBalance.map((u) => ({
+      walletAddress: u.walletAddress.toLowerCase(),
+      cumulativeAmount: u.time26Balance,
+    }));
+
+    const tree = generateRewardsMerkleTree(entries);
+    const root = getRewardsRoot(tree);
+
+    // 4. Update Merkle root on contract
+    const provider = createPolygonProvider();
+    const privateKey =
+      process.env.OPERATOR_PRIVATE_KEY || process.env.PRIVATE_KEY;
+    if (!privateKey) {
+      throw new Error('OPERATOR_PRIVATE_KEY or PRIVATE_KEY not set');
+    }
+    const wallet = new ethers.Wallet(privateKey, provider);
+
+    const proofRecorder = new ethers.Contract(
+      PROOF_RECORDER_ADDRESS,
+      PROOF_RECORDER_ABI,
+      wallet
+    );
+
+    const nonce = await provider.getTransactionCount(wallet.address, 'latest');
+    const feeData = await provider.getFeeData();
+    const gasPrice = feeData.gasPrice ?? BigInt(0);
+    const adjustedGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
+
+    const tx = await proofRecorder.setRewardsMerkleRoot(root, {
+      nonce,
+      gasPrice: adjustedGasPrice,
+      gasLimit: 100000,
+    });
+    await waitForTransaction(provider, tx.hash, 1, 60000);
+
+    // console.log(`[Daily Cron] Updated rewards merkle root: ${root}, tx: ${tx.hash}`);
+
+    return {
+      success: true,
+      totalBurned: totalPendingBurn.toString(),
+      merkleRoot: root,
+      userCount: usersWithBalance.length,
+      txHash: tx.hash,
+    };
+  } catch (error) {
+    console.error('[Daily Cron] Burn and merkle error:', error);
+    return {
+      success: false,
+      totalBurned: '0',
+      userCount: 0,
+      error: String(error),
+    };
+  }
+}
+
+// ============================================================
 // Main Handler
 // ============================================================
 export async function GET(req: NextRequest) {
@@ -310,15 +476,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Run both tasks sequentially
+  // Run all tasks sequentially
   const settleResult = await runSettle();
   const rewardsResult = await runRewards();
+  const burnMerkleResult = await runBurnAndMerkle();
 
-  const success = settleResult.success && rewardsResult.success;
+  const success =
+    settleResult.success && rewardsResult.success && burnMerkleResult.success;
 
   return NextResponse.json({
     success,
     settle: settleResult,
     rewards: rewardsResult,
+    burnMerkle: burnMerkleResult,
   });
 }

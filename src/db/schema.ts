@@ -34,8 +34,15 @@ export const users = pgTable(
     referralCode: varchar('referral_code', { length: 10 }).unique(), // Short hash of wallet
     referredBy: uuid('referred_by'), // ID of the user who referred this user
 
-    // TIME26 Token Balance (off-chain tracking for rewards, in wei)
+    // TIME26 Token Balance (off-chain, claimable amount in wei)
+    // This is reduced when user spends on proofs
     time26Balance: decimal('time26_balance', { precision: 78, scale: 0 })
+      .default('0')
+      .notNull(),
+
+    // TIME26 Pending Burn (spent amount waiting for cron to burn)
+    // Reset to 0 after each cron burn
+    time26PendingBurn: decimal('time26_pending_burn', { precision: 78, scale: 0 })
       .default('0')
       .notNull(),
 
