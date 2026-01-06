@@ -167,11 +167,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 5. Update DB
+    // 5. Update DB (don't set status to MINTED yet - that happens after actual minting)
     await db
       .update(sessions)
       .set({
-        status: 'MINTED',
         ipfsHash: arweaveTxId,
         message: message || null,
         title: title || null,

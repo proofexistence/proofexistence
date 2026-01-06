@@ -12,6 +12,7 @@ export interface Profile {
   name: string | null;
   avatarUrl: string | null;
   referralCode: string | null;
+  time26Balance: string | null;
 }
 
 interface SyncResponse {

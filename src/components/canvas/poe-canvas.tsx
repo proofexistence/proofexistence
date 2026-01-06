@@ -25,9 +25,11 @@ import {
   BackgroundOverlay,
   ClearConfirmModal,
   SubmissionModal,
+  type PaymentMethod,
 } from './canvas-ui';
 import { useTrailRecorder } from '@/hooks/use-trail-recorder';
 import { useGravity } from '@/hooks/use-gravity';
+import { useGaslessEligibility, useGaslessMint } from '@/hooks/use-gasless-eligibility';
 import { TrailPoint, MIN_SESSION_DURATION } from '@/types/session';
 import { TRAIL_COLORS } from './light-trail';
 import { useWeb3Auth } from '@/lib/web3auth';
@@ -436,6 +438,11 @@ export function POECanvas() {
   const [nativeCost, setNativeCost] = useState<string>('... POL');
   const [nativeCostUsd, setNativeCostUsd] = useState<string>('');
 
+  // Gasless minting eligibility
+  const { data: gaslessEligibility, isLoading: gaslessLoading } =
+    useGaslessEligibility(duration >= 10 ? duration : 10);
+  const { mint: gaslessMint } = useGaslessMint();
+
   // Mint confirmation for non-Web3 users
   const [showMintConfirmation, setShowMintConfirmation] = useState(false);
   const [mintConfirmationData, setMintConfirmationData] =
@@ -752,7 +759,7 @@ export function POECanvas() {
         username: string;
         title: string;
         description: string;
-        paymentMethod?: 'NATIVE' | 'TIME26';
+        paymentMethod?: PaymentMethod;
       }
     ) => {
       // NOTE: We now create the session HERE, instead of before opening the modal.
@@ -902,8 +909,38 @@ export function POECanvas() {
           const session = completedSessionRef.current; // Need duration
           if (!session) throw new Error('Session missing');
 
-          // Check if user has an external wallet (MetaMask, etc.)
-          const hasWeb3Wallet = !!window.ethereum;
+          // --- GASLESS MINTING (TIME26_GASLESS) ---
+          if (data.paymentMethod === 'TIME26_GASLESS') {
+            setLoadingStatus('Minting with TIME26 (gasless)...');
+
+            try {
+              const gaslessRes = await gaslessMint({
+                sessionId: sessionId!,
+                metadataURI: dataRes.arweaveTxId,
+                displayName,
+                message: data.message || '',
+                duration: Math.floor(session.duration),
+              });
+
+              if (!gaslessRes.success) {
+                throw new Error('Gasless mint failed');
+              }
+
+              txHash = gaslessRes.txHash;
+              setLoadingStatus('Transaction Confirmed!');
+            } catch (gaslessError) {
+              console.error('Gasless mint error:', gaslessError);
+              throw new Error(
+                gaslessError instanceof Error
+                  ? gaslessError.message
+                  : 'Gasless minting failed'
+              );
+            }
+          } else {
+            // --- REGULAR MINTING (NATIVE or TIME26 with wallet) ---
+
+            // Check if user has an external wallet (MetaMask, etc.)
+            const hasWeb3Wallet = !!window.ethereum;
 
           if (hasWeb3Wallet) {
             // CLIENT-SIDE MINTING (MetaMask)
@@ -1129,6 +1166,7 @@ export function POECanvas() {
             setLoadingStatus('Transaction Submitted!');
             // console.log('Mint Transaction Confirmed', txHash);
           }
+          } // End of else (REGULAR MINTING)
 
           // PERSIST TX HASH TO DB
           setLoadingStatus('Saving Proof to Database...');
@@ -1263,6 +1301,7 @@ export function POECanvas() {
       deleteSession,
       setLoadingStatus,
       requestMintConfirmation,
+      gaslessMint,
     ]
   );
 
@@ -1475,6 +1514,14 @@ export function POECanvas() {
           nativeCost={nativeCost}
           nativeCostUsd={nativeCostUsd}
           time26Cost={time26Cost}
+          gaslessEligible={gaslessEligibility?.eligible ?? false}
+          gaslessTotalCost={gaslessEligibility?.totalCostFormatted ?? '0'}
+          gaslessLoading={gaslessLoading}
+          unclaimedBalance={
+            profile?.time26Balance
+              ? parseFloat(ethers.formatEther(profile.time26Balance)).toFixed(1)
+              : '0'
+          }
           onSetAsDisplayName={async (name: string) => {
             const headers = await getAuthHeaders();
             const res = await fetch('/api/user/update', {

@@ -93,9 +93,9 @@ export async function POST(req: NextRequest) {
     // Calculate new balance
     const newBalance = balance - amountBigInt;
 
-    console.log(
-      `[SpendBalance] User ${user.walletAddress} spent ${formatTime26(amount)} TIME26 for ${reason}${sessionId ? ` (session: ${sessionId})` : ''}`
-    );
+    // console.log(
+    //   `[SpendBalance] User ${user.walletAddress} spent ${formatTime26(amount)} TIME26 for ${reason}${sessionId ? ` (session: ${sessionId})` : ''}`
+    // );
 
     return NextResponse.json({
       success: true,

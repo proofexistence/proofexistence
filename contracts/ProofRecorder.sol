@@ -314,6 +314,29 @@ contract ProofRecorder is Ownable, ReentrancyGuard {
     }
 
     /**
+     * @notice Mint sponsored proof - operator pays gas, NFT goes to recipient
+     * @dev Used for gasless minting where user pays with off-chain TIME26 balance
+     * @param duration Duration in seconds
+     * @param metadataURI Arweave URI for metadata
+     * @param displayName User's display name
+     * @param message User's message
+     * @param recipient Address to receive the NFT
+     */
+    function mintSponsoredNative(
+        uint256 duration,
+        string memory metadataURI,
+        string memory displayName,
+        string memory message,
+        address recipient
+    ) external onlyOperator whenNotPaused {
+        require(duration >= MIN_DURATION, "ProofRecorder: duration too short");
+        require(recipient != address(0), "ProofRecorder: invalid recipient");
+
+        // No payment required - operator sponsors gas, TIME26 cost handled off-chain
+        _mintExistence(recipient, duration, metadataURI, displayName, message);
+    }
+
+    /**
      * @notice Internal mint function - records existence and mints NFT
      */
     function _mintExistence(

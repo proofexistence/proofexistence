@@ -39,6 +39,7 @@ export const PROOF_RECORDER_ABI = [
   // Minting
   'function mintInstantNative(uint256 duration, string memory metadataURI, string memory displayName, string memory message) external payable',
   'function mintInstantTime26(uint256 duration, string memory metadataURI, string memory displayName, string memory message) external',
+  'function mintSponsoredNative(uint256 duration, string memory metadataURI, string memory displayName, string memory message, address recipient) external',
   // Legacy function names (backward compatible)
   'function mintEternalNative(uint256 duration, string memory metadataURI, string memory displayName, string memory message) external payable',
   'function mintEternalTime26(uint256 duration, string memory metadataURI, string memory displayName, string memory message) external',

@@ -12,7 +12,7 @@ if (!isRateLimitEnabled) {
   );
 }
 
-// Create a new ratelimiter, that allows 5 requests per 1 minute
+// Default ratelimiter: 5 requests per 1 minute
 const ratelimit = isRateLimitEnabled
   ? new Ratelimit({
       redis: Redis.fromEnv(),
@@ -22,15 +22,34 @@ const ratelimit = isRateLimitEnabled
     })
   : null;
 
-export async function checkRateLimit(identifier: string) {
+// Stricter ratelimiter for gasless minting: 2 requests per 1 minute
+// (operator pays gas, so we need to prevent abuse)
+const gaslessRatelimit = isRateLimitEnabled
+  ? new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(2, '60 s'),
+      analytics: true,
+      prefix: '@upstash/ratelimit/gasless',
+    })
+  : null;
+
+export type RateLimitTier = 'default' | 'gasless';
+
+export async function checkRateLimit(
+  identifier: string,
+  tier: RateLimitTier = 'default'
+) {
+  // Select the appropriate limiter based on tier
+  const limiter = tier === 'gasless' ? gaslessRatelimit : ratelimit;
+
   // If disabled, always succeed
-  if (!ratelimit) {
+  if (!limiter) {
     return { success: true, limit: 0, remaining: 0, reset: 0 };
   }
 
   try {
     const { success, limit, remaining, reset } =
-      await ratelimit.limit(identifier);
+      await limiter.limit(identifier);
     return { success, limit, remaining, reset };
   } catch (error) {
     console.error('Rate limit error:', error);
