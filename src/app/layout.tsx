@@ -1,13 +1,6 @@
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Noto_Serif_TC } from 'next/font/google';
+import { getLocale } from 'next-intl/server';
 import './globals.css';
-import { Providers } from '@/providers/app-provider';
-import { GlobalBackground } from '@/components/layout/global-background';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
-import { LoadingBar } from '@/components/layout/loading-bar';
-import { ReferralListener } from '@/components/auth/referral-listener';
-import Script from 'next/script';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -19,94 +12,28 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export const metadata: Metadata = {
-  title: 'Proof of Existence | A Year-Long Collective Art Experiment',
-  description:
-    'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
-  metadataBase: new URL('https://proofexistence.com/'),
-  keywords: [
-    'blockchain',
-    'NFT',
-    'Polygon',
-    'Web3',
-    'art',
-    'proof of existence',
-    'digital art',
-    'generative art',
-  ],
-  authors: [{ name: 'POE Team' }],
-  openGraph: {
-    title: 'Proof of Existence | A Year-Long Collective Art Experiment',
-    description:
-      'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
-    url: 'https://proofexistence.com/',
-    siteName: 'POE 2026',
-    images: [
-      {
-        url: 'https://proofexistence.com/og-v2.png',
-        width: 1200,
-        height: 630,
-        alt: 'POE 2026 - Proof of Existence',
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Proof of Existence | A Year-Long Collective Art Experiment',
-    description:
-      'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
-    images: ['https://proofexistence.com/og-v2.png'],
-    creator: '@Proofexist2006',
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
-    ],
-    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
-  },
-  manifest: '/site.webmanifest',
-};
+const notoSerifTC = Noto_Serif_TC({
+  variable: '--font-noto-serif-tc',
+  subsets: ['latin'],
+  weight: ['200', '300', '400', '500', '600', '700', '900'],
+});
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get locale from next-intl
+  const locale = await getLocale();
+
+  // Root layout - locale-specific content is in [locale]/layout.tsx
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${notoSerifTC.variable} antialiased`}
         suppressHydrationWarning
       >
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-SVQWPRD6ER"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-SVQWPRD6ER');
-          `}
-        </Script>
-        <LoadingBar />
-        <Providers>
-          <div className="relative min-h-screen flex flex-col">
-            <GlobalBackground />
-            <header className="relative z-50">
-              <ReferralListener />
-              <Navbar />
-            </header>
-            <main className="flex-grow">{children}</main>
-            <Footer />
-          </div>
-        </Providers>
+        {children}
       </body>
     </html>
   );

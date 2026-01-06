@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 interface Session {
   id: string;
@@ -19,6 +20,7 @@ interface AnimatedHeroProps {
 }
 
 export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
+  const t = useTranslations('home.hero');
   const containerRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
@@ -147,9 +149,9 @@ export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
           ref={subtitleRef}
           className="text-xl md:text-2xl text-zinc-400 max-w-2xl mb-8 font-light leading-relaxed text-center mt-6 relative z-10"
         >
-          A year-long collective art experiment.
+          {t('subtitle')}
           <span className="block text-zinc-500 text-sm md:text-base mt-2">
-            Leave your trace. Co-create history. Prove you existed.
+            {t('description')}
           </span>
         </p>
 
@@ -159,7 +161,7 @@ export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
           href="/cosmos"
           className="group px-8 py-3 mb-12 bg-cyan-500/20 hover:bg-cyan-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-cyan-400/30 hover:border-cyan-400/50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden"
         >
-          <span className="relative z-10">Explore Cosmos</span>
+          <span className="relative z-10">{t('exploreCosmos')}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"

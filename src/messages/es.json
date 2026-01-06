@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "title": "Prueba de Existencia | Un Experimento de Arte Colectivo de Un Año",
+    "description": "Únete al movimiento. Deja tu huella inmutable en la blockchain. Un proyecto de arte colectivo de un año donde cada participante co-crea el monumento digital final."
+  },
+  "nav": {
+    "whitepaper": "Whitepaper",
+    "explore": "Explorar",
+    "cosmos": "Cosmos",
+    "drawToProof": "Dibuja para Probar",
+    "proveExistence": "Probar Existencia",
+    "connectWallet": "Conectar Cartera",
+    "connecting": "Conectando...",
+    "login": "Iniciar Sesión",
+    "viewProfile": "Ver Perfil",
+    "exportPrivateKey": "Exportar Clave Privada",
+    "settings": "Configuración",
+    "logOut": "Cerrar Sesión",
+    "balances": "Saldos",
+    "pendingRewards": "Recompensas Pendientes",
+    "referral": "Referido"
+  },
+  "footer": {
+    "title": "Prueba de Existencia",
+    "tagline": "Rastros de luz inmutables en la blockchain.",
+    "proveHere": "Prueba que estuviste aquí.",
+    "established": "Est. 2026",
+    "viewSupporters": "Ver Patrocinadores",
+    "supportProject": "Apoyar el Proyecto",
+    "sponsorStranger": "Patrocinar a un Desconocido",
+    "sponsorDescription": "Paga por pruebas sin gas en todo el mundo",
+    "donationNote": "Tu donación patrocina pruebas sin gas para desconocidos en todo el mundo. Cada contribución ayuda a preservar la existencia digital de alguien para siempre.",
+    "brandSponsorship": "Patrocinio de Marca",
+    "whitepaper": "Whitepaper",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "copyright": "© {year} Prueba de Existencia. Todos los derechos reservados."
+  },
+  "home": {
+    "hero": {
+      "subtitle": "Un experimento de arte colectivo de un año.",
+      "description": "Deja tu huella. Co-crea la historia. Demuestra que exististe.",
+      "exploreCosmos": "Explorar Cosmos",
+      "connectWallet": "Conectar Cartera",
+      "enterEternal": "Entrar al Eterno"
+    },
+    "manifesto": {
+      "historyTitle": "La historia fue una vez un lujo para <few>pocos</few>.",
+      "historySubtitle": "Reyes en piedra. Conquistadores en epopeyas. Poetas en tinta.",
+      "ghostTitle": "¿Pero qué hay de <you>ti</you>?",
+      "ghostSubtitle": "En el ruido digital, somos fantasmas—publicaciones fugaces, historias que desaparecen, olvidados en el desplazamiento.",
+      "solutionTitle": "Prueba de Existencia es la Epopeya moderna.",
+      "solutionSubtitle": "Un libro mayor inmutable donde tu rastro se preserva—para siempre."
+    },
+    "cta": {
+      "leaveTrace": "Deja tu huella."
+    }
+  },
+  "canvas": {
+    "timer": {
+      "paused": "PAUSADO",
+      "minDuration": "Mín: {seconds}s",
+      "clickToContinue": "Haz clic en el lienzo para continuar"
+    },
+    "actions": {
+      "restart": "Reiniciar",
+      "submit": "Enviar Prueba",
+      "done": "Listo",
+      "exit": "Salir"
+    },
+    "instructions": {
+      "clickAndHold": "Haz clic y mantén para dibujar",
+      "drawForMinimum": "Dibuja al menos {seconds}s para crear una prueba",
+      "theme": "Tema: {name} • Ctrl+B para cambiar",
+      "recording": "Grabando • Suelta para pausar",
+      "readyToSubmit": "¡Listo para enviar!",
+      "useButtons": "Usa los botones arriba para enviar o reiniciar"
+    },
+    "modal": {
+      "title": "Guarda Tu Legado",
+      "subtitle": "Elige cómo quieres inmortalizar este momento.",
+      "artworkDetails": "Detalles de la Obra",
+      "artworkTitle": "TÍTULO DE LA OBRA (OPCIONAL)",
+      "artworkTitlePlaceholder": "Nombra tu creación...",
+      "description": "DESCRIPCIÓN (OPCIONAL)",
+      "descriptionPlaceholder": "Describe tu visión artística...",
+      "identity": "Identidad en Cadena",
+      "nameOnChain": "NOMBRE QUE QUIERES DEJAR EN LA CADENA (OPCIONAL)",
+      "namePlaceholder": "Anónimo",
+      "leaveEmpty": "Deja vacío para aparecer como \"Anónimo\"",
+      "messageToWorld": "MENSAJE AL MUNDO (OPCIONAL)",
+      "messagePlaceholder": "¿Qué quieres dejar atrás?",
+      "paymentMethod": "MÉTODO DE PAGO",
+      "walletBalance": "Saldo de Cartera:",
+      "unclaimedBalance": "Saldo No Reclamado:",
+      "cost": "Costo:",
+      "noSignatureNeeded": "No se necesita firma",
+      "perpetualProof": "Prueba Perpetua (Instantánea)",
+      "standardProof": "Prueba Estándar (Lote Diario)",
+      "free": "GRATIS",
+      "gasFree": "Sin Gas",
+      "cancel": "Cancelar",
+      "setAsDisplayName": "Establecer como nombre visible",
+      "saved": "¡Guardado!",
+      "saving": "Guardando...",
+      "checking": "Verificando...",
+      "inclGas": "(incl. gas)",
+      "reset": "Restablecer",
+      "perpetualDescGasless": "Acuña usando tus recompensas TIME26 no reclamadas. Sin firma de cartera necesaria - ¡completamente sin gas!",
+      "perpetualDescTime26": "Escribe tu rastro en Arweave instantáneamente, verificado en Polygon. Acuña tu NFT de Rastro personal + insignia y Quema Time26.",
+      "perpetualDescNative": "Escribe tu rastro en Arweave instantáneamente, verificado en Polygon. Acuña tu NFT de Rastro personal + insignia.",
+      "standardDesc": "Incluido en el lote diario en cadena (UTC 00:00). Datos completos subidos por el protocolo a Polygon.",
+      "techTitle": "¿Por qué es seguro? / Cómo funciona",
+      "techDesc1": "Tus datos creativos están protegidos usando hash criptográfico (SHA-256). Estas huellas digitales únicas se agregan en una estructura de Árbol de Merkle.",
+      "techDesc2": "Finalmente, agrupamos estas pruebas en una sola transacción verificable en la blockchain. Esto asegura que tu trabajo está matemáticamente probado de existir en este momento específico, con la seguridad de toda la red."
+    },
+    "clearConfirm": {
+      "title": "¿Comenzar Nuevo Dibujo?",
+      "description": "Esto borrará tu rastro actual y reiniciará el temporizador.",
+      "keepTrail": "Mantener Rastro",
+      "clearStart": "Borrar y Comenzar"
+    },
+    "status": {
+      "submitting": "Enviando prueba...",
+      "submitted": "¡Prueba Enviada! Se incluirá en la instantánea diaria.",
+      "mintingTime26": "Acuñando con TIME26 (sin gas)...",
+      "transactionSubmitted": "¡Transacción Enviada! Esperando confirmación...",
+      "minting": "Acuñando Prueba (2/2)...",
+      "minted": "¡Prueba Perpetua Acuñada!",
+      "saving": "Guardando Prueba en Base de Datos..."
+    }
+  },
+  "proof": {
+    "notFound": "Prueba no encontrada.",
+    "goHome": "Ir al Inicio",
+    "status": {
+      "minted": "ACUÑADO",
+      "settled": "LIQUIDADO",
+      "pending": "PENDIENTE"
+    },
+    "share": {
+      "copyLink": "Copiar Enlace",
+      "postOnX": "Publicar en X",
+      "postOnThreads": "Publicar en Threads",
+      "postOnInstagram": "Publicar en Instagram"
+    },
+    "screenshot": {
+      "withoutTitle": "Sin Título",
+      "withTitle": "Con Título"
+    },
+    "verifiedOn": "Verificado en Polygon",
+    "arweaveMetadata": "Metadatos de Arweave",
+    "rawArtFile": "Archivo de Arte Original",
+    "syncingStorage": "Sincronizando Almacenamiento..."
+  },
+  "explore": {
+    "title": "Explorar",
+    "description": "Descubre las últimas pruebas verificadas de todo el mundo."
+  },
+  "referral": {
+    "title": "Invitar Amigos",
+    "subtitle": "Comparte tu enlace de referido y gana recompensas juntos.",
+    "friendsInvited": "Amigos Invitados",
+    "yourLink": "Tu Enlace de Referido",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "shareInfo": "Comparte este enlace con amigos...",
+    "notGenerated": "Código de referido no generado aún.",
+    "signInAgain": "Por favor cierra sesión y vuelve a iniciar para generar uno."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "reset": "Reiniciar",
+    "copy": "Copiar",
+    "copied": "Copiado"
+  },
+  "whitepaper": {
+    "protocolSpec": "Especificación del Protocolo",
+    "readyToExist": "¿Listo para existir?",
+    "enterApp": "Entrar a la App"
+  },
+  "languageSelector": {
+    "label": "Idioma",
+    "en": "English",
+    "zh": "中文繁體",
+    "cn": "中文简体",
+    "es": "Español",
+    "ja": "日本語",
+    "fr": "Français"
+  }
+}

@@ -1,20 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname as useNextPathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Heart, Wallet } from 'lucide-react';
 import { SponsorModal } from '@/components/sponsor/sponsor-modal';
+import { LanguageSelector } from './language-selector';
 
 export function Footer() {
-  const pathname = usePathname();
+  const pathname = useNextPathname();
+  const t = useTranslations('footer');
   const [sponsorOpen, setSponsorOpen] = useState(false);
 
-  // Hide footer on specific routes
+  // Hide footer on specific routes (check for locale prefix pattern)
   if (
-    pathname === '/cosmos' ||
-    pathname === '/canvas' ||
-    pathname?.startsWith('/proof')
+    pathname?.endsWith('/cosmos') ||
+    pathname?.endsWith('/canvas') ||
+    pathname?.includes('/proof/')
   ) {
     return null;
   }
@@ -26,14 +29,14 @@ export function Footer() {
           {/* Brand Column */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
-              Proof of Existence
+              {t('title')}
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed max-w-sm">
-              Immutable light trails on the blockchain.
+              {t('tagline')}
               <br />
-              Prove you were here.
+              {t('proveHere')}
               <br />
-              <span className="opacity-50">Est. 2026</span>
+              <span className="opacity-50">{t('established')}</span>
             </p>
             <div className="flex items-center gap-4 pt-2">
               <Link
@@ -41,7 +44,7 @@ export function Footer() {
                 className="text-xs font-medium text-zinc-500 hover:text-white transition-colors flex items-center gap-2 group"
               >
                 <Heart className="w-3 h-3 group-hover:text-red-500 transition-colors" />
-                View Supporters
+                {t('viewSupporters')}
               </Link>
             </div>
           </div>
@@ -51,7 +54,7 @@ export function Footer() {
             <div className="flex items-center gap-2 mb-6">
               <Wallet className="w-4 h-4 text-zinc-400" />
               <h4 className="text-sm font-semibold text-zinc-200">
-                Support the Project
+                {t('supportProject')}
               </h4>
             </div>
 
@@ -62,54 +65,54 @@ export function Footer() {
               <Heart className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
               <div className="text-left">
                 <span className="font-medium text-zinc-200 group-hover:text-white transition-colors">
-                  Sponsor a Stranger
+                  {t('sponsorStranger')}
                 </span>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  Pay for gas-free proofs worldwide
+                  {t('sponsorDescription')}
                 </p>
               </div>
             </button>
 
-            <p className="text-[10px] text-zinc-600 mt-3 pl-1">
-              Your donation sponsors gas-free proofs for strangers worldwide.
-              Every contribution helps preserve someone&apos;s digital existence
-              forever.
+            <p className="text-xs text-zinc-500 mt-3 pl-1">
+              {t('donationNote')}
             </p>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-zinc-600">
-            © {new Date().getFullYear()} Proof of Existence. All rights
-            reserved.
+            {t('copyright', { year: new Date().getFullYear() })}
           </p>
           <div className="flex items-center gap-6">
             <Link
               href="/brands"
               className="text-xs text-zinc-600 hover:text-white transition-colors"
             >
-              Brand Sponsorship
+              {t('brandSponsorship')}
             </Link>
             <Link
               href="/whitepaper"
               className="text-xs text-zinc-600 hover:text-white transition-colors"
             >
-              Whitepaper
+              {t('whitepaper')}
             </Link>
-            <Link
+            <a
               href="https://github.com/proofexistence"
               target="_blank"
+              rel="noopener noreferrer"
               className="text-xs text-zinc-600 hover:text-white transition-colors"
             >
-              GitHub
-            </Link>
-            <Link
+              {t('github')}
+            </a>
+            <a
               href="https://x.com/Proofexist2006"
               target="_blank"
+              rel="noopener noreferrer"
               className="text-xs text-zinc-600 hover:text-white transition-colors"
             >
-              X (Twitter)
-            </Link>
+              {t('twitter')}
+            </a>
+            <LanguageSelector />
           </div>
         </div>
       </div>

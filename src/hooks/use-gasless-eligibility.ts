@@ -116,7 +116,9 @@ export function useGaslessMint() {
       }>;
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
-        throw new Error('Minting timed out. Please check your transaction history.');
+        throw new Error(
+          'Minting timed out. Please check your transaction history.'
+        );
       }
       throw err;
     } finally {

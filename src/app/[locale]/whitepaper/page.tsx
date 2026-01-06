@@ -1,6 +1,7 @@
 import { getWhitepaperContent } from '@/lib/content';
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { getTranslations } from 'next-intl/server';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -9,7 +10,7 @@ export const revalidate = 3600;
 
 // Define Props interface correctly for Next.js 15+ Server Components
 interface WhitepaperPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ locale: string }>;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,12 +34,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function WhitepaperPage({
-  searchParams,
-}: WhitepaperPageProps) {
-  // Await searchParams before accessing properties
-  const resolvedSearchParams = await searchParams;
-  const lang = (resolvedSearchParams?.lang as string) || 'en';
+export default async function WhitepaperPage({ params }: WhitepaperPageProps) {
+  const { locale } = await params;
+  const t = await getTranslations('whitepaper');
+
+  // Map locale to whitepaper language (cn uses zh content)
+  const lang = locale === 'cn' ? 'zh' : locale;
 
   // Fetch content based on language
   const { content } = await getWhitepaperContent(lang);
@@ -46,43 +47,10 @@ export default async function WhitepaperPage({
   return (
     <div className="min-h-screen bg-transparent text-zinc-100 font-sans selection:bg-purple-500/30">
       <main className="max-w-3xl mx-auto px-6 pt-32 pb-24">
-        {/* Header & Language Toggle */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
+        {/* Header */}
+        <div className="flex items-center justify-center mb-12">
           <div className="text-zinc-500 text-xs tracking-[0.2em] uppercase font-medium">
-            Protocol Specification
-          </div>
-
-          <div className="flex gap-2 text-xs font-mono bg-white/5 p-1 rounded-lg border border-white/5">
-            <Link
-              href="?lang=en"
-              className={`px-3 py-1.5 rounded transition-all ${lang === 'en' ? 'bg-white text-black shadow-sm' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
-            >
-              EN
-            </Link>
-            <Link
-              href="?lang=zh"
-              className={`px-3 py-1.5 rounded transition-all ${lang === 'zh' ? 'bg-white text-black shadow-sm' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
-            >
-              中文
-            </Link>
-            <Link
-              href="?lang=es"
-              className={`px-3 py-1.5 rounded transition-all ${lang === 'es' ? 'bg-white text-black shadow-sm' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
-            >
-              ES
-            </Link>
-            <Link
-              href="?lang=ja"
-              className={`px-3 py-1.5 rounded transition-all ${lang === 'ja' ? 'bg-white text-black shadow-sm' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
-            >
-              JA
-            </Link>
-            <Link
-              href="?lang=fr"
-              className={`px-3 py-1.5 rounded transition-all ${lang === 'fr' ? 'bg-white text-black shadow-sm' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
-            >
-              FR
-            </Link>
+            {t('protocolSpec')}
           </div>
         </div>
 
@@ -91,10 +59,10 @@ export default async function WhitepaperPage({
         </article>
 
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col items-center">
-          <p className="text-zinc-500 text-sm mb-4">Ready to exist?</p>
+          <p className="text-zinc-500 text-sm mb-4">{t('readyToExist')}</p>
           <Link href="/">
             <button className="px-8 py-3 bg-white text-black hover:bg-zinc-200 transition-colors text-sm uppercase tracking-widest font-bold">
-              Enter App
+              {t('enterApp')}
             </button>
           </Link>
         </div>

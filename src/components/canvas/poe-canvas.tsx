@@ -29,7 +29,10 @@ import {
 } from './canvas-ui';
 import { useTrailRecorder } from '@/hooks/use-trail-recorder';
 import { useGravity } from '@/hooks/use-gravity';
-import { useGaslessEligibility, useGaslessMint } from '@/hooks/use-gasless-eligibility';
+import {
+  useGaslessEligibility,
+  useGaslessMint,
+} from '@/hooks/use-gasless-eligibility';
 import { TrailPoint, MIN_SESSION_DURATION } from '@/types/session';
 import { TRAIL_COLORS } from './light-trail';
 import { useWeb3Auth } from '@/lib/web3auth';
@@ -942,230 +945,232 @@ export function POECanvas() {
             // Check if user has an external wallet (MetaMask, etc.)
             const hasWeb3Wallet = !!window.ethereum;
 
-          if (hasWeb3Wallet) {
-            // CLIENT-SIDE MINTING (MetaMask)
-            // Minting via External Wallet (Client-Side)...
-            setLoadingStatus('Please confirm transaction in your wallet...');
+            if (hasWeb3Wallet) {
+              // CLIENT-SIDE MINTING (MetaMask)
+              // Minting via External Wallet (Client-Side)...
+              setLoadingStatus('Please confirm transaction in your wallet...');
 
-            if (!window.ethereum)
-              throw new Error(
-                'No crypto wallet found. Please install MetaMask.'
-              );
-            const provider = new ethers.BrowserProvider(
-              window.ethereum as ethers.Eip1193Provider
-            );
-
-            // Force Network Switch
-            try {
-              await switchNetwork(provider);
-            } catch (e) {
-              console.error('Network switch failed', e);
-              // We continue, but it might fail if on wrong network.
-              // Better to throw?
-              // If valid switchNetwork error, likely user rejected.
-              throw new Error(
-                'Please switch to the correct network (Polygon) to continue.'
-              );
-            }
-
-            await provider.send('eth_requestAccounts', []);
-            const signer = await provider.getSigner();
-
-            const poeContract = new ethers.Contract(
-              PROOF_OF_EXISTENCE_ADDRESS,
-              PROOF_OF_EXISTENCE_ABI,
-              signer
-            );
-
-            if ((data.paymentMethod || 'NATIVE') === 'NATIVE') {
-              const nativeBalance = await provider.getBalance(
-                await signer.getAddress()
-              );
-              const cost = await poeContract.calculateCostNative(
-                Math.floor(session.duration)
-              );
-
-              if (nativeBalance < cost) {
-                throw new Error('Insufficient MATIC balance for minting');
-              }
-
-              // Fetch gas fees with timeout and fallback
-              setLoadingStatus('Estimating gas fees...');
-              const overrides: {
-                value?: bigint;
-                gasPrice?: bigint;
-                maxFeePerGas?: bigint;
-                maxPriorityFeePerGas?: bigint;
-                gasLimit?: bigint;
-              } = { value: cost };
-
-              try {
-                // Use a timeout to prevent hanging
-                const feeDataPromise = provider.getFeeData();
-                const timeoutPromise = new Promise<ethers.FeeData>(
-                  (_, reject) =>
-                    setTimeout(
-                      () => reject(new Error('Gas estimation timeout')),
-                      5000
-                    )
+              if (!window.ethereum)
+                throw new Error(
+                  'No crypto wallet found. Please install MetaMask.'
                 );
+              const provider = new ethers.BrowserProvider(
+                window.ethereum as ethers.Eip1193Provider
+              );
 
-                const feeData = await Promise.race([
-                  feeDataPromise,
-                  timeoutPromise,
-                ]);
-
-                // Use gasPrice with 20% buffer for Polygon reliability
-                if (feeData.gasPrice) {
-                  overrides.gasPrice =
-                    (feeData.gasPrice * BigInt(120)) / BigInt(100);
-                } else if (feeData.maxFeePerGas) {
-                  // EIP-1559 Support
-                  overrides.maxFeePerGas =
-                    (feeData.maxFeePerGas * BigInt(120)) / BigInt(100);
-                  overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas
-                    ? (feeData.maxPriorityFeePerGas * BigInt(120)) / BigInt(100)
-                    : undefined;
-                }
-              } catch (feeError) {
-                console.warn(
-                  'Gas estimation failed or timed out, using wallet defaults:',
-                  feeError
-                );
-                // We proceed without overrides, letting MetaMask estimate
-              }
-
-              let gasLimit = BigInt(300000); // Default fallback
+              // Force Network Switch
               try {
-                const estimatedGas =
-                  await poeContract.mintEternalNative.estimateGas(
-                    Math.floor(session.duration),
-                    dataRes.arweaveTxId,
-                    displayName,
-                    data.message || '',
-                    { ...overrides }
-                  );
-                gasLimit = (estimatedGas * BigInt(120)) / BigInt(100); // Add 20% buffer
-              } catch {
-                // Use default gasLimit if estimation fails
+                await switchNetwork(provider);
+              } catch (e) {
+                console.error('Network switch failed', e);
+                // We continue, but it might fail if on wrong network.
+                // Better to throw?
+                // If valid switchNetwork error, likely user rejected.
+                throw new Error(
+                  'Please switch to the correct network (Polygon) to continue.'
+                );
               }
 
-              overrides.gasLimit = gasLimit;
+              await provider.send('eth_requestAccounts', []);
+              const signer = await provider.getSigner();
 
-              const tx = await poeContract.mintEternalNative(
-                Math.floor(session.duration),
-                dataRes.arweaveTxId,
-                displayName,
-                data.message || '',
-                overrides
-              );
-              setLoadingStatus(
-                'Transaction Submitted! Waiting for confirmation...'
-              );
-              await tx.wait();
-              txHash = tx.hash;
-            } else {
-              // TIME26 payment
-              const time26Contract = new ethers.Contract(
-                TIME26_ADDRESS,
-                TIME26_ABI,
+              const poeContract = new ethers.Contract(
+                PROOF_OF_EXISTENCE_ADDRESS,
+                PROOF_OF_EXISTENCE_ABI,
                 signer
               );
 
-              setLoadingStatus('Approving TIME26 (1/2)...');
-              const approveTx = await time26Contract.approve(
+              if ((data.paymentMethod || 'NATIVE') === 'NATIVE') {
+                const nativeBalance = await provider.getBalance(
+                  await signer.getAddress()
+                );
+                const cost = await poeContract.calculateCostNative(
+                  Math.floor(session.duration)
+                );
+
+                if (nativeBalance < cost) {
+                  throw new Error('Insufficient MATIC balance for minting');
+                }
+
+                // Fetch gas fees with timeout and fallback
+                setLoadingStatus('Estimating gas fees...');
+                const overrides: {
+                  value?: bigint;
+                  gasPrice?: bigint;
+                  maxFeePerGas?: bigint;
+                  maxPriorityFeePerGas?: bigint;
+                  gasLimit?: bigint;
+                } = { value: cost };
+
+                try {
+                  // Use a timeout to prevent hanging
+                  const feeDataPromise = provider.getFeeData();
+                  const timeoutPromise = new Promise<ethers.FeeData>(
+                    (_, reject) =>
+                      setTimeout(
+                        () => reject(new Error('Gas estimation timeout')),
+                        5000
+                      )
+                  );
+
+                  const feeData = await Promise.race([
+                    feeDataPromise,
+                    timeoutPromise,
+                  ]);
+
+                  // Use gasPrice with 20% buffer for Polygon reliability
+                  if (feeData.gasPrice) {
+                    overrides.gasPrice =
+                      (feeData.gasPrice * BigInt(120)) / BigInt(100);
+                  } else if (feeData.maxFeePerGas) {
+                    // EIP-1559 Support
+                    overrides.maxFeePerGas =
+                      (feeData.maxFeePerGas * BigInt(120)) / BigInt(100);
+                    overrides.maxPriorityFeePerGas =
+                      feeData.maxPriorityFeePerGas
+                        ? (feeData.maxPriorityFeePerGas * BigInt(120)) /
+                          BigInt(100)
+                        : undefined;
+                  }
+                } catch (feeError) {
+                  console.warn(
+                    'Gas estimation failed or timed out, using wallet defaults:',
+                    feeError
+                  );
+                  // We proceed without overrides, letting MetaMask estimate
+                }
+
+                let gasLimit = BigInt(300000); // Default fallback
+                try {
+                  const estimatedGas =
+                    await poeContract.mintEternalNative.estimateGas(
+                      Math.floor(session.duration),
+                      dataRes.arweaveTxId,
+                      displayName,
+                      data.message || '',
+                      { ...overrides }
+                    );
+                  gasLimit = (estimatedGas * BigInt(120)) / BigInt(100); // Add 20% buffer
+                } catch {
+                  // Use default gasLimit if estimation fails
+                }
+
+                overrides.gasLimit = gasLimit;
+
+                const tx = await poeContract.mintEternalNative(
+                  Math.floor(session.duration),
+                  dataRes.arweaveTxId,
+                  displayName,
+                  data.message || '',
+                  overrides
+                );
+                setLoadingStatus(
+                  'Transaction Submitted! Waiting for confirmation...'
+                );
+                await tx.wait();
+                txHash = tx.hash;
+              } else {
+                // TIME26 payment
+                const time26Contract = new ethers.Contract(
+                  TIME26_ADDRESS,
+                  TIME26_ABI,
+                  signer
+                );
+
+                setLoadingStatus('Approving TIME26 (1/2)...');
+                const approveTx = await time26Contract.approve(
+                  PROOF_OF_EXISTENCE_ADDRESS,
+                  ethers.MaxUint256
+                );
+                await approveTx.wait();
+
+                setLoadingStatus('Minting Proof (2/2)...');
+                const tx = await poeContract.mintEternalTime26(
+                  Math.floor(session.duration),
+                  dataRes.arweaveTxId,
+                  displayName,
+                  data.message || ''
+                );
+                await tx.wait();
+                txHash = tx.hash;
+              }
+
+              setLoadingStatus('Transaction Confirmed!');
+              // console.log('Client-side Mint Confirmed', txHash);
+            } else {
+              // SERVER-SIDE MINTING (Openfort embedded wallet)
+              // Show confirmation dialog for non-Web3 users
+              setLoadingStatus('Preparing transaction details...');
+
+              // Fetch costs for confirmation dialog
+              const RPC_URL =
+                process.env.NEXT_PUBLIC_RPC_URL ||
+                'https://rpc-amoy.polygon.technology';
+              const confirmProvider = new ethers.JsonRpcProvider(RPC_URL);
+              const confirmPoeContract = new ethers.Contract(
                 PROOF_OF_EXISTENCE_ADDRESS,
-                ethers.MaxUint256
+                PROOF_OF_EXISTENCE_ABI,
+                confirmProvider
               );
-              await approveTx.wait();
+              const confirmNativeCost =
+                await confirmPoeContract.calculateCostNative(
+                  Math.floor(session.duration)
+                );
+              const confirmTime26Cost =
+                await confirmPoeContract.calculateCostTime26(
+                  Math.floor(session.duration)
+                );
 
-              setLoadingStatus('Minting Proof (2/2)...');
-              const tx = await poeContract.mintEternalTime26(
-                Math.floor(session.duration),
-                dataRes.arweaveTxId,
-                displayName,
-                data.message || ''
-              );
-              await tx.wait();
-              txHash = tx.hash;
-            }
-
-            setLoadingStatus('Transaction Confirmed!');
-            // console.log('Client-side Mint Confirmed', txHash);
-          } else {
-            // SERVER-SIDE MINTING (Openfort embedded wallet)
-            // Show confirmation dialog for non-Web3 users
-            setLoadingStatus('Preparing transaction details...');
-
-            // Fetch costs for confirmation dialog
-            const RPC_URL =
-              process.env.NEXT_PUBLIC_RPC_URL ||
-              'https://rpc-amoy.polygon.technology';
-            const confirmProvider = new ethers.JsonRpcProvider(RPC_URL);
-            const confirmPoeContract = new ethers.Contract(
-              PROOF_OF_EXISTENCE_ADDRESS,
-              PROOF_OF_EXISTENCE_ABI,
-              confirmProvider
-            );
-            const confirmNativeCost =
-              await confirmPoeContract.calculateCostNative(
-                Math.floor(session.duration)
-              );
-            const confirmTime26Cost =
-              await confirmPoeContract.calculateCostTime26(
-                Math.floor(session.duration)
-              );
-
-            // Request user confirmation
-            const confirmed = await requestMintConfirmation({
-              duration: session.duration,
-              paymentMethod: (data.paymentMethod || 'NATIVE') as
-                | 'NATIVE'
-                | 'TIME26',
-              nativeCost: confirmNativeCost,
-              time26Cost: confirmTime26Cost,
-            });
-
-            if (!confirmed) {
-              // User cancelled - stop the minting process
-              setIsSubmitting(false);
-              setLoadingStatus(undefined);
-              return;
-            }
-
-            // Proceed with minting
-            setLoadingStatus(
-              'Minting via embedded wallet (no approval needed)...'
-            );
-
-            // Call API endpoint
-            const mintRes = await fetch('/api/mint', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...instantAuthHeaders,
-              },
-              body: JSON.stringify({
-                sessionId: sessionId,
-                arweaveTxId: dataRes.arweaveTxId,
+              // Request user confirmation
+              const confirmed = await requestMintConfirmation({
                 duration: session.duration,
-                paymentMethod: data.paymentMethod || 'NATIVE',
-                username: displayName,
-                message: data.message,
-              }),
-            });
+                paymentMethod: (data.paymentMethod || 'NATIVE') as
+                  | 'NATIVE'
+                  | 'TIME26',
+                nativeCost: confirmNativeCost,
+                time26Cost: confirmTime26Cost,
+              });
 
-            if (!mintRes.ok) {
-              const errData = await mintRes.json();
-              throw new Error(errData.error || 'Minting API failed');
+              if (!confirmed) {
+                // User cancelled - stop the minting process
+                setIsSubmitting(false);
+                setLoadingStatus(undefined);
+                return;
+              }
+
+              // Proceed with minting
+              setLoadingStatus(
+                'Minting via embedded wallet (no approval needed)...'
+              );
+
+              // Call API endpoint
+              const mintRes = await fetch('/api/mint', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...instantAuthHeaders,
+                },
+                body: JSON.stringify({
+                  sessionId: sessionId,
+                  arweaveTxId: dataRes.arweaveTxId,
+                  duration: session.duration,
+                  paymentMethod: data.paymentMethod || 'NATIVE',
+                  username: displayName,
+                  message: data.message,
+                }),
+              });
+
+              if (!mintRes.ok) {
+                const errData = await mintRes.json();
+                throw new Error(errData.error || 'Minting API failed');
+              }
+
+              const mintData = await mintRes.json();
+              txHash = mintData.txHash;
+
+              setLoadingStatus('Transaction Submitted!');
+              // console.log('Mint Transaction Confirmed', txHash);
             }
-
-            const mintData = await mintRes.json();
-            txHash = mintData.txHash;
-
-            setLoadingStatus('Transaction Submitted!');
-            // console.log('Mint Transaction Confirmed', txHash);
-          }
           } // End of else (REGULAR MINTING)
 
           // PERSIST TX HASH TO DB

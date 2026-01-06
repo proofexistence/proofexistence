@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useTranslations } from 'next-intl';
 import { HomeActions } from './home-actions';
 
 // Register ScrollTrigger
@@ -11,6 +12,7 @@ if (typeof window !== 'undefined') {
 }
 
 export function AnimatedCTA() {
+  const t = useTranslations('home.cta');
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
@@ -81,7 +83,7 @@ export function AnimatedCTA() {
         ref={titleRef}
         className="text-3xl md:text-5xl font-bold text-white tracking-tight relative z-10"
       >
-        Leave your trace.
+        {t('leaveTrace')}
       </h2>
 
       <div ref={actionsRef} className="relative z-10">

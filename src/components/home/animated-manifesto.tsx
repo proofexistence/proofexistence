@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useTranslations } from 'next-intl';
 
 // Register ScrollTrigger
 if (typeof window !== 'undefined') {
@@ -81,6 +82,7 @@ function ManifestoSection({ children, className = '' }: ManifestoSectionProps) {
 export function AnimatedManifesto() {
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations('home.manifesto');
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -114,36 +116,34 @@ export function AnimatedManifesto() {
       {/* 1. The History */}
       <ManifestoSection>
         <h2 className="text-3xl md:text-5xl font-thin leading-tight text-zinc-300">
-          History was once a luxury for the <Highlight>few</Highlight>.
+          {t.rich('historyTitle', {
+            few: (chunks) => <Highlight>{chunks}</Highlight>,
+          })}
         </h2>
         <p className="mt-8 text-lg md:text-xl text-zinc-500 font-light max-w-2xl">
-          Kings in stone. Conquerors in epics. Poets in ink.
-          <br />
-          They were written into the blockchain of their time.
+          {t('historySubtitle')}
         </p>
       </ManifestoSection>
 
       {/* 2. The Ghost */}
       <ManifestoSection>
         <h2 className="text-3xl md:text-5xl font-thin leading-tight text-zinc-300">
-          But what about <Highlight>you</Highlight>?
+          {t.rich('ghostTitle', {
+            you: (chunks) => <Highlight>{chunks}</Highlight>,
+          })}
         </h2>
         <p className="mt-8 text-lg md:text-xl text-zinc-500 font-light max-w-2xl">
-          In the digital noise, we are ghosts. <br />A server crashes, a
-          platform dies, and our footprints vanish into the void.
+          {t('ghostSubtitle')}
         </p>
       </ManifestoSection>
 
       {/* 3. The Solution / Epic */}
       <ManifestoSection className="min-h-[80vh]">
         <h2 className="text-4xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white via-zinc-200 to-zinc-600 pb-2">
-          Proof of Existence
-          <br />
-          is the modern Epic.
+          {t('solutionTitle')}
         </h2>
         <p className="mt-8 text-xl md:text-2xl text-zinc-400 font-light max-w-3xl leading-relaxed">
-          An immutable ledger where your trace—no matter how small—is carved
-          into the block, <Highlight>forever</Highlight>.
+          {t('solutionSubtitle')}
         </p>
         <div
           ref={lineRef}

@@ -11,6 +11,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { GasFreeBadge } from '@/components/ui/gas-free-badge';
+import { useTranslations } from 'next-intl';
 
 // -- Helper: Format Time --
 export const formatTime = (seconds: number) => {
@@ -37,6 +38,7 @@ export function TimerDisplay({
   onClear,
   onFinish,
 }: TimerDisplayProps) {
+  const t = useTranslations('canvas');
   const getIndicatorClass = () => {
     if (isPaused)
       return 'bg-amber-500 animate-pulse shadow-lg shadow-amber-500/50';
@@ -60,13 +62,14 @@ export function TimerDisplay({
               {formatTime(duration)}
             </span>
             <span className="text-amber-300 text-xs font-medium px-2 py-0.5 bg-amber-500/20 rounded-full">
-              PAUSED
+              {t('timer.paused')}
             </span>
           </div>
           {/* Hint text */}
           <p className="text-white/40 text-[10px] text-center mb-3">
-            Click canvas to continue
-            {!isValid && ` • ${MIN_SESSION_DURATION}s min`}
+            {t('timer.clickToContinue')}
+            {!isValid &&
+              ` • ${t('timer.minDuration', { seconds: MIN_SESSION_DURATION })}`}
           </p>
           {/* Buttons row */}
           <div className="flex gap-2 justify-center">
@@ -90,7 +93,7 @@ export function TimerDisplay({
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                Restart
+                {t('actions.restart')}
               </button>
             )}
             {onFinish && (
@@ -118,7 +121,7 @@ export function TimerDisplay({
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Done
+                {t('actions.done')}
               </button>
             )}
           </div>
@@ -139,7 +142,7 @@ export function TimerDisplay({
         </span>
         {!isValid && isRecording && (
           <span className="text-yellow-300/80 text-xs md:text-sm font-light border-l border-white/20 pl-3">
-            Min: {MIN_SESSION_DURATION}s
+            {t('timer.minDuration', { seconds: MIN_SESSION_DURATION })}
           </span>
         )}
       </div>
@@ -196,6 +199,7 @@ interface ActionButtonsProps {
 }
 
 export function ActionButtons({ onClear, onSubmit }: ActionButtonsProps) {
+  const t = useTranslations('canvas');
   return (
     <div className="flex gap-2 pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
       <button
@@ -217,7 +221,7 @@ export function ActionButtons({ onClear, onSubmit }: ActionButtonsProps) {
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
           />
         </svg>
-        Restart
+        {t('actions.restart')}
       </button>
       <button
         onClick={onSubmit}
@@ -238,7 +242,7 @@ export function ActionButtons({ onClear, onSubmit }: ActionButtonsProps) {
             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        Submit Proof
+        {t('actions.submit')}
       </button>
     </div>
   );
@@ -306,6 +310,7 @@ interface ExitControlsProps {
 }
 
 export function ExitControls({ onExit }: ExitControlsProps) {
+  const t = useTranslations('canvas');
   return (
     <div className="absolute top-6 left-4 md:top-8 md:left-6 pointer-events-auto animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
       <button
@@ -325,7 +330,7 @@ export function ExitControls({ onExit }: ExitControlsProps) {
             d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
-        Exit
+        {t('actions.exit')}
       </button>
     </div>
   );
@@ -392,6 +397,7 @@ export function Instructions({
   onSubmit,
   themeName,
 }: InstructionsProps) {
+  const t = useTranslations('canvas');
   // Position changes based on state
   // Paused state uses pointer-events-none on container so clicks pass through to canvas
   const getPositionClass = () => {
@@ -409,36 +415,17 @@ export function Instructions({
       {/* Idle state - not recording, not paused, not ready */}
       {!isReady && !isRecording && !isPaused && (
         <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-6 py-4 border border-white/10 shadow-lg shadow-black/30 text-center animate-in fade-in zoom-in-95 duration-500">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-400/30 flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-purple-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                />
-              </svg>
-            </div>
-            <p className="text-white text-base font-medium">
-              Click & hold to draw
-            </p>
-          </div>
+          <p className="text-white text-base font-medium mb-1">
+            {t('instructions.clickAndHold')}
+          </p>
           <p className="text-white/50 text-xs mb-3">
-            Draw for at least{' '}
-            <span className="text-purple-300 font-medium">
-              {MIN_SESSION_DURATION}s
-            </span>{' '}
-            to create a proof
+            {t('instructions.drawForMinimum', {
+              seconds: MIN_SESSION_DURATION,
+            })}
           </p>
           <div className="pt-3 border-t border-white/5">
             <p className="text-white/30 text-[10px] font-mono">
-              Theme: {themeName || 'Default'} • Ctrl+B to cycle
+              {t('instructions.theme', { name: themeName || 'Default' })}
             </p>
           </div>
         </div>
@@ -450,7 +437,7 @@ export function Instructions({
           <div className="bg-black/30 backdrop-blur-xl rounded-xl px-4 py-2.5 border border-green-500/20 shadow-lg shadow-green-500/10">
             <p className="text-white/70 text-xs font-medium flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              Recording • Release to pause
+              {t('instructions.recording')}
             </p>
           </div>
         </div>
@@ -479,12 +466,12 @@ export function Instructions({
               </svg>
             </div>
             <p className="text-cyan-300 text-base font-medium">
-              Ready to submit!
+              {t('instructions.readyToSubmit')}
             </p>
           </div>
           <div className="hidden md:block">
             <p className="text-white/50 text-xs">
-              Use buttons above to submit or restart
+              {t('instructions.useButtons')}
             </p>
           </div>
           <div className="block md:hidden mt-3">
@@ -504,7 +491,7 @@ export function Instructions({
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
                   </svg>
-                  Restart
+                  {t('actions.restart')}
                 </GlassButton>
                 <GlassButton onClick={onSubmit} variant="primary">
                   <svg
@@ -520,7 +507,7 @@ export function Instructions({
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  Submit
+                  {t('actions.submit')}
                 </GlassButton>
               </div>
             )}
@@ -554,6 +541,7 @@ export function ClearConfirmModal({
   onConfirm,
   onCancel,
 }: ClearConfirmModalProps) {
+  const t = useTranslations('canvas');
   if (!isOpen) return null;
 
   return (
@@ -580,10 +568,12 @@ export function ClearConfirmModal({
               />
             </svg>
           </div>
-          <h3 className="text-white text-lg font-medium">Start New Drawing?</h3>
+          <h3 className="text-white text-lg font-medium">
+            {t('clearConfirm.title')}
+          </h3>
         </div>
         <p className="text-white/50 text-sm text-center mb-5">
-          This will clear your current trail and reset the timer.
+          {t('clearConfirm.description')}
         </p>
         <div className="flex gap-2 justify-center">
           <button
@@ -605,7 +595,7 @@ export function ClearConfirmModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-            Keep Trail
+            {t('clearConfirm.keepTrail')}
           </button>
           <button
             onClick={onConfirm}
@@ -626,7 +616,7 @@ export function ClearConfirmModal({
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            Clear & Start
+            {t('clearConfirm.clearStart')}
           </button>
         </div>
       </div>
@@ -689,6 +679,7 @@ export function SubmissionModal({
   gaslessLoading = false,
   unclaimedBalance = '0',
 }: SubmissionModalProps) {
+  const t = useTranslations('canvas');
   // Logic: Default to Name -> Username -> Empty (Anonymous)
   const defaultName = profileName || profileUsername || '';
   const [username, setUsername] = useState(defaultName);
@@ -782,10 +773,10 @@ export function SubmissionModal({
         <div className="relative z-10 p-6 flex flex-col h-full max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
           <DialogHeader className="mb-5 flex-shrink-0">
             <DialogTitle className="text-2xl font-bold text-white text-center tracking-tight">
-              Save Your Legacy
+              {t('modal.title')}
             </DialogTitle>
             <DialogDescription className="text-zinc-400 text-center text-sm">
-              Choose how you want to immortalize this moment.
+              {t('modal.subtitle')}
             </DialogDescription>
           </DialogHeader>
 
@@ -795,19 +786,19 @@ export function SubmissionModal({
             <div className="space-y-3 p-4 bg-zinc-900/40 rounded-3xl border border-white/5">
               <h4 className="flex items-center gap-2 text-[10px] font-bold text-cyan-400 tracking-widest uppercase mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-                Artwork Details
+                {t('modal.artworkDetails')}
               </h4>
 
               {/* Title */}
               <div>
                 <label className="block text-[10px] font-bold text-zinc-500 mb-1.5 ml-1">
-                  ARTWORK TITLE (OPTIONAL)
+                  {t('modal.artworkTitle')}
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Name your creation..."
+                  placeholder={t('modal.artworkTitlePlaceholder')}
                   maxLength={100}
                   className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all text-sm font-bold"
                 />
@@ -816,12 +807,12 @@ export function SubmissionModal({
               {/* Description */}
               <div>
                 <label className="block text-[10px] font-bold text-zinc-500 mb-1.5 ml-1">
-                  DESCRIPTION (OPTIONAL)
+                  {t('modal.description')}
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe your artistic vision..."
+                  placeholder={t('modal.descriptionPlaceholder')}
                   maxLength={500}
                   rows={2}
                   className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all resize-none text-xs"
@@ -833,20 +824,20 @@ export function SubmissionModal({
             <div className="space-y-3 p-4 bg-zinc-900/40 rounded-3xl border border-white/5">
               <h4 className="flex items-center gap-2 text-[10px] font-bold text-purple-400 tracking-widest uppercase mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                On-Chain Identity
+                {t('modal.identity')}
               </h4>
 
               {/* 1. Name on Chain */}
               <div>
                 <label className="block text-[10px] font-bold text-zinc-500 mb-1.5 ml-1">
-                  NAME YOU WANT TO LEAVE ON THE CHAIN (OPTIONAL)
+                  {t('modal.nameOnChain')}
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder={profileName || 'Anonymous'}
+                    placeholder={profileName || t('modal.namePlaceholder')}
                     maxLength={50}
                     className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-mono text-sm"
                   />
@@ -856,7 +847,7 @@ export function SubmissionModal({
                         onClick={() => setUsername(profileName)}
                         className="text-[10px] text-purple-400 hover:text-purple-300 bg-purple-500/10 px-2 py-1 rounded"
                       >
-                        Reset
+                        {t('modal.reset')}
                       </button>
                     )}
                     {onSetAsDisplayName &&
@@ -868,28 +859,28 @@ export function SubmissionModal({
                           className="text-[10px] text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 px-2 py-1 rounded disabled:opacity-50"
                         >
                           {isSavingDisplayName
-                            ? 'Saving...'
+                            ? t('modal.saving')
                             : displayNameSaved
-                              ? 'Saved!'
-                              : 'Set as display name'}
+                              ? t('modal.saved')
+                              : t('modal.setAsDisplayName')}
                         </button>
                       )}
                   </div>
                 </div>
                 <p className="text-[10px] text-zinc-600 mt-1 ml-1">
-                  Leave empty to appear as &ldquo;Anonymous&rdquo;
+                  {t('modal.leaveEmpty')}
                 </p>
               </div>
 
               {/* 2. Message */}
               <div>
                 <label className="block text-[10px] font-bold text-zinc-500 mb-1.5 ml-1">
-                  MESSAGE TO THE WORLD (OPTIONAL)
+                  {t('modal.messageToWorld')}
                 </label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="What do you want to leave behind?"
+                  placeholder={t('modal.messagePlaceholder')}
                   maxLength={280}
                   rows={2}
                   className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all resize-none italic text-sm"
@@ -901,7 +892,7 @@ export function SubmissionModal({
           {/* Payment Method Selector (Full Width) */}
           <div className="mb-4">
             <label className="block text-xs font-medium text-zinc-500 mb-2 ml-1">
-              PAYMENT METHOD
+              {t('modal.paymentMethod')}
             </label>
             <div className="grid grid-cols-2 gap-2 p-1.5 bg-zinc-900/60 rounded-2xl border border-white/5">
               <button
@@ -915,7 +906,7 @@ export function SubmissionModal({
               {gaslessLoading ? (
                 <div className="py-2.5 px-3 rounded-xl text-sm font-medium text-zinc-500 flex items-center justify-center gap-2">
                   <div className="h-3 w-3 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
-                  <span>Checking...</span>
+                  <span>{t('modal.checking')}</span>
                 </div>
               ) : gaslessEligible ? (
                 <button
@@ -925,7 +916,9 @@ export function SubmissionModal({
                 >
                   <span className="flex items-center justify-center gap-1.5">
                     TIME26
-                    <span className="text-[10px] text-green-400 font-semibold">FREE</span>
+                    <span className="text-[10px] text-green-400 font-semibold">
+                      {t('modal.free')}
+                    </span>
                   </span>
                 </button>
               ) : (
@@ -942,7 +935,7 @@ export function SubmissionModal({
             {paymentMethod === 'TIME26' && (
               <div className="flex justify-between items-center px-3 mt-2">
                 <span className="text-xs text-zinc-500">
-                  Wallet Balance:{' '}
+                  {t('modal.walletBalance')}{' '}
                   <span className="text-purple-300 font-mono">
                     {time26Balance} TIME
                   </span>
@@ -953,7 +946,7 @@ export function SubmissionModal({
               <div className="flex flex-col gap-1 px-3 mt-2">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-zinc-500">
-                    Unclaimed Balance:{' '}
+                    {t('modal.unclaimedBalance')}{' '}
                     <span className="text-green-300 font-mono">
                       {unclaimedBalance} TIME
                     </span>
@@ -961,14 +954,16 @@ export function SubmissionModal({
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-zinc-500">
-                    Cost:{' '}
+                    {t('modal.cost')}{' '}
                     <span className="text-green-300 font-mono">
                       {gaslessTotalCost} TIME
                     </span>
-                    <span className="text-zinc-600 ml-1">(incl. gas)</span>
+                    <span className="text-zinc-600 ml-1">
+                      {t('modal.inclGas')}
+                    </span>
                   </span>
                   <span className="text-xs text-green-400">
-                    No signature needed
+                    {t('modal.noSignatureNeeded')}
                   </span>
                 </div>
               </div>
@@ -1024,7 +1019,7 @@ export function SubmissionModal({
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-white font-bold text-lg">
-                      Perpetual Proof (Instant)
+                      {t('modal.perpetualProof')}
                     </h3>
                     {paymentMethod === 'TIME26_GASLESS' && (
                       <GasFreeBadge variant="pill" />
@@ -1055,10 +1050,10 @@ export function SubmissionModal({
                 </div>
                 <p className="text-purple-200/70 text-sm leading-snug">
                   {paymentMethod === 'TIME26_GASLESS'
-                    ? 'Mint using your unclaimed TIME26 rewards. No wallet signature needed - completely gasless!'
+                    ? t('modal.perpetualDescGasless')
                     : paymentMethod === 'TIME26'
-                      ? 'Write your trail to Arweave instantly, verified on Polygon. Mint your personal Trail NFT + badge & Burn Time26.'
-                      : 'Write your trail to Arweave instantly, verified on Polygon. Mint your personal Trail NFT + badge.'}
+                      ? t('modal.perpetualDescTime26')
+                      : t('modal.perpetualDescNative')}
                 </p>
               </div>
             </button>
@@ -1077,16 +1072,15 @@ export function SubmissionModal({
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-0.5">
                   <h3 className="text-zinc-400 font-medium text-base group-hover:text-white transition-colors">
-                    Standard Proof (Daily Batch)
+                    {t('modal.standardProof')}
                   </h3>
                   <span className="text-[10px] font-mono bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">
-                    FREE
+                    {t('modal.free')}
                   </span>
                 </div>
                 <p className="text-zinc-500 text-xs">
-                  <strong>Free (0 gas). </strong> Included in the daily on-chain
-                  batch (UTC 00:00). Full data uploaded by the protocol to
-                  Polygon.
+                  <strong>{t('modal.gasFree')}. </strong>{' '}
+                  {t('modal.standardDesc')}
                 </p>
               </div>
             </button>
@@ -1096,22 +1090,14 @@ export function SubmissionModal({
           <div className="mt-4 p-4 bg-zinc-900/40 rounded-2xl border border-white/5">
             <h4 className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
-              Why this is safe? / How it works
+              {t('modal.techTitle')}
             </h4>
             <div className="space-y-2">
               <p className="text-xs text-zinc-500 leading-relaxed">
-                Your creative data is secured using cryptographic{' '}
-                <span className="text-zinc-300 font-medium">hashing</span>{' '}
-                (SHA-256). These unique fingerprints are aggregated into a{' '}
-                <span className="text-zinc-300 font-medium">Merkle Tree</span>{' '}
-                structure.
+                {t('modal.techDesc1')}
               </p>
               <p className="text-xs text-zinc-500 leading-relaxed">
-                Finally, we{' '}
-                <span className="text-zinc-300 font-medium">batch</span> these
-                proofs into a single verifiable transaction on the blockchain.
-                This ensures your work is mathematically proven to exist at this
-                specific time, with the security of the entire network.
+                {t('modal.techDesc2')}
               </p>
             </div>
           </div>
@@ -1122,7 +1108,7 @@ export function SubmissionModal({
               disabled={isSubmitting}
               className="text-zinc-500 hover:text-white text-sm transition-colors py-2 px-4 rounded-lg hover:bg-white/5"
             >
-              Cancel
+              {t('modal.cancel')}
             </button>
           </div>
         </div>

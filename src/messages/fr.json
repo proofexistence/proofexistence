@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "title": "Preuve d'Existence | Une Expérience d'Art Collectif d'Un An",
+    "description": "Rejoignez le mouvement. Laissez votre trace immuable sur la blockchain. Un projet d'art collectif d'un an où chaque participant co-crée le monument numérique final."
+  },
+  "nav": {
+    "whitepaper": "Livre Blanc",
+    "explore": "Explorer",
+    "cosmos": "Cosmos",
+    "drawToProof": "Dessiner pour Prouver",
+    "proveExistence": "Prouver l'Existence",
+    "connectWallet": "Connecter le Portefeuille",
+    "connecting": "Connexion...",
+    "login": "Connexion",
+    "viewProfile": "Voir le Profil",
+    "exportPrivateKey": "Exporter la Clé Privée",
+    "settings": "Paramètres",
+    "logOut": "Déconnexion",
+    "balances": "Soldes",
+    "pendingRewards": "Récompenses en Attente",
+    "referral": "Parrainage"
+  },
+  "footer": {
+    "title": "Preuve d'Existence",
+    "tagline": "Traces de lumière immuables sur la blockchain.",
+    "proveHere": "Prouvez que vous étiez ici.",
+    "established": "Est. 2026",
+    "viewSupporters": "Voir les Supporters",
+    "supportProject": "Soutenir le Projet",
+    "sponsorStranger": "Parrainer un Inconnu",
+    "sponsorDescription": "Payez pour des preuves sans frais de gas dans le monde entier",
+    "donationNote": "Votre don parraine des preuves sans frais de gas pour des inconnus dans le monde entier. Chaque contribution aide à préserver l'existence numérique de quelqu'un pour toujours.",
+    "brandSponsorship": "Parrainage de Marque",
+    "whitepaper": "Livre Blanc",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "copyright": "© {year} Preuve d'Existence. Tous droits réservés."
+  },
+  "home": {
+    "hero": {
+      "subtitle": "Une expérience d'art collectif d'un an.",
+      "description": "Laissez votre trace. Co-créez l'histoire. Prouvez que vous avez existé.",
+      "exploreCosmos": "Explorer le Cosmos",
+      "connectWallet": "Connecter le Portefeuille",
+      "enterEternal": "Entrer dans l'Éternel"
+    },
+    "manifesto": {
+      "historyTitle": "L'histoire était autrefois un luxe pour <few>quelques-uns</few>.",
+      "historySubtitle": "Rois dans la pierre. Conquérants dans les épopées. Poètes dans l'encre.",
+      "ghostTitle": "Mais qu'en est-il de <you>vous</you> ?",
+      "ghostSubtitle": "Dans le bruit numérique, nous sommes des fantômes—des posts éphémères, des histoires qui disparaissent, oubliés dans le défilement.",
+      "solutionTitle": "Preuve d'Existence est l'Épopée moderne.",
+      "solutionSubtitle": "Un registre immuable où votre trace est préservée—pour toujours."
+    },
+    "cta": {
+      "leaveTrace": "Laissez votre trace."
+    }
+  },
+  "canvas": {
+    "timer": {
+      "paused": "EN PAUSE",
+      "minDuration": "Min : {seconds}s",
+      "clickToContinue": "Cliquez sur le canevas pour continuer"
+    },
+    "actions": {
+      "restart": "Recommencer",
+      "submit": "Soumettre la Preuve",
+      "done": "Terminé",
+      "exit": "Quitter"
+    },
+    "instructions": {
+      "clickAndHold": "Cliquez et maintenez pour dessiner",
+      "drawForMinimum": "Dessinez pendant au moins {seconds}s pour créer une preuve",
+      "theme": "Thème : {name} • Ctrl+B pour changer",
+      "recording": "Enregistrement • Relâchez pour pause",
+      "readyToSubmit": "Prêt à soumettre !",
+      "useButtons": "Utilisez les boutons ci-dessus pour soumettre ou recommencer"
+    },
+    "modal": {
+      "title": "Sauvegardez Votre Héritage",
+      "subtitle": "Choisissez comment vous voulez immortaliser ce moment.",
+      "artworkDetails": "Détails de l'Œuvre",
+      "artworkTitle": "TITRE DE L'ŒUVRE (OPTIONNEL)",
+      "artworkTitlePlaceholder": "Nommez votre création...",
+      "description": "DESCRIPTION (OPTIONNEL)",
+      "descriptionPlaceholder": "Décrivez votre vision artistique...",
+      "identity": "Identité On-Chain",
+      "nameOnChain": "NOM QUE VOUS VOULEZ LAISSER SUR LA CHAÎNE (OPTIONNEL)",
+      "namePlaceholder": "Anonyme",
+      "leaveEmpty": "Laissez vide pour apparaître comme \"Anonyme\"",
+      "messageToWorld": "MESSAGE AU MONDE (OPTIONNEL)",
+      "messagePlaceholder": "Que voulez-vous laisser derrière vous ?",
+      "paymentMethod": "MÉTHODE DE PAIEMENT",
+      "walletBalance": "Solde du Portefeuille :",
+      "unclaimedBalance": "Solde Non Réclamé :",
+      "cost": "Coût :",
+      "noSignatureNeeded": "Pas de signature requise",
+      "perpetualProof": "Preuve Perpétuelle (Instantanée)",
+      "standardProof": "Preuve Standard (Lot Quotidien)",
+      "free": "GRATUIT",
+      "gasFree": "Sans Gas",
+      "cancel": "Annuler",
+      "setAsDisplayName": "Définir comme nom d'affichage",
+      "saved": "Enregistré !",
+      "saving": "Enregistrement...",
+      "checking": "Vérification...",
+      "inclGas": "(gas inclus)",
+      "reset": "Réinitialiser",
+      "perpetualDescGasless": "Frappez en utilisant vos récompenses TIME26 non réclamées. Aucune signature de portefeuille nécessaire - totalement sans gas !",
+      "perpetualDescTime26": "Écrivez votre trace sur Arweave instantanément, vérifié sur Polygon. Frappez votre NFT de Trace personnel + badge et Brûlez Time26.",
+      "perpetualDescNative": "Écrivez votre trace sur Arweave instantanément, vérifié sur Polygon. Frappez votre NFT de Trace personnel + badge.",
+      "standardDesc": "Inclus dans le lot quotidien on-chain (UTC 00:00). Données complètes téléchargées par le protocole sur Polygon.",
+      "techTitle": "Pourquoi c'est sûr ? / Comment ça marche",
+      "techDesc1": "Vos données créatives sont sécurisées par hachage cryptographique (SHA-256). Ces empreintes uniques sont agrégées dans une structure d'Arbre de Merkle.",
+      "techDesc2": "Enfin, nous regroupons ces preuves en une seule transaction vérifiable sur la blockchain. Cela garantit que votre œuvre est mathématiquement prouvée d'exister à ce moment précis, avec la sécurité de l'ensemble du réseau."
+    },
+    "clearConfirm": {
+      "title": "Commencer un Nouveau Dessin ?",
+      "description": "Cela effacera votre trace actuelle et réinitialisera le minuteur.",
+      "keepTrail": "Garder la Trace",
+      "clearStart": "Effacer et Commencer"
+    },
+    "status": {
+      "submitting": "Soumission de la preuve...",
+      "submitted": "Preuve Soumise ! Elle sera incluse dans l'instantané quotidien.",
+      "mintingTime26": "Frappe avec TIME26 (sans gas)...",
+      "transactionSubmitted": "Transaction Soumise ! En attente de confirmation...",
+      "minting": "Frappe de la Preuve (2/2)...",
+      "minted": "Preuve Perpétuelle Frappée !",
+      "saving": "Enregistrement de la Preuve dans la Base de Données..."
+    }
+  },
+  "proof": {
+    "notFound": "Preuve non trouvée.",
+    "goHome": "Retour à l'Accueil",
+    "status": {
+      "minted": "FRAPPÉ",
+      "settled": "RÉGLÉ",
+      "pending": "EN ATTENTE"
+    },
+    "share": {
+      "copyLink": "Copier le Lien",
+      "postOnX": "Publier sur X",
+      "postOnThreads": "Publier sur Threads",
+      "postOnInstagram": "Publier sur Instagram"
+    },
+    "screenshot": {
+      "withoutTitle": "Sans Titre",
+      "withTitle": "Avec Titre"
+    },
+    "verifiedOn": "Vérifié sur Polygon",
+    "arweaveMetadata": "Métadonnées Arweave",
+    "rawArtFile": "Fichier Art Original",
+    "syncingStorage": "Synchronisation du Stockage..."
+  },
+  "explore": {
+    "title": "Explorer",
+    "description": "Découvrez les dernières preuves vérifiées du monde entier."
+  },
+  "referral": {
+    "title": "Inviter des Amis",
+    "subtitle": "Partagez votre lien de parrainage et gagnez des récompenses ensemble.",
+    "friendsInvited": "Amis Invités",
+    "yourLink": "Votre Lien de Parrainage",
+    "copy": "Copier",
+    "copied": "Copié",
+    "shareInfo": "Partagez ce lien avec vos amis...",
+    "notGenerated": "Code de parrainage pas encore généré.",
+    "signInAgain": "Veuillez vous déconnecter et vous reconnecter pour en générer un."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "reset": "Réinitialiser",
+    "copy": "Copier",
+    "copied": "Copié"
+  },
+  "whitepaper": {
+    "protocolSpec": "Spécification du Protocole",
+    "readyToExist": "Prêt à exister ?",
+    "enterApp": "Entrer dans l'App"
+  },
+  "languageSelector": {
+    "label": "Langue",
+    "en": "English",
+    "zh": "中文繁體",
+    "cn": "中文简体",
+    "es": "Español",
+    "ja": "日本語",
+    "fr": "Français"
+  }
+}

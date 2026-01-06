@@ -1,9 +1,6 @@
 import { ethers } from 'ethers';
 import { createProvider } from '../provider';
-import {
-  PROOF_RECORDER_ADDRESS,
-  PROOF_RECORDER_ABI,
-} from '../contracts';
+import { PROOF_RECORDER_ADDRESS, PROOF_RECORDER_ABI } from '../contracts';
 
 /**
  * Gas estimation utilities for gasless minting
@@ -85,8 +82,7 @@ export async function estimateMintGas(
       );
 
       // Add 20% buffer to estimation
-      gasLimit =
-        (BigInt(estimated.toString()) * BigInt(120)) / BigInt(100);
+      gasLimit = (BigInt(estimated.toString()) * BigInt(120)) / BigInt(100);
     } catch (error) {
       // If estimation fails, use default
       console.warn(

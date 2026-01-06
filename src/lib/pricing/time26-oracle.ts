@@ -35,7 +35,10 @@ export function getTime26PriceUsd(): number {
  */
 export function getPolPriceUsd(): number {
   // Check cache first
-  if (cachedPolPrice && Date.now() - cachedPolPrice.timestamp < POL_PRICE_CACHE_MS) {
+  if (
+    cachedPolPrice &&
+    Date.now() - cachedPolPrice.timestamp < POL_PRICE_CACHE_MS
+  ) {
     return cachedPolPrice.price;
   }
 
@@ -56,7 +59,10 @@ export function getPolPriceUsd(): number {
  */
 export async function fetchPolPrice(): Promise<number> {
   // Return cached if fresh
-  if (cachedPolPrice && Date.now() - cachedPolPrice.timestamp < POL_PRICE_CACHE_MS) {
+  if (
+    cachedPolPrice &&
+    Date.now() - cachedPolPrice.timestamp < POL_PRICE_CACHE_MS
+  ) {
     return cachedPolPrice.price;
   }
 
@@ -108,9 +114,7 @@ export function convertPolToTime26(polWei: bigint): bigint {
   const time26PriceUsd = getTime26PriceUsd();
 
   // Conversion ratio (scaled by 1e18 for precision)
-  const ratioScaled = BigInt(
-    Math.floor((polPriceUsd / time26PriceUsd) * 1e18)
-  );
+  const ratioScaled = BigInt(Math.floor((polPriceUsd / time26PriceUsd) * 1e18));
 
   // TIME26 (wei) = POL (wei) * ratio / 1e18
   return (polWei * ratioScaled) / BigInt(1e18);
@@ -194,7 +198,9 @@ export function checkGaslessEligibility(
     mintCostTime26,
     gasCostTime26,
     totalCostTime26,
-    shortfall: hasEnoughBalance ? undefined : totalCostTime26 - unclaimedBalance,
+    shortfall: hasEnoughBalance
+      ? undefined
+      : totalCostTime26 - unclaimedBalance,
     reason,
     // Formatted values for display
     mintCostFormatted: formatTime26(mintCostTime26),

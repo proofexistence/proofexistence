@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "title": "存在証明 | 1年間の集団アート実験",
+    "description": "ムーブメントに参加しよう。ブロックチェーン上に不変の痕跡を残そう。すべての参加者が最終的なデジタルモニュメントを共同制作する1年間のアートプロジェクト。"
+  },
+  "nav": {
+    "whitepaper": "ホワイトペーパー",
+    "explore": "探索",
+    "cosmos": "コスモス",
+    "drawToProof": "描いて証明",
+    "proveExistence": "存在を証明",
+    "connectWallet": "ウォレット接続",
+    "connecting": "接続中...",
+    "login": "ログイン",
+    "viewProfile": "プロフィール表示",
+    "exportPrivateKey": "秘密鍵をエクスポート",
+    "settings": "設定",
+    "logOut": "ログアウト",
+    "balances": "残高",
+    "pendingRewards": "保留中の報酬",
+    "referral": "紹介"
+  },
+  "footer": {
+    "title": "存在証明",
+    "tagline": "ブロックチェーン上の不変の光跡。",
+    "proveHere": "あなたがここにいたことを証明しよう。",
+    "established": "2026年設立",
+    "viewSupporters": "サポーターを見る",
+    "supportProject": "プロジェクトを支援",
+    "sponsorStranger": "見知らぬ人をスポンサー",
+    "sponsorDescription": "世界中でガス代無料の証明を提供",
+    "donationNote": "あなたの寄付は世界中の見知らぬ人にガス代無料の証明を提供します。すべての貢献が誰かのデジタル存在を永遠に保存する助けとなります。",
+    "brandSponsorship": "ブランドスポンサーシップ",
+    "whitepaper": "ホワイトペーパー",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "copyright": "© {year} 存在証明。全著作権所有。"
+  },
+  "home": {
+    "hero": {
+      "subtitle": "1年間の集団アート実験。",
+      "description": "あなたの痕跡を残そう。歴史を共創しよう。存在を証明しよう。",
+      "exploreCosmos": "コスモスを探索",
+      "connectWallet": "ウォレット接続",
+      "enterEternal": "永遠へ入る"
+    },
+    "manifesto": {
+      "historyTitle": "歴史はかつて<few>少数者</few>の贅沢品だった。",
+      "historySubtitle": "王は石に。征服者は叙事詩に。詩人はインクに。",
+      "ghostTitle": "でも<you>あなた</you>は？",
+      "ghostSubtitle": "デジタルノイズの中で、私たちは幽霊のよう—儚い投稿、消えゆくストーリー、スクロールの中で忘れられる。",
+      "solutionTitle": "存在証明は現代の叙事詩。",
+      "solutionSubtitle": "あなたの痕跡が永遠に保存される不変の台帳。"
+    },
+    "cta": {
+      "leaveTrace": "あなたの痕跡を残そう。"
+    }
+  },
+  "canvas": {
+    "timer": {
+      "paused": "一時停止中",
+      "minDuration": "最小: {seconds}秒",
+      "clickToContinue": "キャンバスをクリックして続行"
+    },
+    "actions": {
+      "restart": "やり直す",
+      "submit": "証明を提出",
+      "done": "完了",
+      "exit": "終了"
+    },
+    "instructions": {
+      "clickAndHold": "クリック＆ホールドで描画",
+      "drawForMinimum": "証明を作成するには{seconds}秒以上描画してください",
+      "theme": "テーマ: {name} • Ctrl+Bで切り替え",
+      "recording": "録画中 • 離すと一時停止",
+      "readyToSubmit": "提出準備完了！",
+      "useButtons": "上のボタンを使って提出またはやり直し"
+    },
+    "modal": {
+      "title": "あなたの遺産を保存",
+      "subtitle": "この瞬間をどのように永遠に刻むか選んでください。",
+      "artworkDetails": "作品の詳細",
+      "artworkTitle": "作品タイトル（任意）",
+      "artworkTitlePlaceholder": "作品に名前を付けて...",
+      "description": "説明（任意）",
+      "descriptionPlaceholder": "あなたの芸術的ビジョンを説明...",
+      "identity": "オンチェーンアイデンティティ",
+      "nameOnChain": "チェーンに残したい名前（任意）",
+      "namePlaceholder": "匿名",
+      "leaveEmpty": "空欄にすると「匿名」と表示されます",
+      "messageToWorld": "世界へのメッセージ（任意）",
+      "messagePlaceholder": "何を残したいですか？",
+      "paymentMethod": "支払い方法",
+      "walletBalance": "ウォレット残高：",
+      "unclaimedBalance": "未請求残高：",
+      "cost": "費用：",
+      "noSignatureNeeded": "署名不要",
+      "perpetualProof": "永続証明（即時）",
+      "standardProof": "標準証明（日次バッチ）",
+      "free": "無料",
+      "gasFree": "ガス代無料",
+      "cancel": "キャンセル",
+      "setAsDisplayName": "表示名として設定",
+      "saved": "保存しました！",
+      "saving": "保存中...",
+      "checking": "確認中...",
+      "inclGas": "（ガス代込み）",
+      "reset": "リセット",
+      "perpetualDescGasless": "未請求のTIME26報酬を使用してミント。ウォレット署名不要 - 完全ガスレス！",
+      "perpetualDescTime26": "Arweaveに即時書き込み、Polygonで検証。個人のトレイルNFT + バッジをミント、Time26をバーン。",
+      "perpetualDescNative": "Arweaveに即時書き込み、Polygonで検証。個人のトレイルNFT + バッジをミント。",
+      "standardDesc": "日次オンチェーンバッチに含まれます（UTC 00:00）。完全なデータはプロトコルによりPolygonにアップロード。",
+      "techTitle": "なぜ安全？/ 仕組み",
+      "techDesc1": "あなたのクリエイティブデータは暗号ハッシュ（SHA-256）で保護されています。これらのユニークな指紋はマークルツリー構造に集約されます。",
+      "techDesc2": "最後に、これらの証明をブロックチェーン上の単一の検証可能なトランザクションにバッチ処理します。これにより、あなたの作品がこの特定の時点で存在することが数学的に証明され、ネットワーク全体のセキュリティで保護されます。"
+    },
+    "clearConfirm": {
+      "title": "新しい描画を開始しますか？",
+      "description": "現在のトレイルがクリアされ、タイマーがリセットされます。",
+      "keepTrail": "トレイルを保持",
+      "clearStart": "クリアして開始"
+    },
+    "status": {
+      "submitting": "証明を提出中...",
+      "submitted": "証明が提出されました！日次スナップショットに含まれます。",
+      "mintingTime26": "TIME26でミント中（ガス代無料）...",
+      "transactionSubmitted": "トランザクション送信完了！確認を待っています...",
+      "minting": "証明をミント中 (2/2)...",
+      "minted": "永続証明がミントされました！",
+      "saving": "証明をデータベースに保存中..."
+    }
+  },
+  "proof": {
+    "notFound": "証明が見つかりません。",
+    "goHome": "ホームへ戻る",
+    "status": {
+      "minted": "ミント済み",
+      "settled": "決済済み",
+      "pending": "保留中"
+    },
+    "share": {
+      "copyLink": "リンクをコピー",
+      "postOnX": "Xに投稿",
+      "postOnThreads": "Threadsに投稿",
+      "postOnInstagram": "Instagramに投稿"
+    },
+    "screenshot": {
+      "withoutTitle": "タイトルなし",
+      "withTitle": "タイトルあり"
+    },
+    "verifiedOn": "Polygonで検証済み",
+    "arweaveMetadata": "Arweaveメタデータ",
+    "rawArtFile": "オリジナルアートファイル",
+    "syncingStorage": "ストレージ同期中..."
+  },
+  "explore": {
+    "title": "探索",
+    "description": "世界中から最新の検証済み証明を発見しよう。"
+  },
+  "referral": {
+    "title": "友達を招待",
+    "subtitle": "紹介リンクを共有して一緒に報酬を獲得しよう。",
+    "friendsInvited": "招待した友達",
+    "yourLink": "あなたの紹介リンク",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "shareInfo": "このリンクを友達と共有...",
+    "notGenerated": "紹介コードがまだ生成されていません。",
+    "signInAgain": "ログアウトして再度ログインして生成してください。"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "save": "保存",
+    "delete": "削除",
+    "reset": "リセット",
+    "copy": "コピー",
+    "copied": "コピーしました"
+  },
+  "whitepaper": {
+    "protocolSpec": "プロトコル仕様",
+    "readyToExist": "存在する準備はできましたか？",
+    "enterApp": "アプリに入る"
+  },
+  "languageSelector": {
+    "label": "言語",
+    "en": "English",
+    "zh": "中文繁體",
+    "cn": "中文简体",
+    "es": "Español",
+    "ja": "日本語",
+    "fr": "Français"
+  }
+}

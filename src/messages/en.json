@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "title": "Proof of Existence | A Year-Long Collective Art Experiment",
+    "description": "Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument."
+  },
+  "nav": {
+    "whitepaper": "Whitepaper",
+    "explore": "Explore",
+    "cosmos": "Cosmos",
+    "drawToProof": "Draw to Proof",
+    "proveExistence": "Prove Existence",
+    "connectWallet": "Connect Wallet",
+    "connecting": "Connecting...",
+    "login": "Login",
+    "viewProfile": "View Profile",
+    "exportPrivateKey": "Export Private Key",
+    "settings": "Settings",
+    "logOut": "Log Out",
+    "balances": "Balances",
+    "pendingRewards": "Pending Rewards",
+    "referral": "Referral"
+  },
+  "footer": {
+    "title": "Proof of Existence",
+    "tagline": "Immutable light trails on the blockchain.",
+    "proveHere": "Prove you were here.",
+    "established": "Est. 2026",
+    "viewSupporters": "View Supporters",
+    "supportProject": "Support the Project",
+    "sponsorStranger": "Sponsor a Stranger",
+    "sponsorDescription": "Pay for gas-free proofs worldwide",
+    "donationNote": "Your donation sponsors gas-free proofs for strangers worldwide. Every contribution helps preserve someone's digital existence forever.",
+    "brandSponsorship": "Brand Sponsorship",
+    "whitepaper": "Whitepaper",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "copyright": "© {year} Proof of Existence. All rights reserved."
+  },
+  "home": {
+    "hero": {
+      "subtitle": "A year-long collective art experiment.",
+      "description": "Leave your trace. Co-create history. Prove you existed.",
+      "exploreCosmos": "Explore Cosmos",
+      "connectWallet": "Connect Wallet",
+      "enterEternal": "Enter the Eternal"
+    },
+    "manifesto": {
+      "historyTitle": "History was once a luxury for the <few>few</few>.",
+      "historySubtitle": "Kings in stone. Conquerors in epics. Poets in ink.",
+      "ghostTitle": "But what about <you>you</you>?",
+      "ghostSubtitle": "In the digital noise, we are ghosts—fleeting posts, disappearing stories, forgotten in the scroll.",
+      "solutionTitle": "Proof of Existence is the modern Epic.",
+      "solutionSubtitle": "An immutable ledger where your trace is preserved—forever."
+    },
+    "cta": {
+      "leaveTrace": "Leave your trace."
+    }
+  },
+  "canvas": {
+    "timer": {
+      "paused": "PAUSED",
+      "minDuration": "Min: {seconds}s",
+      "clickToContinue": "Click canvas to continue"
+    },
+    "actions": {
+      "restart": "Restart",
+      "submit": "Submit Proof",
+      "done": "Done",
+      "exit": "Exit"
+    },
+    "instructions": {
+      "clickAndHold": "Click & hold to draw",
+      "drawForMinimum": "Draw for at least {seconds}s to create a proof",
+      "theme": "Theme: {name} • Ctrl+B to cycle",
+      "recording": "Recording • Release to pause",
+      "readyToSubmit": "Ready to submit!",
+      "useButtons": "Use buttons above to submit or restart"
+    },
+    "modal": {
+      "title": "Save Your Legacy",
+      "subtitle": "Choose how you want to immortalize this moment.",
+      "artworkDetails": "Artwork Details",
+      "artworkTitle": "ARTWORK TITLE (OPTIONAL)",
+      "artworkTitlePlaceholder": "Name your creation...",
+      "description": "DESCRIPTION (OPTIONAL)",
+      "descriptionPlaceholder": "Describe your artistic vision...",
+      "identity": "On-Chain Identity",
+      "nameOnChain": "NAME YOU WANT TO LEAVE ON THE CHAIN (OPTIONAL)",
+      "namePlaceholder": "Anonymous",
+      "leaveEmpty": "Leave empty to appear as \"Anonymous\"",
+      "messageToWorld": "MESSAGE TO THE WORLD (OPTIONAL)",
+      "messagePlaceholder": "What do you want to leave behind?",
+      "paymentMethod": "PAYMENT METHOD",
+      "walletBalance": "Wallet Balance:",
+      "unclaimedBalance": "Unclaimed Balance:",
+      "cost": "Cost:",
+      "noSignatureNeeded": "No signature needed",
+      "perpetualProof": "Perpetual Proof (Instant)",
+      "standardProof": "Standard Proof (Daily Batch)",
+      "free": "FREE",
+      "gasFree": "Gas-Free",
+      "cancel": "Cancel",
+      "setAsDisplayName": "Set as display name",
+      "saved": "Saved!",
+      "saving": "Saving...",
+      "checking": "Checking...",
+      "inclGas": "(incl. gas)",
+      "reset": "Reset",
+      "perpetualDescGasless": "Mint using your unclaimed TIME26 rewards. No wallet signature needed - completely gasless!",
+      "perpetualDescTime26": "Write your trail to Arweave instantly, verified on Polygon. Mint your personal Trail NFT + badge & Burn Time26.",
+      "perpetualDescNative": "Write your trail to Arweave instantly, verified on Polygon. Mint your personal Trail NFT + badge.",
+      "standardDesc": "Included in the daily on-chain batch (UTC 00:00). Full data uploaded by the protocol to Polygon.",
+      "techTitle": "Why this is safe? / How it works",
+      "techDesc1": "Your creative data is secured using cryptographic hashing (SHA-256). These unique fingerprints are aggregated into a Merkle Tree structure.",
+      "techDesc2": "Finally, we batch these proofs into a single verifiable transaction on the blockchain. This ensures your work is mathematically proven to exist at this specific time, with the security of the entire network."
+    },
+    "clearConfirm": {
+      "title": "Start New Drawing?",
+      "description": "This will clear your current trail and reset the timer.",
+      "keepTrail": "Keep Trail",
+      "clearStart": "Clear & Start"
+    },
+    "status": {
+      "submitting": "Submitting proof...",
+      "submitted": "Proof Submitted! It will be included in the daily snapshot.",
+      "mintingTime26": "Minting with TIME26 (gasless)...",
+      "transactionSubmitted": "Transaction Submitted! Waiting for confirmation...",
+      "minting": "Minting Proof (2/2)...",
+      "minted": "Perpetual Proof Minted!",
+      "saving": "Saving Proof to Database..."
+    }
+  },
+  "proof": {
+    "notFound": "Proof not found.",
+    "goHome": "Go Home",
+    "status": {
+      "minted": "MINTED",
+      "settled": "SETTLED",
+      "pending": "PENDING"
+    },
+    "share": {
+      "copyLink": "Copy Link",
+      "postOnX": "Post on X",
+      "postOnThreads": "Post on Threads",
+      "postOnInstagram": "Post on Instagram"
+    },
+    "screenshot": {
+      "withoutTitle": "Without Title",
+      "withTitle": "With Title"
+    },
+    "verifiedOn": "Verified on Polygon",
+    "arweaveMetadata": "Arweave Metadata",
+    "rawArtFile": "Raw Art File",
+    "syncingStorage": "Syncing Storage..."
+  },
+  "explore": {
+    "title": "Explore",
+    "description": "Discover the latest verified proofs from around the world."
+  },
+  "referral": {
+    "title": "Invite Friends",
+    "subtitle": "Share your referral link and earn rewards together.",
+    "friendsInvited": "Friends Invited",
+    "yourLink": "Your Referral Link",
+    "copy": "Copy",
+    "copied": "Copied",
+    "shareInfo": "Share this link with friends...",
+    "notGenerated": "Referral code not generated yet.",
+    "signInAgain": "Please sign out and sign back in to generate one."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "reset": "Reset",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "whitepaper": {
+    "protocolSpec": "Protocol Specification",
+    "readyToExist": "Ready to exist?",
+    "enterApp": "Enter App"
+  },
+  "languageSelector": {
+    "label": "Language",
+    "en": "English",
+    "zh": "中文繁體",
+    "cn": "中文简体",
+    "es": "Español",
+    "ja": "日本語",
+    "fr": "Français"
+  }
+}

@@ -4,12 +4,14 @@ import { useWeb3Auth } from '@/lib/web3auth';
 import { useProfile } from '@/hooks/use-profile';
 import { useClaimTime26 } from '@/hooks/useClaimTime26';
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { Settings, LogOut, User, Gift, Loader2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 export function AvatarDropdown() {
+  const t = useTranslations('nav');
   const {
     isLoading: isAuthLoading,
     isConnected,
@@ -148,14 +150,14 @@ export function AvatarDropdown() {
                   className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
                 >
                   <Settings className="w-4 h-4" />
-                  Settings
+                  {t('settings')}
                 </Link>
                 <button
                   onClick={() => logout()}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2.5"
                 >
                   <LogOut className="w-4 h-4" />
-                  Log Out
+                  {t('logOut')}
                 </button>
               </motion.div>
             )}
@@ -166,7 +168,7 @@ export function AvatarDropdown() {
           onClick={() => login()}
           className="bg-black/20 hover:bg-black/40 backdrop-blur-xl text-white font-medium px-4 py-2 rounded-xl border border-white/10 hover:border-white/20 transition-all shadow-lg active:scale-95 text-sm"
         >
-          Login
+          {t('login')}
         </button>
       )}
     </div>

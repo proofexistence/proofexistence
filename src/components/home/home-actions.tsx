@@ -1,14 +1,16 @@
 'use client';
 
 import { useWeb3Auth } from '@/lib/web3auth';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
 import { AnimatedGradientText } from '@/registry/magicui/animated-gradient-text';
 import { LineSquiggle } from '@/components/icons/line-squiggle';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export function HomeActions() {
+  const t = useTranslations('home.hero');
   const { isLoading, isConnected, login } = useWeb3Auth();
 
   const [mounted, setMounted] = useState(false);
@@ -32,7 +34,7 @@ export function HomeActions() {
             className="group relative px-8 py-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full font-semibold text-white transition-all hover:bg-white/20 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
           >
             <span className="relative z-10 flex items-center gap-2">
-              Connect Wallet
+              {t('connectWallet')}
               <svg
                 className="w-5 h-5 transition-transform group-hover:translate-x-1"
                 fill="none"
@@ -72,7 +74,7 @@ export function HomeActions() {
               <LineSquiggle className="w-5 h-5 text-zinc-400 group-hover:text-white transition-colors" />
               <hr className="mx-2 h-4 w-px shrink-0 bg-neutral-500" />
               <AnimatedGradientText className="text-sm font-medium from-[#ffaa40] via-[#9c40ff] to-[#ffaa40]">
-                Enter the Eternal
+                {t('enterEternal')}
               </AnimatedGradientText>
               <ChevronRight className="ml-1 size-4 stroke-neutral-500 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
             </Link>

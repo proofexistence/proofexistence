@@ -104,6 +104,32 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Chinese locale font - Noto Serif TC */
+html[lang='zh'] body,
+html[lang='cn'] body {
+  font-family:
+    var(--font-noto-serif-tc), var(--font-sans), 'Noto Serif TC', 'PingFang TC',
+    'Microsoft JhengHei', serif;
+}
+
+/* Ensure Chinese text is readable - slightly larger base sizes */
+html[lang='zh'],
+html[lang='cn'] {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Prevent extremely small Chinese text */
+html[lang='zh'] .text-\[10px\],
+html[lang='cn'] .text-\[10px\] {
+  font-size: 12px;
+}
+
+html[lang='zh'] .text-xs,
+html[lang='cn'] .text-xs {
+  font-size: 13px;
+}
+
 /* Radial gradient utility */
 .bg-gradient-radial {
   background-image: radial-gradient(
@@ -228,4 +254,32 @@ body {
   body {
     @apply bg-transparent text-foreground;
   }
+}
+
+/* Custom Scrollbar - Dark Theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }

@@ -55,8 +55,8 @@ export function GaslessTooltipContent() {
     <div className="max-w-xs space-y-2 p-1">
       <p className="font-medium text-white">Gasless Minting</p>
       <p className="text-sm text-zinc-400">
-        Use your unclaimed TIME26 rewards to mint without paying gas fees.
-        The cost includes both the mint fee and gas equivalent in TIME26.
+        Use your unclaimed TIME26 rewards to mint without paying gas fees. The
+        cost includes both the mint fee and gas equivalent in TIME26.
       </p>
       <p className="text-xs text-zinc-500">
         Your TIME26 balance will be burned to cover the transaction.

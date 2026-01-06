@@ -7,10 +7,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { ethers } from 'ethers';
 import { z } from 'zod';
 import { createProvider, waitForTransaction } from '@/lib/provider';
-import {
-  PROOF_RECORDER_ADDRESS,
-  PROOF_RECORDER_ABI,
-} from '@/lib/contracts';
+import { PROOF_RECORDER_ADDRESS, PROOF_RECORDER_ABI } from '@/lib/contracts';
 import { estimateMintGas } from '@/lib/gas/estimate';
 import {
   checkGaslessEligibility,

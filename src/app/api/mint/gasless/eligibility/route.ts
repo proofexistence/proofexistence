@@ -5,10 +5,7 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { ethers } from 'ethers';
 import { createProvider } from '@/lib/provider';
-import {
-  PROOF_RECORDER_ADDRESS,
-  PROOF_RECORDER_ABI,
-} from '@/lib/contracts';
+import { PROOF_RECORDER_ADDRESS, PROOF_RECORDER_ABI } from '@/lib/contracts';
 import { getQuickGasEstimate } from '@/lib/gas/estimate';
 import {
   checkGaslessEligibility,

@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { Link, useRouter, usePathname } from '@/i18n/navigation';
+import { usePathname as useNextPathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useWeb3Auth } from '@/lib/web3auth';
 import { useEffect, useState } from 'react';
 import VariableFontHoverByRandomLetter from '@/components/fancy/text/variable-font-hover-by-random-letter';
@@ -43,6 +44,7 @@ export function Navbar() {
     refresh: refreshBalances,
   } = useWalletBalances();
   const { balance: pendingBalance } = useTime26Balance();
+  const t = useTranslations('nav');
 
   const handleSignOut = () => logout();
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -68,6 +70,7 @@ export function Navbar() {
   const authenticated = isAuthenticated;
   const router = useRouter();
   const pathname = usePathname();
+  const nextPathname = useNextPathname();
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [launched, setLaunched] = useState(false);
@@ -91,13 +94,13 @@ export function Navbar() {
   }, [isMobileMenuOpen]);
 
   if (!mounted) return null;
-  if (pathname?.startsWith('/canvas') || pathname?.startsWith('/proof'))
+  if (nextPathname?.includes('/canvas') || nextPathname?.includes('/proof/'))
     return null;
 
   const leftNavLinks = [
     {
-      name: 'Whitepaper',
-      href: '/whitepaper',
+      name: t('whitepaper'),
+      href: '/whitepaper' as const,
       icon: (
         <svg
           width="15"
@@ -121,11 +124,15 @@ export function Navbar() {
         </svg>
       ),
     },
-    { name: 'Explore', href: '/explore', icon: <Globe className="w-4 h-4" /> },
+    {
+      name: t('explore'),
+      href: '/explore' as const,
+      icon: <Globe className="w-4 h-4" />,
+    },
 
     {
-      name: 'Cosmos',
-      href: '/cosmos',
+      name: t('cosmos'),
+      href: '/cosmos' as const,
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -196,7 +203,7 @@ export function Navbar() {
               >
                 <LineSquiggle className="w-5 h-5 text-zinc-400 group-hover/proof:text-white transition-colors" />
                 <VariableFontHoverByRandomLetter
-                  label="Draw to Proof"
+                  label={t('drawToProof')}
                   className="text-lg font-medium font-sans bg-clip-text text-transparent bg-[linear-gradient(to_right,#0CC9F2,#4877DA,#7E44DB)]"
                   fromFontVariationSettings={'"wght" 400'}
                   toFontVariationSettings={'"wght" 900'}
@@ -316,7 +323,7 @@ export function Navbar() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-black"></span>
                   </span>
-                  Prove Existence
+                  {t('proveExistence')}
                 </button>
               </div>
             )}
@@ -395,7 +402,7 @@ export function Navbar() {
                     <div className="px-4 py-3 border-b border-white/10">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
-                          Balances
+                          {t('balances')}
                         </span>
                         <button
                           onClick={refreshBalances}
@@ -450,7 +457,7 @@ export function Navbar() {
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                             <span className="text-xs text-zinc-400">
-                              Pending Rewards
+                              {t('pendingRewards')}
                             </span>
                           </div>
                           <span className="text-sm font-mono font-semibold text-green-400">
@@ -466,7 +473,7 @@ export function Navbar() {
                         <div className="flex items-center gap-2">
                           <Share2 className="w-4 h-4 text-zinc-500" />
                           <span className="text-xs text-zinc-400">
-                            Referral
+                            {t('referral')}
                           </span>
                         </div>
                         <button
@@ -495,7 +502,7 @@ export function Navbar() {
                         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
                       >
                         <User className="w-4 h-4" />
-                        View Profile
+                        {t('viewProfile')}
                       </Link>
                       {!isExternalWallet && (
                         <button
@@ -506,7 +513,7 @@ export function Navbar() {
                           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
                         >
                           <Key className="w-4 h-4" />
-                          Export Private Key
+                          {t('exportPrivateKey')}
                         </button>
                       )}
                       <Link
@@ -515,7 +522,7 @@ export function Navbar() {
                         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
                       >
                         <Settings className="w-4 h-4" />
-                        Settings
+                        {t('settings')}
                       </Link>
                     </div>
                   </div>
@@ -529,7 +536,7 @@ export function Navbar() {
                     className="w-full py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
-                    Log Out
+                    {t('logOut')}
                   </button>
                 </div>
               ) : (
@@ -548,7 +555,7 @@ export function Navbar() {
                     className="w-full py-4 rounded-xl bg-white text-black font-semibold hover:bg-zinc-100 transition-colors flex items-center justify-center gap-2"
                   >
                     <Wallet className="w-5 h-5" />
-                    Connect Wallet
+                    {t('connectWallet')}
                   </button>
                 </MobileConnectButton>
               )}

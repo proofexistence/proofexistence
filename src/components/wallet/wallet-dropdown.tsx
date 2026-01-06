@@ -3,7 +3,7 @@
 import { useWeb3Auth } from '@/lib/web3auth';
 import { useProfile } from '@/hooks/use-profile';
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { Settings, LogOut, User, Key, Share2, Copy, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -11,8 +11,10 @@ import { WalletHeader } from './wallet-header';
 import { WalletBalances } from './wallet-balances';
 import { WalletPendingRewards } from './wallet-pending-rewards';
 import { ExportKeyDialog } from './export-key-dialog';
+import { useTranslations } from 'next-intl';
 
 export function WalletDropdown() {
+  const t = useTranslations('nav');
   const {
     isLoading: isAuthLoading,
     isConnected,
@@ -124,7 +126,7 @@ export function WalletDropdown() {
                         <div className="flex items-center gap-2">
                           <Share2 className="w-3.5 h-3.5 text-zinc-500" />
                           <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
-                            Referral
+                            {t('referral')}
                           </span>
                         </div>
                         <button
@@ -157,7 +159,7 @@ export function WalletDropdown() {
                       className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
                     >
                       <User className="w-4 h-4" />
-                      View Profile
+                      {t('viewProfile')}
                     </Link>
 
                     {/* Export Private Key - only for social login users */}
@@ -167,7 +169,7 @@ export function WalletDropdown() {
                         className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
                       >
                         <Key className="w-4 h-4" />
-                        Export Private Key
+                        {t('exportPrivateKey')}
                       </button>
                     )}
 
@@ -177,7 +179,7 @@ export function WalletDropdown() {
                       className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
                     >
                       <Settings className="w-4 h-4" />
-                      Settings
+                      {t('settings')}
                     </Link>
 
                     <button
@@ -185,7 +187,7 @@ export function WalletDropdown() {
                       className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2.5"
                     >
                       <LogOut className="w-4 h-4" />
-                      Log Out
+                      {t('logOut')}
                     </button>
                   </div>
                 </motion.div>
@@ -197,7 +199,7 @@ export function WalletDropdown() {
             onClick={() => login()}
             className="bg-black/20 hover:bg-black/40 backdrop-blur-xl text-white font-medium px-4 py-2 rounded-xl border border-white/10 hover:border-white/20 transition-all shadow-lg active:scale-95 text-sm"
           >
-            Login
+            {t('login')}
           </button>
         )}
       </div>

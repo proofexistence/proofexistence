@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "title": "存在证明 | 为期一年的集体艺术实验",
+    "description": "加入这场运动。在区块链上留下你不可篡改的痕迹。一个为期一年的集体艺术项目，每位参与者共同创作最终的数字纪念碑。"
+  },
+  "nav": {
+    "whitepaper": "白皮书",
+    "explore": "探索",
+    "cosmos": "宇宙",
+    "drawToProof": "绘画证明",
+    "proveExistence": "证明存在",
+    "connectWallet": "连接钱包",
+    "connecting": "连接中...",
+    "login": "登录",
+    "viewProfile": "查看资料",
+    "exportPrivateKey": "导出私钥",
+    "settings": "设置",
+    "logOut": "退出登录",
+    "balances": "余额",
+    "pendingRewards": "待领奖励",
+    "referral": "推荐"
+  },
+  "footer": {
+    "title": "存在证明",
+    "tagline": "区块链上不可篡改的光迹。",
+    "proveHere": "证明你曾在这里。",
+    "established": "创立于 2026",
+    "viewSupporters": "查看支持者",
+    "supportProject": "支持项目",
+    "sponsorStranger": "赞助陌生人",
+    "sponsorDescription": "为全球用户支付免Gas费证明",
+    "donationNote": "您的捐赠将为全球陌生人提供免Gas费证明。每一份贡献都有助于永久保存某人的数字存在。",
+    "brandSponsorship": "品牌赞助",
+    "whitepaper": "白皮书",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "copyright": "© {year} 存在证明。保留所有权利。"
+  },
+  "home": {
+    "hero": {
+      "subtitle": "为期一年的集体艺术实验。",
+      "description": "留下你的痕迹。共创历史。证明你的存在。",
+      "exploreCosmos": "探索宇宙",
+      "connectWallet": "连接钱包",
+      "enterEternal": "进入永恒"
+    },
+    "manifesto": {
+      "historyTitle": "历史曾经是<few>少数人</few>的奢侈品。",
+      "historySubtitle": "国王刻于石碑。征服者载于史诗。诗人留于墨迹。",
+      "ghostTitle": "但<you>你</you>呢？",
+      "ghostSubtitle": "在数字噪音中，我们如同幽灵——转瞬即逝的帖子，消失的故事，在滚动中被遗忘。",
+      "solutionTitle": "存在证明是现代的史诗。",
+      "solutionSubtitle": "一个不可篡改的账本，你的痕迹将被永久保存。"
+    },
+    "cta": {
+      "leaveTrace": "留下你的痕迹。"
+    }
+  },
+  "canvas": {
+    "timer": {
+      "paused": "已暂停",
+      "minDuration": "最少: {seconds}秒",
+      "clickToContinue": "点击画布继续"
+    },
+    "actions": {
+      "restart": "重新开始",
+      "submit": "提交证明",
+      "done": "完成",
+      "exit": "退出"
+    },
+    "instructions": {
+      "clickAndHold": "点击并按住绘画",
+      "drawForMinimum": "至少绘画{seconds}秒才能创建证明",
+      "theme": "主题: {name} • Ctrl+B 切换",
+      "recording": "录制中 • 松开暂停",
+      "readyToSubmit": "准备提交！",
+      "useButtons": "使用上方按钮提交或重新开始"
+    },
+    "modal": {
+      "title": "保存你的遗产",
+      "subtitle": "选择如何将这一刻永久铭记。",
+      "artworkDetails": "作品详情",
+      "artworkTitle": "作品标题（可选）",
+      "artworkTitlePlaceholder": "为你的创作命名...",
+      "description": "描述（可选）",
+      "descriptionPlaceholder": "描述你的艺术愿景...",
+      "identity": "链上身份",
+      "nameOnChain": "你想留在链上的名字（可选）",
+      "namePlaceholder": "匿名",
+      "leaveEmpty": "留空将显示为「匿名」",
+      "messageToWorld": "给世界的留言（可选）",
+      "messagePlaceholder": "你想留下什么？",
+      "paymentMethod": "支付方式",
+      "walletBalance": "钱包余额：",
+      "unclaimedBalance": "未领取余额：",
+      "cost": "费用：",
+      "noSignatureNeeded": "无需签名",
+      "perpetualProof": "永久证明（即时）",
+      "standardProof": "标准证明（每日批处理）",
+      "free": "免费",
+      "gasFree": "免Gas费",
+      "cancel": "取消",
+      "setAsDisplayName": "设为显示名称",
+      "saved": "已保存！",
+      "saving": "保存中...",
+      "checking": "检查中...",
+      "inclGas": "（含Gas费）",
+      "reset": "重置",
+      "perpetualDescGasless": "使用未领取的TIME26奖励铸造。无需钱包签名 - 完全免Gas费！",
+      "perpetualDescTime26": "即时写入Arweave，在Polygon上验证。铸造你的个人光迹NFT + 徽章并燃烧Time26。",
+      "perpetualDescNative": "即时写入Arweave，在Polygon上验证。铸造你的个人光迹NFT + 徽章。",
+      "standardDesc": "包含在每日链上批处理中（UTC 00:00）。完整数据由协议上传至Polygon。",
+      "techTitle": "为什么这是安全的？/ 运作原理",
+      "techDesc1": "你的创作数据使用加密哈希（SHA-256）进行保护。这些独特的指纹被聚合成默克尔树结构。",
+      "techDesc2": "最后，我们将这些证明批量处理成区块链上的单一可验证交易。这确保你的作品在数学上被证明存在于这个特定时间，并具有整个网络的安全性。"
+    },
+    "clearConfirm": {
+      "title": "开始新绘画？",
+      "description": "这将清除你当前的光迹并重置计时器。",
+      "keepTrail": "保留光迹",
+      "clearStart": "清除并开始"
+    },
+    "status": {
+      "submitting": "正在提交证明...",
+      "submitted": "证明已提交！将包含在每日快照中。",
+      "mintingTime26": "使用TIME26铸造（免Gas费）...",
+      "transactionSubmitted": "交易已提交！等待确认...",
+      "minting": "铸造证明中 (2/2)...",
+      "minted": "永久证明已铸造！",
+      "saving": "正在保存证明到数据库..."
+    }
+  },
+  "proof": {
+    "notFound": "未找到证明。",
+    "goHome": "返回首页",
+    "status": {
+      "minted": "已铸造",
+      "settled": "已结算",
+      "pending": "待处理"
+    },
+    "share": {
+      "copyLink": "复制链接",
+      "postOnX": "发布到 X",
+      "postOnThreads": "发布到 Threads",
+      "postOnInstagram": "发布到 Instagram"
+    },
+    "screenshot": {
+      "withoutTitle": "无标题",
+      "withTitle": "有标题"
+    },
+    "verifiedOn": "在Polygon上验证",
+    "arweaveMetadata": "Arweave元数据",
+    "rawArtFile": "原始艺术文件",
+    "syncingStorage": "同步存储中..."
+  },
+  "explore": {
+    "title": "探索",
+    "description": "发现来自世界各地的最新验证证明。"
+  },
+  "referral": {
+    "title": "邀请好友",
+    "subtitle": "分享你的推荐链接，一起赚取奖励。",
+    "friendsInvited": "已邀请好友",
+    "yourLink": "你的推荐链接",
+    "copy": "复制",
+    "copied": "已复制",
+    "shareInfo": "与朋友分享此链接...",
+    "notGenerated": "推荐码尚未生成。",
+    "signInAgain": "请退出并重新登录以生成。"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "delete": "删除",
+    "reset": "重置",
+    "copy": "复制",
+    "copied": "已复制"
+  },
+  "whitepaper": {
+    "protocolSpec": "协议规范",
+    "readyToExist": "准备好存在了吗？",
+    "enterApp": "进入应用"
+  },
+  "languageSelector": {
+    "label": "语言",
+    "en": "English",
+    "zh": "中文繁體",
+    "cn": "中文简体",
+    "es": "Español",
+    "ja": "日本語",
+    "fr": "Français"
+  }
+}
