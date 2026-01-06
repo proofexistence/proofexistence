@@ -1549,8 +1549,11 @@ export function POECanvas() {
         {dialogState.isOpen && (
           <div className="fixed inset-0 flex items-center justify-center z-[100] pointer-events-auto animate-in fade-in duration-200">
             <div
-              className="bg-black/40 backdrop-blur-sm absolute inset-0 cursor-pointer"
+              className={`bg-black/40 backdrop-blur-sm absolute inset-0 ${dialogState.shareSessionId ? 'cursor-default' : 'cursor-pointer'}`}
               onClick={() => {
+                // Don't allow backdrop click to close success dialogs
+                // Users must use action buttons to prevent accidental re-submission
+                if (dialogState.shareSessionId) return;
                 setDialogState((prev) => ({ ...prev, isOpen: false }));
                 setShowSuccessShareMenu(false);
               }}
