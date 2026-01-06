@@ -42,8 +42,9 @@ export function useTime26Balance() {
     isConnected && walletAddress ? '/api/user/balance' : null,
     fetcher,
     {
-      refreshInterval: 60000, // Refresh every minute
-      revalidateOnFocus: true,
+      revalidateOnFocus: false, // Don't refetch on window focus
+      revalidateOnReconnect: false, // Don't refetch on reconnect
+      dedupingInterval: 60000, // Dedupe requests within 60s
     }
   );
 

@@ -24,17 +24,17 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useUserProfile } from '@/hooks/use-user-profile';
+import { useProfile } from '@/hooks/use-profile';
 import { isLaunchTime } from '@/lib/launch-config';
 import { NavbarCountdown } from './navbar-countdown';
 import { MobileConnectButton } from '@/components/auth/mobile-connect-button';
 import { WalletDropdown, ExportKeyDialog } from '@/components/wallet';
 import { useNetworkInfo } from '@/hooks/use-network-info';
 import { useWalletBalances } from '@/hooks/use-wallet-balances';
-import { useTime26Balance } from '@/hooks/useTime26Balance';
+import { ethers } from 'ethers';
 
 export function Navbar() {
-  const { profile, isLoading, isAuthenticated } = useUserProfile();
+  const { profile, isLoading, isAuthenticated } = useProfile();
   const { logout, isExternalWallet } = useWeb3Auth();
   const network = useNetworkInfo();
   const {
@@ -43,7 +43,10 @@ export function Navbar() {
     isLoading: balancesLoading,
     refresh: refreshBalances,
   } = useWalletBalances();
-  const { balance: pendingBalance } = useTime26Balance();
+  // Use profile.time26Balance instead of separate API call
+  const pendingBalance = profile?.time26Balance
+    ? parseFloat(ethers.formatEther(profile.time26Balance)).toFixed(1)
+    : '0';
   const t = useTranslations('nav');
 
   const handleSignOut = () => logout();
@@ -340,9 +343,9 @@ export function Navbar() {
                     {/* Header with Avatar & Name */}
                     <div className="p-4 flex items-center gap-3 border-b border-white/10">
                       <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
-                        {profile?.imageUrl ? (
+                        {profile?.avatarUrl ? (
                           <Image
-                            src={profile.imageUrl}
+                            src={profile.avatarUrl}
                             alt="Profile"
                             fill
                             sizes="48px"
@@ -367,9 +370,9 @@ export function Navbar() {
                             {network.shortName}
                           </span>
                         </div>
-                        {profile?.displayName && (
+                        {profile?.name && (
                           <div className="text-base font-semibold text-white truncate mt-1">
-                            {profile.displayName}
+                            {profile.name}
                           </div>
                         )}
                         {profile?.username && (

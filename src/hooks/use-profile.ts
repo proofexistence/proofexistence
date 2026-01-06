@@ -15,6 +15,12 @@ export interface Profile {
   time26Balance: string | null;
 }
 
+// Helper to truncate wallet address for display
+export function truncateWallet(address: string): string {
+  if (!address) return '';
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
 interface SyncResponse {
   success: boolean;
   user: Profile;
@@ -96,8 +102,14 @@ export function useProfile() {
     return result.user;
   };
 
+  // Computed display label: name > truncated wallet
+  const displayLabel = profile
+    ? profile.name || truncateWallet(profile.walletAddress)
+    : '';
+
   return {
     profile,
+    displayLabel,
     isLoading: isAuthLoading || (isConnected && isProfileLoading),
     isAuthenticated: isConnected && !!profile,
     error,

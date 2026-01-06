@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { useUserProfile } from '@/hooks/use-user-profile';
+import { useProfile } from '@/hooks/use-profile';
 
 interface ReferralDialogProps {
   open: boolean;
@@ -17,7 +17,7 @@ interface ReferralDialogProps {
 }
 
 export function ReferralDialog({ open, onOpenChange }: ReferralDialogProps) {
-  const { profile } = useUserProfile();
+  const { profile } = useProfile();
   const [copied, setCopied] = useState(false);
   const [referralCount, setReferralCount] = useState<number | null>(null);
   const [isLoadingCount, setIsLoadingCount] = useState(false);

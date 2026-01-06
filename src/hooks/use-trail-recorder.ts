@@ -8,6 +8,10 @@ import {
   MIN_SESSION_DURATION,
 } from '@/types/session';
 
+// Prevent unbounded memory growth - trim oldest points when limit reached
+// Reduced from 10000 to 5000 for better rendering performance
+const MAX_POINTS = 5000;
+
 const INITIAL_STATE: SessionState = {
   isRecording: false,
   startTime: null,
@@ -141,6 +145,13 @@ export function useTrailRecorder() {
       z,
       t: totalElapsed,
     };
+
+    // Trim oldest points if exceeding limit (keep last 80%)
+    if (stateRef.current.points.length >= MAX_POINTS) {
+      stateRef.current.points = stateRef.current.points.slice(
+        -Math.floor(MAX_POINTS * 0.8)
+      );
+    }
 
     stateRef.current.points.push(point);
   }, []);

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { NFTThumbnail } from './nft-thumbnail';
 import { useState, useRef, useEffect } from 'react';
-import { useUserProfile } from '@/hooks/use-user-profile';
+import { useProfile } from '@/hooks/use-profile';
 import { useSavedProofs } from '@/hooks/use-saved-proofs';
 import { useLikes } from '@/hooks/use-likes';
 import { useWeb3Auth } from '@/lib/web3auth';
@@ -84,7 +84,7 @@ export function ProofCard({
   const [showShareMenu, setShowShareMenu] = useState(false);
   const shareMenuRef = useRef<HTMLDivElement>(null);
 
-  const { isAuthenticated } = useUserProfile();
+  const { isAuthenticated } = useProfile();
 
   // Close share menu when clicking outside
   useEffect(() => {

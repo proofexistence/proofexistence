@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  useMemo,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -79,6 +85,8 @@ function StrokeRenderer({
     () => processPoints(points, size),
     [points, size]
   );
+  const geometryRef = useRef<THREE.TubeGeometry | null>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   const curve = useMemo(() => {
     if (processedPoints.length < 2) return null;
@@ -94,13 +102,42 @@ function StrokeRenderer({
     return new THREE.TubeGeometry(curve, tubularSegments, size, 8, false);
   }, [curve, processedPoints.length, size]);
 
+  // Memoize emissive color to prevent re-creation every render
+  const emissiveColor = useMemo(
+    () => new THREE.Color(color).multiplyScalar(8),
+    [color]
+  );
+
+  // Dispose old geometry when it changes
+  useEffect(() => {
+    if (geometryRef.current && geometryRef.current !== geometry) {
+      geometryRef.current.dispose();
+    }
+    geometryRef.current = geometry;
+  }, [geometry]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    const geo = geometryRef.current;
+    const mat = materialRef.current;
+    return () => {
+      if (geo) {
+        geo.dispose();
+      }
+      if (mat) {
+        mat.dispose();
+      }
+    };
+  }, []);
+
   if (!geometry) return null;
 
   return (
     <mesh geometry={geometry}>
       <meshStandardMaterial
+        ref={materialRef}
         color="#000000"
-        emissive={new THREE.Color(color).multiplyScalar(8)}
+        emissive={emissiveColor}
         emissiveIntensity={0.5}
         toneMapped={false}
         transparent

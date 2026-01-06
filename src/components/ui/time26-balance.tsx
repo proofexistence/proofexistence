@@ -1,7 +1,8 @@
 'use client';
 
-import { useTime26Balance } from '@/hooks/useTime26Balance';
+import { useProfile } from '@/hooks/use-profile';
 import { cn } from '@/lib/utils';
+import { ethers } from 'ethers';
 
 interface Time26BalanceProps {
   className?: string;
@@ -14,7 +15,10 @@ export function Time26Balance({
   showIcon = true,
   compact = false,
 }: Time26BalanceProps) {
-  const { balance, isLoading } = useTime26Balance();
+  const { profile, isLoading } = useProfile();
+  const balance = profile?.time26Balance
+    ? parseFloat(ethers.formatEther(profile.time26Balance)).toFixed(2)
+    : '0';
 
   if (isLoading) {
     return (

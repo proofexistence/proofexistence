@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { TrailPoint } from '@/types/session';
@@ -43,8 +43,9 @@ function processPoints(points: TrailPoint[]): TrailPoint[] {
   const uniquePoints: TrailPoint[] = [points[0]];
   let lastPoint = points[0];
 
+  // Increased minimum distance to reduce point density for better performance
   const radius = 0.02;
-  const minDistance = radius * 0.5;
+  const minDistance = radius * 1.5;
 
   for (let i = 1; i < points.length; i++) {
     const p = points[i];
@@ -70,6 +71,8 @@ function StrokeRenderer({
   color: string;
 }) {
   const processedPoints = useMemo(() => processPoints(points), [points]);
+  const geometryRef = useRef<THREE.TubeGeometry | null>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   const curve = useMemo(() => {
     if (processedPoints.length < 2) return null;
@@ -81,17 +84,48 @@ function StrokeRenderer({
 
   const geometry = useMemo(() => {
     if (!curve) return null;
-    const tubularSegments = Math.min(processedPoints.length * 8, 2000);
-    return new THREE.TubeGeometry(curve, tubularSegments, 0.02, 8, false);
+    // Reduced segments for better performance (was *8, cap 2000)
+    const tubularSegments = Math.min(processedPoints.length * 4, 1000);
+    return new THREE.TubeGeometry(curve, tubularSegments, 0.02, 6, false);
   }, [curve, processedPoints.length]);
+
+  // Memoize emissive color to prevent re-creation every render
+  const emissiveColor = useMemo(
+    () => new THREE.Color(color).multiplyScalar(10),
+    [color]
+  );
+
+  // Dispose old geometry when it changes
+  useEffect(() => {
+    // Dispose previous geometry if it exists and is different
+    if (geometryRef.current && geometryRef.current !== geometry) {
+      geometryRef.current.dispose();
+    }
+    geometryRef.current = geometry;
+  }, [geometry]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    const geo = geometryRef.current;
+    const mat = materialRef.current;
+    return () => {
+      if (geo) {
+        geo.dispose();
+      }
+      if (mat) {
+        mat.dispose();
+      }
+    };
+  }, []);
 
   if (!geometry) return null;
 
   return (
     <mesh geometry={geometry}>
       <meshStandardMaterial
+        ref={materialRef}
         color="#000000"
-        emissive={new THREE.Color(color).multiplyScalar(10)}
+        emissive={emissiveColor}
         emissiveIntensity={0.5}
         toneMapped={false}
         transparent
@@ -170,25 +204,25 @@ export function CometHead({
 
   return (
     <group position={position}>
-      {/* Outermost neon halo */}
+      {/* Outermost neon halo - smaller & more transparent */}
       <mesh ref={outerRef}>
-        <sphereGeometry args={[0.4, 24, 24]} />
-        <meshBasicMaterial color={color} transparent opacity={0.08} />
+        <sphereGeometry args={[0.18, 16, 16]} />
+        <meshBasicMaterial color={color} transparent opacity={0.05} depthWrite={false} />
       </mesh>
       {/* Wide neon glow */}
       <mesh ref={neonRef}>
-        <sphereGeometry args={[0.25, 24, 24]} />
-        <meshBasicMaterial color={color} transparent opacity={0.15} />
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshBasicMaterial color={color} transparent opacity={0.1} depthWrite={false} />
       </mesh>
       {/* Colored glow layer */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[0.15, 16, 16]} />
-        <meshBasicMaterial color={color} transparent opacity={0.5} />
+        <sphereGeometry args={[0.07, 12, 12]} />
+        <meshBasicMaterial color={color} transparent opacity={0.25} depthWrite={false} />
       </mesh>
       {/* Core bright center */}
       <mesh ref={meshRef}>
-        <sphereGeometry args={[0.08, 16, 16]} />
-        <meshBasicMaterial color="#ffffff" />
+        <sphereGeometry args={[0.035, 12, 12]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.9} depthWrite={false} />
       </mesh>
     </group>
   );

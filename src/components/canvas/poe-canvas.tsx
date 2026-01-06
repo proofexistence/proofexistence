@@ -441,9 +441,11 @@ export function POECanvas() {
   const [nativeCost, setNativeCost] = useState<string>('... POL');
   const [nativeCostUsd, setNativeCostUsd] = useState<string>('');
 
-  // Gasless minting eligibility
+  // Gasless minting eligibility - only fetch when submission modal is open
   const { data: gaslessEligibility, isLoading: gaslessLoading } =
-    useGaslessEligibility(duration >= 10 ? duration : 10);
+    useGaslessEligibility(duration >= 10 ? duration : 10, {
+      enabled: showSubmissionModal,
+    });
   const { mint: gaslessMint } = useGaslessMint();
 
   // Mint confirmation for non-Web3 users
@@ -486,7 +488,7 @@ export function POECanvas() {
     setMounted(true);
   }, []);
 
-  // Update UI state from recorder
+  // Update UI state from recorder (throttled to reduce re-renders)
   useEffect(() => {
     if (!isRecording) return;
 
@@ -495,7 +497,7 @@ export function POECanvas() {
       setDuration(state.duration);
       setPoints([...state.points]);
       setIsValid(isValidDuration());
-    }, 50);
+    }, 100); // Reduced from 50ms to 100ms for better performance
 
     return () => clearInterval(interval);
   }, [isRecording, getState, isValidDuration]);
@@ -563,7 +565,7 @@ export function POECanvas() {
     setPoints([...session.points]);
     setIsValid(
       session.duration >= MIN_SESSION_DURATION &&
-        session.points.filter((p) => p.t !== -1).length >= 5
+      session.points.filter((p) => p.t !== -1).length >= 5
     );
   }, [isRecording, endStroke]);
 
@@ -1029,7 +1031,7 @@ export function POECanvas() {
                     overrides.maxPriorityFeePerGas =
                       feeData.maxPriorityFeePerGas
                         ? (feeData.maxPriorityFeePerGas * BigInt(120)) /
-                          BigInt(100)
+                        BigInt(100)
                         : undefined;
                   }
                 } catch (feeError) {
@@ -1408,7 +1410,7 @@ export function POECanvas() {
         gl={{
           preserveDrawingBuffer: true, // Required for screenshot capture
           antialias: false,
-          alpha: false,
+          alpha: true,
           stencil: false,
           depth: true,
           toneMapping: THREE.NoToneMapping,

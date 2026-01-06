@@ -28,11 +28,16 @@ export interface GaslessEligibility {
  * Hook to check gasless minting eligibility
  *
  * @param duration - Duration in seconds (must be >= 10)
+ * @param options.enabled - Whether to enable the query (default: true)
  * @returns Eligibility status and cost breakdown
  */
-export function useGaslessEligibility(duration: number) {
+export function useGaslessEligibility(
+  duration: number,
+  options?: { enabled?: boolean }
+) {
   const { user, isConnected } = useWeb3Auth();
   const walletAddress = user?.walletAddress;
+  const externalEnabled = options?.enabled ?? true;
 
   return useQuery<GaslessEligibility>({
     queryKey: ['gasless-eligibility', walletAddress, duration],
@@ -57,7 +62,7 @@ export function useGaslessEligibility(duration: number) {
 
       return res.json();
     },
-    enabled: isConnected && !!walletAddress && duration >= 10,
+    enabled: externalEnabled && isConnected && !!walletAddress && duration >= 10,
     staleTime: 1000 * 30, // 30 seconds - gas prices change
     refetchInterval: 1000 * 60, // Refresh every minute
     retry: 2,
