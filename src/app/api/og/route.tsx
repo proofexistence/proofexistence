@@ -257,20 +257,6 @@ export async function GET(req: NextRequest) {
                       gap: '12px',
                     }}
                   >
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                      }}
-                    >
-                      👤
-                    </div>
                     <span
                       style={{
                         color: 'white',
@@ -278,7 +264,7 @@ export async function GET(req: NextRequest) {
                         fontWeight: 500,
                       }}
                     >
-                      {authorName}
+                      by {authorName}
                     </span>
                   </div>
 
@@ -439,8 +425,9 @@ export async function GET(req: NextRequest) {
         height: 630,
       }
     );
-  } catch {
-    return new Response(`Failed to generate the image`, {
+  } catch (error) {
+    console.error('[OG Route] Error generating image:', error);
+    return new Response(`Failed to generate the image: ${error instanceof Error ? error.message : 'Unknown error'}`, {
       status: 500,
     });
   }
