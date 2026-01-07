@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Link, useRouter, usePathname } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { usePathname as useNextPathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useWeb3Auth } from '@/lib/web3auth';
@@ -71,7 +71,6 @@ export function Navbar() {
 
   const ready = !isLoading;
   const authenticated = isAuthenticated;
-  const router = useRouter();
   const pathname = usePathname();
   const nextPathname = useNextPathname();
   const [mounted, setMounted] = useState(false);
@@ -156,8 +155,20 @@ export function Navbar() {
     },
   ];
 
-  // Mobile nav links - just the main navigation, wallet section is separate
-  const mobileNavLinks = [...leftNavLinks];
+  // Mobile nav links - drawToProof first, then main navigation
+  const mobileNavLinks = [
+    ...(launched
+      ? [
+          {
+            name: t('drawToProof'),
+            href: '/canvas' as const,
+            icon: <LineSquiggle className="w-5 h-5" />,
+            featured: true,
+          },
+        ]
+      : []),
+    ...leftNavLinks,
+  ];
 
   return (
     <>
@@ -263,7 +274,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-3xl flex flex-col p-6 overflow-y-auto"
+            className="fixed inset-0 z-[60] bg-linear-to-br from-black/98 via-black/95 to-black/98 backdrop-blur-3xl flex flex-col p-6 overflow-y-auto"
           >
             {/* Header: Logo + Close Button */}
             <div className="flex items-center justify-between mb-8">
@@ -291,45 +302,49 @@ export function Navbar() {
 
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2.5 bg-white/5 border border-white/10 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+                className="p-2.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             {/* Navigation Links */}
-            <div className="flex flex-col gap-2 mb-8">
+            <div className="flex flex-col gap-3 mb-8">
               {mobileNavLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-4 p-4 rounded-xl text-lg font-medium text-zinc-300 bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 hover:text-white transition-all"
+                  className={`flex items-center gap-4 p-4 rounded-2xl text-lg font-medium transition-all ${
+                    link.featured
+                      ? 'bg-linear-to-r from-purple-500/20 via-blue-500/20 to-pink-500/20 backdrop-blur-xl border-2 border-white/30 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:border-white/50 hover:scale-[1.02]'
+                      : 'text-zinc-300 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white'
+                  }`}
                 >
-                  {link.icon}
-                  {link.name}
+                  <span
+                    className={
+                      link.featured
+                        ? 'text-purple-300'
+                        : 'text-zinc-400 group-hover:text-white'
+                    }
+                  >
+                    {link.icon}
+                  </span>
+                  <span className={link.featured ? 'font-bold' : ''}>
+                    {link.name}
+                  </span>
+                  {link.featured && (
+                    <span className="ml-auto">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+                      </span>
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>
 
-            {/* CTA Button */}
-            {launched && (
-              <div className="mb-8">
-                <button
-                  onClick={() => {
-                    router.push('/canvas');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full py-4 rounded-xl bg-white text-black font-bold text-lg shadow-lg shadow-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                >
-                  <span className="relative flex h-3 w-3 mr-1">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-black"></span>
-                  </span>
-                  {t('proveExistence')}
-                </button>
-              </div>
-            )}
 
             {/* Divider */}
             <div className="h-px bg-white/10 w-full mb-6" />
@@ -339,7 +354,7 @@ export function Navbar() {
               {ready && authenticated ? (
                 <div className="space-y-4">
                   {/* Wallet Card */}
-                  <div className="rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 overflow-hidden">
+                  <div className="rounded-2xl bg-linear-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/10">
                     {/* Header with Avatar & Name */}
                     <div className="p-4 flex items-center gap-3 border-b border-white/10">
                       <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
@@ -536,7 +551,7 @@ export function Navbar() {
                       await handleSignOut();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-xl backdrop-blur-md border border-red-500/30 bg-red-500/5 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-all flex items-center justify-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
                     {t('logOut')}
@@ -555,7 +570,7 @@ export function Navbar() {
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-4 rounded-xl bg-white text-black font-semibold hover:bg-zinc-100 transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-2xl bg-linear-to-r from-white via-purple-100 to-white backdrop-blur-md text-black font-bold text-lg shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                   >
                     <Wallet className="w-5 h-5" />
                     {t('connectWallet')}
