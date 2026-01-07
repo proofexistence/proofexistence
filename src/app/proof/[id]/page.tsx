@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ProofViewer } from '@/components/proof/proof-viewer';
 
 interface PageProps {
-  params: Promise<{ id: string; locale: string }>;
+  params: Promise<{ id: string }>;
 }
 
 async function getSession(id: string) {
@@ -35,6 +35,7 @@ async function getSession(id: string) {
 
   if (!session) return null;
 
+  // Manual fetch for user if relation is missing
   const user = await db.query.users.findFirst({
     where: eq(users.id, session.userId),
     columns: {
@@ -92,7 +93,7 @@ export async function generateMetadata({
       try {
         const metadataUrl = `https://gateway.irys.xyz/${session.ipfsHash}`;
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
 
         const res = await fetch(metadataUrl, {
           signal: controller.signal,
@@ -109,10 +110,12 @@ export async function generateMetadata({
           }
         }
       } catch (e) {
+        // Silently fail - use fallback image
         console.warn('Failed to fetch Arweave metadata for OG:', e);
       }
     }
 
+    // Add image to OG URL if available
     if (finalImage) {
       ogUrl.searchParams.set('image', finalImage);
     }
@@ -122,8 +125,7 @@ export async function generateMetadata({
       session.description ||
       `Verified immutable proof stored on Arweave. Created at ${dateStr}.`;
     const title = `${displayTitle} | Proof of Existence`;
-    // Use the current locale URL as canonical
-    const proofUrl = `https://proofexistence.com/${resolvedParams.locale}/proof/${session.id}`;
+    const proofUrl = `https://proofexistence.com/proof/${session.id}`;
 
     return {
       title: title,
@@ -153,6 +155,7 @@ export async function generateMetadata({
     };
   } catch (error) {
     console.error('[generateMetadata] Error:', error);
+    // Return fallback metadata on error
     return {
       title: 'Proof of Existence',
       description: 'A Year-Long Collective Art Experiment',
