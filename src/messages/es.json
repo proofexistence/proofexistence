@@ -9,7 +9,7 @@
     "cosmos": "Cosmos",
     "drawToProof": "Dibuja para Probar",
     "proveExistence": "Probar Existencia",
-    "connectWallet": "Conectar Cartera",
+    "connectWallet": "Iniciar Sesión / Conectar Cartera",
     "connecting": "Conectando...",
     "login": "Iniciar Sesión",
     "viewProfile": "Ver Perfil",
@@ -41,7 +41,7 @@
       "subtitle": "Un experimento de arte colectivo de un año.",
       "description": "Deja tu huella. Co-crea la historia. Demuestra que exististe.",
       "exploreCosmos": "Explorar Cosmos",
-      "connectWallet": "Conectar Cartera",
+      "connectWallet": "Iniciar Sesión / Conectar Cartera",
       "enterEternal": "Entrar al Eterno"
     },
     "manifesto": {

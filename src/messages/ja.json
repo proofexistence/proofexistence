@@ -9,7 +9,7 @@
     "cosmos": "コスモス",
     "drawToProof": "描いて証明",
     "proveExistence": "存在を証明",
-    "connectWallet": "ウォレット接続",
+    "connectWallet": "ログイン/ウォレット接続",
     "connecting": "接続中...",
     "login": "ログイン",
     "viewProfile": "プロフィール表示",
@@ -41,7 +41,7 @@
       "subtitle": "1年間の集団アート実験。",
       "description": "あなたの痕跡を残そう。歴史を共創しよう。存在を証明しよう。",
       "exploreCosmos": "コスモスを探索",
-      "connectWallet": "ウォレット接続",
+      "connectWallet": "ログイン/ウォレット接続",
       "enterEternal": "永遠へ入る"
     },
     "manifesto": {

@@ -9,7 +9,7 @@
     "cosmos": "宇宙",
     "drawToProof": "绘画证明",
     "proveExistence": "证明存在",
-    "connectWallet": "连接钱包",
+    "connectWallet": "登录/连接钱包",
     "connecting": "连接中...",
     "login": "登录",
     "viewProfile": "查看资料",
@@ -41,7 +41,7 @@
       "subtitle": "为期一年的集体艺术实验。",
       "description": "留下你的痕迹。共创历史。证明你的存在。",
       "exploreCosmos": "探索宇宙",
-      "connectWallet": "连接钱包",
+      "connectWallet": "登录/连接钱包",
       "enterEternal": "进入永恒"
     },
     "manifesto": {
