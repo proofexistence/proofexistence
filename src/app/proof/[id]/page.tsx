@@ -71,7 +71,7 @@ export async function generateMetadata({
       session.user?.name || session.user?.username || 'Anonymous';
 
     // Build OG image URL with parameters
-    const ogUrl = new URL('https://proofexistence.com/api/og');
+    const ogUrl = new URL('https://www.proofexistence.com/api/og');
     ogUrl.searchParams.set('title', displayTitle);
     ogUrl.searchParams.set('date', dateStr);
     ogUrl.searchParams.set('id', session.id);
@@ -125,7 +125,7 @@ export async function generateMetadata({
       session.description ||
       `Verified immutable proof stored on Arweave. Created at ${dateStr}.`;
     const title = `${displayTitle} | Proof of Existence`;
-    const proofUrl = `https://proofexistence.com/proof/${session.id}`;
+    const proofUrl = `https://www.proofexistence.com/proof/${session.id}`;
 
     return {
       title: title,
