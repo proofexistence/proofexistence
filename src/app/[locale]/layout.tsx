@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: 'Proof of Existence | A Year-Long Collective Art Experiment',
   description:
     'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
-  metadataBase: new URL('https://proofexistence.com/'),
+  metadataBase: new URL('https://www.proofexistence.com/'),
   keywords: [
     'POE2026',
     'blockchain',
@@ -36,11 +36,11 @@ export const metadata: Metadata = {
     title: 'Proof of Existence | A Year-Long Collective Art Experiment',
     description:
       'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
-    url: 'https://proofexistence.com/',
+    url: 'https://www.proofexistence.com/',
     siteName: 'POE 2026',
     images: [
       {
-        url: 'https://proofexistence.com/og-v2.png',
+        url: 'https://www.proofexistence.com/og-v2.png',
         width: 1200,
         height: 630,
         alt: 'POE 2026 - Proof of Existence',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title: 'Proof of Existence | A Year-Long Collective Art Experiment',
     description:
       'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
-    images: ['https://proofexistence.com/og-v2.png'],
+    images: ['https://www.proofexistence.com/og-v2.png'],
     creator: '@Proofexist2006',
   },
   icons: {

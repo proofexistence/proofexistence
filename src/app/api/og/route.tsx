@@ -8,7 +8,7 @@ async function getSessionData(id: string) {
   try {
     // Use absolute URL for edge runtime
     const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || 'https://proofexistence.com';
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://www.proofexistence.com';
     const res = await fetch(`${baseUrl}/api/sessions/${id}`, {
       next: { revalidate: 60 },
     });

@@ -74,7 +74,7 @@ export function ProofViewer({
   const shareUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/proof/${session.id}`
-      : `https://proofexistence.com/proof/${session.id}`;
+      : `https://www.proofexistence.com/proof/${session.id}`;
 
   // Increment view count on mount
   useEffect(() => {
