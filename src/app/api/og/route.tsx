@@ -49,13 +49,19 @@ export async function GET(req: NextRequest) {
       }
 
       if (session) {
-        const date = new Date(session.createdAt).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        });
+        let date = 'Unknown Date';
+        try {
+          date = new Date(session.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+        } catch (e) {
+          console.error('[OG] Date parsing error:', e);
+        }
+
         const displayTitle =
-          session.title || `Proof #${session.id.slice(0, 8)}`;
+          session.title || `Proof #${String(session.id || 'unknown').slice(0, 8)}`;
         const authorName =
           session.user?.name || session.user?.username || 'Anonymous';
         const duration = session.duration ? `${session.duration}s` : '';
