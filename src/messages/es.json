@@ -7,6 +7,10 @@
     "whitepaper": "Whitepaper",
     "explore": "Explorar",
     "cosmos": "Cosmos",
+    "learn": "Aprender",
+    "gettingStarted": "Primeros Pasos",
+    "tutorials": "Tutoriales",
+    "stories": "Historias",
     "drawToProof": "Dibuja para Probar",
     "proveExistence": "Probar Existencia",
     "connectWallet": "Iniciar Sesión / Conectar Cartera",
@@ -184,6 +188,13 @@
     "protocolSpec": "Especificación del Protocolo",
     "readyToExist": "¿Listo para existir?",
     "enterApp": "Entrar a la App"
+  },
+  "learn": {
+    "title": "Aprender",
+    "description": "Descubre cómo usar Prueba de Existencia. Tutoriales, guías e historias detrás del proyecto.",
+    "backToLearn": "Volver a Aprender",
+    "readyToStart": "¿Listo para dejar tu huella?",
+    "startDrawing": "Empezar a Dibujar"
   },
   "languageSelector": {
     "label": "Idioma",

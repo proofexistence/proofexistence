@@ -7,6 +7,10 @@
     "whitepaper": "Whitepaper",
     "explore": "Explore",
     "cosmos": "Cosmos",
+    "learn": "Learn",
+    "gettingStarted": "Getting Started",
+    "tutorials": "Tutorials",
+    "stories": "Stories",
     "drawToProof": "Draw to Proof",
     "proveExistence": "Prove Existence",
     "connectWallet": "Login / Connect Wallet",
@@ -184,6 +188,13 @@
     "protocolSpec": "Protocol Specification",
     "readyToExist": "Ready to exist?",
     "enterApp": "Enter App"
+  },
+  "learn": {
+    "title": "Learn",
+    "description": "Discover how to use Proof of Existence. Tutorials, guides, and stories behind the project.",
+    "backToLearn": "Back to Learn",
+    "readyToStart": "Ready to leave your mark?",
+    "startDrawing": "Start Drawing"
   },
   "languageSelector": {
     "label": "Language",

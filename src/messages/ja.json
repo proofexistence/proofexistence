@@ -7,6 +7,10 @@
     "whitepaper": "ホワイトペーパー",
     "explore": "探索",
     "cosmos": "コスモス",
+    "learn": "学ぶ",
+    "gettingStarted": "はじめに",
+    "tutorials": "チュートリアル",
+    "stories": "ストーリー",
     "drawToProof": "描いて証明",
     "proveExistence": "存在を証明",
     "connectWallet": "ログイン/ウォレット接続",
@@ -184,6 +188,13 @@
     "protocolSpec": "プロトコル仕様",
     "readyToExist": "存在する準備はできましたか？",
     "enterApp": "アプリに入る"
+  },
+  "learn": {
+    "title": "学ぶ",
+    "description": "存在証明の使い方を学びましょう。チュートリアル、ガイド、プロジェクトの裏話。",
+    "backToLearn": "学ぶに戻る",
+    "readyToStart": "あなたの痕跡を残す準備はできましたか？",
+    "startDrawing": "描き始める"
   },
   "languageSelector": {
     "label": "言語",

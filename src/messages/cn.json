@@ -7,6 +7,10 @@
     "whitepaper": "白皮书",
     "explore": "探索",
     "cosmos": "宇宙",
+    "learn": "学习",
+    "gettingStarted": "入门指南",
+    "tutorials": "教程",
+    "stories": "故事",
     "drawToProof": "绘画证明",
     "proveExistence": "证明存在",
     "connectWallet": "登录/连接钱包",
@@ -184,6 +188,13 @@
     "protocolSpec": "协议规范",
     "readyToExist": "准备好存在了吗？",
     "enterApp": "进入应用"
+  },
+  "learn": {
+    "title": "学习",
+    "description": "了解如何使用存在证明。教程、指南和项目背后的故事。",
+    "backToLearn": "返回学习",
+    "readyToStart": "准备好留下你的印记了吗？",
+    "startDrawing": "开始绘画"
   },
   "languageSelector": {
     "label": "语言",

@@ -7,6 +7,10 @@
     "whitepaper": "Livre Blanc",
     "explore": "Explorer",
     "cosmos": "Cosmos",
+    "learn": "Apprendre",
+    "gettingStarted": "Premiers Pas",
+    "tutorials": "Tutoriels",
+    "stories": "Histoires",
     "drawToProof": "Dessiner pour Prouver",
     "proveExistence": "Prouver l'Existence",
     "connectWallet": "Connexion / Connecter le Portefeuille",
@@ -184,6 +188,13 @@
     "protocolSpec": "Spécification du Protocole",
     "readyToExist": "Prêt à exister ?",
     "enterApp": "Entrer dans l'App"
+  },
+  "learn": {
+    "title": "Apprendre",
+    "description": "Découvrez comment utiliser Preuve d'Existence. Tutoriels, guides et histoires derrière le projet.",
+    "backToLearn": "Retour à Apprendre",
+    "readyToStart": "Prêt à laisser votre marque ?",
+    "startDrawing": "Commencer à Dessiner"
   },
   "languageSelector": {
     "label": "Langue",

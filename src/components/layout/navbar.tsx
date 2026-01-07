@@ -21,6 +21,11 @@ import {
   Check,
   Share2,
   RefreshCw,
+  BookOpen,
+  Sparkles,
+  MessageCircle,
+  FileText,
+  ChevronRight,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -31,6 +36,7 @@ import { MobileConnectButton } from '@/components/auth/mobile-connect-button';
 import { WalletDropdown, ExportKeyDialog } from '@/components/wallet';
 import { useNetworkInfo } from '@/hooks/use-network-info';
 import { useWalletBalances } from '@/hooks/use-wallet-balances';
+import { LearnDropdown } from './learn-dropdown';
 import { ethers } from 'ethers';
 
 export function Navbar() {
@@ -75,6 +81,7 @@ export function Navbar() {
   const nextPathname = useNextPathname();
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileLearnOpen, setIsMobileLearnOpen] = useState(false);
   const [launched, setLaunched] = useState(false);
 
   useEffect(() => {
@@ -101,37 +108,10 @@ export function Navbar() {
 
   const leftNavLinks = [
     {
-      name: t('whitepaper'),
-      href: '/whitepaper' as const,
-      icon: (
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 15 15"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M3 2C2.44772 2 2 2.44772 2 3V12C2 12.5523 2.44772 13 3 13H12C12.5523 13 13 12.5523 13 12V8.5C13 8.22386 13.2239 8 13.5 8C13.7761 8 14 8.22386 14 8.5V12C14 13.1046 13.1046 14 12 14H3C1.89543 14 1 13.1046 1 12V3C1 1.89543 1.89543 1 3 1H6.5C6.77614 1 7 1.22386 7 1.5C7 1.77614 6.77614 2 6.5 2H3Z"
-            fill="currentColor"
-            fillRule="evenodd"
-            clipRule="evenodd"
-          />
-          <path
-            d="M14 1.5C14 1.22386 13.7761 1 13.5 1H10C9.72386 1 9.5 1.22386 9.5 1.5C9.5 1.77614 9.72386 2 10 2H12.2929L6.14645 8.14645C5.95118 8.34171 5.95118 8.65829 6.14645 8.85355C6.34171 9.04882 6.65829 9.04882 6.85355 8.85355L13 2.70711V5C13 5.27614 13.2239 5.5 13.5 5.5C13.7761 5.5 14 5.27614 14 5V1.5Z"
-            fill="currentColor"
-            fillRule="evenodd"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-    },
-    {
       name: t('explore'),
       href: '/explore' as const,
       icon: <Globe className="w-4 h-4" />,
     },
-
     {
       name: t('cosmos'),
       href: '/cosmos' as const,
@@ -197,6 +177,7 @@ export function Navbar() {
               <div className="h-3.5 w-[1px] bg-white/20 mx-1.5" />
 
               <div className="flex items-center">
+                <LearnDropdown />
                 {leftNavLinks.map((link) => (
                   <Link
                     key={link.name}
@@ -343,8 +324,73 @@ export function Navbar() {
                   )}
                 </Link>
               ))}
-            </div>
 
+              {/* Learn Section - Expandable */}
+              <div className="mt-2">
+                <button
+                  onClick={() => setIsMobileLearnOpen(!isMobileLearnOpen)}
+                  className="w-full flex items-center justify-between gap-4 p-4 rounded-2xl text-lg font-medium text-zinc-300 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    <BookOpen className="w-5 h-5 text-zinc-400" />
+                    <span>{t('learn')}</span>
+                  </div>
+                  <ChevronRight
+                    className={`w-5 h-5 text-zinc-400 transition-transform duration-200 ${
+                      isMobileLearnOpen ? 'rotate-90' : ''
+                    }`}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {isMobileLearnOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 mt-2 space-y-2">
+                        <Link
+                          href="/learn#getting-started"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          {t('gettingStarted')}
+                        </Link>
+                        <Link
+                          href="/learn#tutorials"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                          {t('tutorials')}
+                        </Link>
+                        <Link
+                          href="/learn#stories"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          {t('stories')}
+                        </Link>
+                        <div className="my-2 border-t border-white/10" />
+                        <Link
+                          href="/whitepaper"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <FileText className="w-4 h-4" />
+                          {t('whitepaper')}
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
 
             {/* Divider */}
             <div className="h-px bg-white/10 w-full mb-6" />
