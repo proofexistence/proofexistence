@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { TrailPoint } from '@/types/session';
 
 interface LightTrailProps {
-  points: TrailPoint[];
+  points: TrailPoint[]; // Active chunk (being drawn)
+  frozenChunks?: TrailPoint[][]; // Frozen chunks (completed, won't change)
   color?: string;
 }
 
@@ -62,7 +63,72 @@ function processPoints(points: TrailPoint[]): TrailPoint[] {
   return uniquePoints;
 }
 
-// Single stroke renderer component
+// Memoized frozen stroke - won't re-render once created
+const FrozenStroke = memo(function FrozenStroke({
+  points,
+  color,
+  chunkIndex,
+}: {
+  points: TrailPoint[];
+  color: string;
+  chunkIndex: number;
+}) {
+  const processedPoints = useMemo(() => processPoints(points), [points]);
+  const geometryRef = useRef<THREE.TubeGeometry | null>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+
+  const curve = useMemo(() => {
+    if (processedPoints.length < 2) return null;
+    const vectors = processedPoints.map(
+      (p) => new THREE.Vector3(p.x, p.y, p.z)
+    );
+    return new THREE.CatmullRomCurve3(vectors);
+  }, [processedPoints]);
+
+  const geometry = useMemo(() => {
+    if (!curve) return null;
+    const tubularSegments = Math.min(processedPoints.length * 4, 1000);
+    return new THREE.TubeGeometry(curve, tubularSegments, 0.02, 6, false);
+  }, [curve, processedPoints.length]);
+
+  const emissiveColor = useMemo(
+    () => new THREE.Color(color).multiplyScalar(10),
+    [color]
+  );
+
+  // Store geometry ref for cleanup
+  useEffect(() => {
+    geometryRef.current = geometry;
+  }, [geometry]);
+
+  // Cleanup on unmount only (frozen chunks don't change)
+  useEffect(() => {
+    const geo = geometryRef.current;
+    const mat = materialRef.current;
+    return () => {
+      if (geo) geo.dispose();
+      if (mat) mat.dispose();
+    };
+  }, []);
+
+  if (!geometry) return null;
+
+  return (
+    <mesh geometry={geometry} key={`frozen-${chunkIndex}`}>
+      <meshStandardMaterial
+        ref={materialRef}
+        color="#000000"
+        emissive={emissiveColor}
+        emissiveIntensity={0.5}
+        toneMapped={false}
+        transparent
+        opacity={0.8}
+      />
+    </mesh>
+  );
+});
+
+// Single stroke renderer component (for active drawing)
 function StrokeRenderer({
   points,
   color,
@@ -137,13 +203,26 @@ function StrokeRenderer({
 
 export function LightTrail({
   points,
+  frozenChunks = [],
   color = '#7C3AED',
   autoRotate = false,
 }: LightTrailProps & { autoRotate?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
 
-  // Split points into strokes (supports multi-stroke sessions)
-  const strokes = useMemo(() => splitIntoStrokes(points), [points]);
+  // Split active points into strokes (supports multi-stroke sessions)
+  const activeStrokes = useMemo(() => splitIntoStrokes(points), [points]);
+
+  // Flatten frozen chunks for rendering (each chunk becomes separate strokes)
+  const frozenStrokes = useMemo(() => {
+    return frozenChunks.flatMap((chunk, chunkIndex) => {
+      const strokes = splitIntoStrokes(chunk);
+      return strokes.map((stroke, strokeIndex) => ({
+        points: stroke,
+        key: `frozen-${chunkIndex}-${strokeIndex}`,
+        chunkIndex: chunkIndex * 100 + strokeIndex, // Unique index
+      }));
+    });
+  }, [frozenChunks]);
 
   // Rotate slowly like the replay view (only if enabled)
   useFrame((state, delta) => {
@@ -152,12 +231,24 @@ export function LightTrail({
     }
   });
 
-  if (strokes.length === 0) return null;
+  const hasContent = frozenStrokes.length > 0 || activeStrokes.length > 0;
+  if (!hasContent) return null;
 
   return (
     <group ref={groupRef}>
-      {strokes.map((strokePoints, index) => (
-        <StrokeRenderer key={index} points={strokePoints} color={color} />
+      {/* Frozen chunks - memoized, won't re-render */}
+      {frozenStrokes.map((stroke) => (
+        <FrozenStroke
+          key={stroke.key}
+          points={stroke.points}
+          color={color}
+          chunkIndex={stroke.chunkIndex}
+        />
+      ))}
+
+      {/* Active chunk - updates as user draws */}
+      {activeStrokes.map((strokePoints, index) => (
+        <StrokeRenderer key={`active-${index}`} points={strokePoints} color={color} />
       ))}
     </group>
   );

@@ -6,17 +6,15 @@ import {
   SessionState,
   DrawingState,
   MIN_SESSION_DURATION,
+  CHUNK_SIZE,
 } from '@/types/session';
-
-// Prevent unbounded memory growth - trim oldest points when limit reached
-// Reduced from 10000 to 5000 for better rendering performance
-const MAX_POINTS = 5000;
 
 const INITIAL_STATE: SessionState = {
   isRecording: false,
   startTime: null,
   duration: 0,
   points: [],
+  frozenChunks: [],
   sectorId: 1,
   // Multi-stroke support
   drawingState: 'idle',
@@ -65,6 +63,7 @@ export function useTrailRecorder() {
         strokeStartTime: now,
         drawingState: 'drawing',
         points: [],
+        frozenChunks: [],
         sectorId: stateRef.current.sectorId, // Preserve sectorId
       };
     } else if (currentState === 'paused') {
@@ -146,14 +145,17 @@ export function useTrailRecorder() {
       t: totalElapsed,
     };
 
-    // Trim oldest points if exceeding limit (keep last 80%)
-    if (stateRef.current.points.length >= MAX_POINTS) {
-      stateRef.current.points = stateRef.current.points.slice(
-        -Math.floor(MAX_POINTS * 0.8)
-      );
-    }
-
     stateRef.current.points.push(point);
+
+    // Freeze chunk when it reaches CHUNK_SIZE (keep some overlap for smooth transitions)
+    if (stateRef.current.points.length >= CHUNK_SIZE) {
+      // Keep last few points for continuity with next chunk
+      const overlapPoints = 5;
+      const chunkToFreeze = stateRef.current.points.slice(0, -overlapPoints);
+      stateRef.current.frozenChunks.push(chunkToFreeze);
+      // Start new active chunk with overlap points
+      stateRef.current.points = stateRef.current.points.slice(-overlapPoints);
+    }
   }, []);
 
   // Check if current session meets minimum duration
@@ -163,14 +165,24 @@ export function useTrailRecorder() {
 
   // Check if session has enough points
   const isValidPoints = useCallback(() => {
-    // Count actual points (exclude boundary markers)
-    const actualPoints = stateRef.current.points.filter((p) => p.t !== -1);
-    return actualPoints.length >= 5;
+    // Count actual points from all chunks (exclude boundary markers)
+    const frozenCount = stateRef.current.frozenChunks.reduce(
+      (sum, chunk) => sum + chunk.filter((p) => p.t !== -1).length,
+      0
+    );
+    const activeCount = stateRef.current.points.filter((p) => p.t !== -1).length;
+    return frozenCount + activeCount >= 5;
   }, []);
 
   // Get current state (for UI updates)
   const getState = useCallback(() => {
     return { ...stateRef.current };
+  }, []);
+
+  // Get all points combined (for submission)
+  const getAllPoints = useCallback((): TrailPoint[] => {
+    const allChunks = [...stateRef.current.frozenChunks, stateRef.current.points];
+    return allChunks.flat();
   }, []);
 
   // Get current drawing state
@@ -198,6 +210,7 @@ export function useTrailRecorder() {
     recordPoint,
     isValidDuration,
     getState,
+    getAllPoints, // Get all points for submission (frozen + active)
     setSectorId,
     MIN_SESSION_DURATION,
   };

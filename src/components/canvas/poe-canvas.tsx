@@ -130,6 +130,7 @@ const TrackingPlane = ({
 function Scene({
   isRecording,
   points,
+  frozenChunks,
   cursorPosition,
   trailColor,
   onMove,
@@ -142,6 +143,7 @@ function Scene({
 }: {
   isRecording: boolean;
   points: TrailPoint[];
+  frozenChunks: TrailPoint[][];
   cursorPosition: [number, number, number];
   trailColor: string;
   onMove: (x: number, y: number, z: number) => void;
@@ -214,7 +216,7 @@ function Scene({
       />
 
       {/* The comet light trail */}
-      <LightTrail points={points} color={trailColor} />
+      <LightTrail points={points} frozenChunks={frozenChunks} color={trailColor} />
 
       {/* Comet head at cursor */}
       <CometHead
@@ -407,13 +409,15 @@ export function POECanvas() {
     isValidDuration,
     getState,
     getDrawingState,
+    getAllPoints,
   } = useTrailRecorder();
 
   const [isRecording, setIsRecording] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [isPaused, setIsPaused] = useState(false); // Multi-stroke: paused between strokes
   const [duration, setDuration] = useState(0);
-  const [points, setPoints] = useState<TrailPoint[]>([]);
+  const [points, setPoints] = useState<TrailPoint[]>([]); // Active chunk
+  const [frozenChunks, setFrozenChunks] = useState<TrailPoint[][]>([]); // Frozen chunks
   const [cursorPosition, setCursorPosition] = useState<
     [number, number, number]
   >([0, 0, 0]);
@@ -495,7 +499,14 @@ export function POECanvas() {
     const interval = setInterval(() => {
       const state = getState();
       setDuration(state.duration);
-      setPoints([...state.points]);
+      setPoints([...state.points]); // Active chunk only
+      // Only update frozen chunks if they changed (avoid unnecessary re-renders)
+      setFrozenChunks((prev) => {
+        if (prev.length !== state.frozenChunks.length) {
+          return [...state.frozenChunks];
+        }
+        return prev;
+      });
       setIsValid(isValidDuration());
     }, 100); // Reduced from 50ms to 100ms for better performance
 
@@ -509,6 +520,7 @@ export function POECanvas() {
     setIsPaused(false);
     setIsRecording(false);
     setPoints([]);
+    setFrozenChunks([]); // Clear frozen chunks too
     setDuration(0);
     setIsValid(false);
     setShowClearConfirm(false);
@@ -577,13 +589,14 @@ export function POECanvas() {
     const session = finishSession();
     setIsPaused(false);
 
-    // Validate and prepare for submission
-    const actualPoints = session.points.filter((p) => p.t !== -1);
+    // Get all points (frozen + active) for validation and submission
+    const allPoints = getAllPoints();
+    const actualPoints = allPoints.filter((p) => p.t !== -1);
     if (session.duration >= MIN_SESSION_DURATION && actualPoints.length >= 5) {
       setIsReady(true);
       completedSessionRef.current = {
         duration: session.duration,
-        points: session.points,
+        points: allPoints, // Use all points including frozen chunks
         sectorId: session.sectorId,
         color: trailColor,
       };
@@ -592,7 +605,7 @@ export function POECanvas() {
       // They can continue drawing or clear
       setIsPaused(true); // Go back to paused state
     }
-  }, [getDrawingState, finishSession, trailColor]);
+  }, [getDrawingState, finishSession, getAllPoints, trailColor]);
 
   // Capture Mode handling
   const [captureMode, setCaptureMode] = useState(false);
@@ -1421,21 +1434,14 @@ export function POECanvas() {
         <fog attach="fog" args={[currentTheme.backgroundColor, 20, 80]} />
         {captureMode ? (
           <CaptureScene
-            points={
-              points.length > 0
-                ? points
-                : completedSessionRef.current?.points || []
-            }
-            color={
-              points.length > 0
-                ? trailColor
-                : completedSessionRef.current?.color || trailColor
-            }
+            points={completedSessionRef.current?.points || []}
+            color={completedSessionRef.current?.color || trailColor}
           />
         ) : (
           <Scene
             isRecording={isRecording}
             points={points}
+            frozenChunks={frozenChunks}
             cursorPosition={cursorPosition}
             trailColor={trailColor}
             onMove={handleMove}

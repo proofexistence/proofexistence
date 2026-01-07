@@ -14,13 +14,17 @@ export interface SessionState {
   isRecording: boolean;
   startTime: number | null;
   duration: number; // in seconds (cumulative drawing time only)
-  points: TrailPoint[];
+  points: TrailPoint[]; // Active chunk being drawn
+  frozenChunks: TrailPoint[][]; // Completed chunks (frozen, won't change)
   sectorId: number;
   // Multi-stroke support
   drawingState: DrawingState;
   strokeStartTime: number | null; // Start time of current stroke
   cumulativeDrawingMs: number; // Total drawing time in ms (excludes pauses)
 }
+
+// Chunk size for rendering optimization (freeze chunks of this size)
+export const CHUNK_SIZE = 1000;
 
 // Minimum duration for a valid session (10 seconds)
 export const MIN_SESSION_DURATION = 10;
