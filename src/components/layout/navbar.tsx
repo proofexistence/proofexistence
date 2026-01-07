@@ -357,13 +357,13 @@ export function Navbar() {
                   <div className="rounded-2xl bg-linear-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/10">
                     {/* Header with Avatar & Name */}
                     <div className="p-4 flex items-center gap-3 border-b border-white/10">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20">
                         {profile?.avatarUrl ? (
                           <Image
                             src={profile.avatarUrl}
                             alt="Profile"
                             fill
-                            sizes="48px"
+                            sizes="40px"
                             className="object-cover"
                           />
                         ) : (

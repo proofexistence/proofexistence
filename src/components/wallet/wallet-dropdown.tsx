@@ -79,14 +79,14 @@ export function WalletDropdown() {
             {/* Avatar Button - Click to toggle */}
             <button
               onClick={toggleDropdown}
-              className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/40 transition-all shadow-lg shadow-black/20 cursor-pointer"
+              className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/40 transition-all shadow-lg shadow-black/20 cursor-pointer"
             >
               {userImage ? (
                 <Image
                   src={userImage}
                   alt="Profile"
                   fill
-                  sizes="36px"
+                  sizes="40px"
                   className="object-cover"
                 />
               ) : (

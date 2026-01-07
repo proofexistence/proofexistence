@@ -52,36 +52,36 @@ export function TimerDisplay({
   if (isPaused) {
     return (
       <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 pointer-events-auto">
-        <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-4 py-3 border border-amber-500/20 shadow-lg shadow-amber-500/10 transition-all duration-300 animate-in fade-in zoom-in-95">
+        <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-3 py-2 md:px-4 md:py-3 border border-amber-500/20 shadow-lg shadow-amber-500/10 transition-all duration-300 animate-in fade-in zoom-in-95">
           {/* Timer row */}
-          <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="flex items-center justify-center gap-2 md:gap-3 mb-2 md:mb-3">
             <div
-              className={`w-3 h-3 rounded-full border border-white/30 transition-colors duration-300 ${getIndicatorClass()}`}
+              className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-white/30 transition-colors duration-300 ${getIndicatorClass()}`}
             />
-            <span className="text-white font-mono text-lg tracking-wider">
+            <span className="text-white font-mono text-sm md:text-lg tracking-wider">
               {formatTime(duration)}
             </span>
-            <span className="text-amber-300 text-xs font-medium px-2 py-0.5 bg-amber-500/20 rounded-full">
+            <span className="text-amber-300 text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 bg-amber-500/20 rounded-full">
               {t('timer.paused')}
             </span>
           </div>
-          {/* Hint text */}
-          <p className="text-white/40 text-[10px] text-center mb-3">
+          {/* Hint text - hidden on mobile to save space */}
+          <p className="hidden md:block text-white/40 text-[10px] text-center mb-3">
             {t('timer.clickToContinue')}
             {!isValid &&
               ` • ${t('timer.minDuration', { seconds: MIN_SESSION_DURATION })}`}
           </p>
           {/* Buttons row */}
-          <div className="flex gap-2 justify-center">
+          <div className="flex gap-1.5 md:gap-2 justify-center">
             {onClear && (
               <button
                 onClick={onClear}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-medium
                   bg-white/10 border border-white/20 text-white/70 hover:bg-white/20 hover:text-white
                   backdrop-blur-md transition-all active:scale-95"
               >
                 <svg
-                  className="w-3.5 h-3.5"
+                  className="w-3 h-3 md:w-3.5 md:h-3.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -93,14 +93,14 @@ export function TimerDisplay({
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                {t('actions.restart')}
+                <span className="hidden md:inline">{t('actions.restart')}</span>
               </button>
             )}
             {onFinish && (
               <button
                 onClick={onFinish}
                 disabled={!isValid}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-medium
                   backdrop-blur-md transition-all
                   ${
                     isValid
@@ -109,7 +109,7 @@ export function TimerDisplay({
                   }`}
               >
                 <svg
-                  className="w-3.5 h-3.5"
+                  className="w-3 h-3 md:w-3.5 md:h-3.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -121,7 +121,7 @@ export function TimerDisplay({
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                {t('actions.done')}
+                <span className="hidden md:inline">{t('actions.done')}</span>
               </button>
             )}
           </div>
@@ -133,15 +133,15 @@ export function TimerDisplay({
   // Normal timer display
   return (
     <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 pointer-events-none">
-      <div className="bg-black/30 backdrop-blur-xl rounded-full px-3 py-1.5 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 border border-white/10 shadow-lg shadow-black/20 transition-all duration-300">
+      <div className="bg-black/30 backdrop-blur-xl rounded-full h-10 px-4 flex items-center gap-3 border border-white/10 shadow-lg shadow-black/20 transition-all duration-300">
         <div
           className={`w-3 h-3 rounded-full border border-white/30 transition-colors duration-300 ${getIndicatorClass()}`}
         />
-        <span className="text-white font-mono text-sm md:text-base tracking-wider min-w-[3ch] text-center">
+        <span className="text-white font-mono text-base tracking-wider min-w-[3ch] text-center">
           {formatTime(duration)}
         </span>
         {!isValid && isRecording && (
-          <span className="text-yellow-300/80 text-xs md:text-sm font-light border-l border-white/20 pl-3">
+          <span className="text-yellow-300/80 text-sm font-light border-l border-white/20 pl-3">
             {t('timer.minDuration', { seconds: MIN_SESSION_DURATION })}
           </span>
         )}
@@ -160,16 +160,16 @@ export function ColorPicker({ trailColor, onColorChange }: ColorPickerProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-black/20 backdrop-blur-xl rounded-2xl p-1 md:p-2 border border-white/10 shadow-lg shadow-black/20 pointer-events-auto transition-all duration-300">
+    <div className="pointer-events-auto flex items-start md:items-center h-10">
       {!isExpanded ? (
         <button
           onClick={() => setIsExpanded(true)}
-          className="w-6 h-6 md:w-6 md:h-6 rounded-full border-2 border-white scale-110 shadow-lg ring-2 ring-white/20 transition-all duration-200 hover:scale-125"
+          className="w-10 h-10 rounded-full border-2 border-white shadow-lg ring-2 ring-white/20 backdrop-blur-sm transition-all duration-200 hover:scale-110 active:scale-95"
           style={{ backgroundColor: trailColor }}
           aria-label="Expand Color Picker"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:flex animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex md:flex-row flex-col gap-3 animate-in fade-in zoom-in-95 duration-200">
           {TRAIL_COLORS.map((c) => (
             <button
               key={c.value}
@@ -177,9 +177,9 @@ export function ColorPicker({ trailColor, onColorChange }: ColorPickerProps) {
                 onColorChange(c.value);
                 setIsExpanded(false);
               }}
-              className={`w-6 h-6 md:w-6 md:h-6 rounded-full border-2 transition-all duration-200 hover:scale-110 active:scale-95 ${
+              className={`w-10 h-10 rounded-full border-2 backdrop-blur-sm transition-all duration-200 hover:scale-110 active:scale-95 ${
                 trailColor === c.value
-                  ? 'border-white scale-110 shadow-lg ring-2 ring-white/20'
+                  ? 'border-white shadow-lg ring-2 ring-white/20'
                   : 'border-white/30 hover:border-white/60'
               }`}
               style={{ backgroundColor: c.value }}
@@ -204,9 +204,9 @@ export function ActionButtons({ onClear, onSubmit }: ActionButtonsProps) {
     <div className="flex gap-2 pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
       <button
         onClick={onClear}
-        className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium
+        className="flex items-center justify-center gap-2 h-10 px-4 rounded-full font-medium text-base
           bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white
-          backdrop-blur-md transition-all active:scale-95"
+          backdrop-blur-xl transition-all active:scale-95 shadow-lg shadow-black/20"
       >
         <svg
           className="w-4 h-4"
@@ -225,9 +225,9 @@ export function ActionButtons({ onClear, onSubmit }: ActionButtonsProps) {
       </button>
       <button
         onClick={onSubmit}
-        className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium
+        className="flex items-center justify-center gap-2 h-10 px-5 rounded-full font-medium text-base
           bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/30
-          backdrop-blur-md transition-all shadow-lg shadow-emerald-500/10 active:scale-95"
+          backdrop-blur-xl transition-all shadow-lg shadow-emerald-500/10 active:scale-95"
       >
         <svg
           className="w-4 h-4"
@@ -315,7 +315,7 @@ export function ExitControls({ onExit }: ExitControlsProps) {
     <div className="absolute top-6 left-4 md:top-8 md:left-6 pointer-events-auto animate-in fade-in slide-in-from-left-4 duration-500 delay-200">
       <button
         onClick={onExit}
-        className="flex items-center gap-2 bg-black/20 hover:bg-black/40 backdrop-blur-xl text-white/80 hover:text-white font-medium px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base rounded-xl transition-all border border-white/10 hover:border-white/20 active:scale-95 shadow-lg shadow-black/20 group"
+        className="flex items-center gap-2 h-10 bg-black/30 hover:bg-black/40 backdrop-blur-xl text-white/80 hover:text-white font-medium px-4 text-base rounded-full transition-all border border-white/10 hover:border-white/20 active:scale-95 shadow-lg shadow-black/20 group"
       >
         <svg
           className="w-4 h-4 transition-transform group-hover:-translate-x-1"
@@ -449,7 +449,7 @@ export function Instructions({
       {/* Ready state - session finished, can submit */}
       {isReady && !isRecording && (
         <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-6 py-4 border border-cyan-500/20 shadow-lg shadow-cyan-500/10 text-center animate-in fade-in zoom-in-95 duration-500">
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="flex items-center justify-center gap-2">
             <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center">
               <svg
                 className="w-4 h-4 text-cyan-300"
@@ -468,49 +468,6 @@ export function Instructions({
             <p className="text-cyan-300 text-base font-medium">
               {t('instructions.readyToSubmit')}
             </p>
-          </div>
-          <div className="hidden md:block">
-            <p className="text-white/50 text-xs">
-              {t('instructions.useButtons')}
-            </p>
-          </div>
-          <div className="block md:hidden mt-3">
-            {onClear && onSubmit && (
-              <div className="flex gap-2 justify-center">
-                <GlassButton onClick={onClear} variant="secondary">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                  {t('actions.restart')}
-                </GlassButton>
-                <GlassButton onClick={onSubmit} variant="primary">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {t('actions.submit')}
-                </GlassButton>
-              </div>
-            )}
           </div>
         </div>
       )}

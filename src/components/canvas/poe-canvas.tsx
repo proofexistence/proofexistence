@@ -1491,6 +1491,14 @@ export function POECanvas() {
 
         <div className="absolute top-6 right-4 md:top-8 md:right-6 flex flex-col md:flex-row gap-3 items-end md:items-center z-40 pointer-events-none">
           {isReady && !isRecording && !isSubmitting && !dialogState.isOpen && (
+            <div className="md:hidden w-full flex gap-2 justify-end">
+              <ActionButtons
+                onClear={() => setShowClearConfirm(true)}
+                onSubmit={handleComplete}
+              />
+            </div>
+          )}
+          {isReady && !isRecording && !isSubmitting && !dialogState.isOpen && (
             <div className="hidden md:block">
               <ActionButtons
                 onClear={() => setShowClearConfirm(true)}
