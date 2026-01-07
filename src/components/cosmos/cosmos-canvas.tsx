@@ -206,10 +206,11 @@ export function CosmosCanvas({
       </Canvas>
 
       {/* UI Overlay */}
-      {/* Mobile: Search at navbar level (between logo and hamburger) */}
-      <div className="md:hidden fixed top-3 left-0 right-0 z-[55] px-14 py-3 pointer-events-none">
-        <div className="flex items-center justify-center">
-          <div className="pointer-events-auto">
+      {/* Mobile: Search (left, below logo) and My Star (right, below menu) on same row */}
+      <div className={`md:hidden fixed top-[68px] left-0 right-0 pointer-events-none transition-all ${isSearchActive ? 'z-[70]' : 'z-[55]'}`}>
+        <div className="flex items-center justify-between px-4 pb-2">
+          {/* Search - expands to cover My Star when active */}
+          <div className={`pointer-events-auto transition-all duration-200 ${isSearchActive ? 'flex-1 mr-0' : 'flex-none'}`}>
             <CosmosSearch
               trails={validTrails}
               onSelect={(t) => {
@@ -220,6 +221,13 @@ export function CosmosCanvas({
               onToggle={setIsSearchActive}
             />
           </div>
+
+          {/* My Star - hidden when search is active */}
+          {!isSearchActive && (
+            <div className="pointer-events-auto ml-2">
+              <FindMeButton trails={validTrails} onFocus={selectStar} compact />
+            </div>
+          )}
         </div>
       </div>
 
@@ -236,15 +244,6 @@ export function CosmosCanvas({
               externalActive={isSearchActive}
               onToggle={setIsSearchActive}
             />
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile: Find My Star below navbar, left aligned */}
-      <div className="md:hidden fixed top-16 left-0 right-0 z-40 px-4 pointer-events-none">
-        <div className="flex items-center justify-start">
-          <div className="pointer-events-auto">
-            <FindMeButton trails={validTrails} onFocus={selectStar} compact />
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { Pencil } from 'lucide-react';
 
 interface Session {
   id: string;
@@ -21,10 +22,11 @@ interface AnimatedHeroProps {
 
 export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
   const t = useTranslations('home.hero');
+  const tNav = useTranslations('nav');
   const containerRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const ctaRef = useRef<HTMLAnchorElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Split sessions into two orbits
@@ -155,31 +157,44 @@ export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
           </span>
         </p>
 
-        {/* CTA Button */}
-        <Link
+        {/* CTA Buttons */}
+        <div
           ref={ctaRef}
-          href="/cosmos"
-          className="group px-8 py-3 mb-12 bg-cyan-500/20 hover:bg-cyan-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-cyan-400/30 hover:border-cyan-400/50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden"
+          className="flex flex-col sm:flex-row gap-4 mb-12"
         >
-          <span className="relative z-10">{t('exploreCosmos')}</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="relative z-10 group-hover:rotate-180 transition-transform duration-500"
+          <Link
+            href="/cosmos"
+            className="group px-8 py-3 bg-cyan-500/20 hover:bg-cyan-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-cyan-400/30 hover:border-cyan-400/50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden justify-center"
           >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-            <path d="M2 12h20" />
-          </svg>
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-        </Link>
+            <span className="relative z-10">{t('exploreCosmos')}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="relative z-10 group-hover:rotate-180 transition-transform duration-500"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+              <path d="M2 12h20" />
+            </svg>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          </Link>
+
+          <Link
+            href="/canvas"
+            className="group px-8 py-3 bg-purple-500/20 hover:bg-purple-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-purple-400/30 hover:border-purple-400/50 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden justify-center"
+          >
+            <Pencil className="relative z-10 w-4 h-4" />
+            <span className="relative z-10">{tNav('drawToProof')}</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          </Link>
+        </div>
       </div>
 
       {/* Scroll Indicator */}

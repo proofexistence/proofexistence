@@ -64,7 +64,7 @@ export function CosmosSearch({
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full md:w-80 animate-in fade-in duration-150">
+    <div className="flex flex-col gap-2 w-full animate-in fade-in duration-150">
       <div className="relative group">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           <Search className="w-4 h-4 text-white/40 group-focus-within:text-cyan-400 transition-colors" />
@@ -82,7 +82,7 @@ export function CosmosSearch({
             setActive(false);
             setQuery('');
           }}
-          className="absolute inset-y-0 right-3 flex items-center text-white/40 hover:text-white transition-colors"
+          className="absolute inset-y-0 right-3 flex items-center text-white/40 hover:text-white transition-colors touch-manipulation"
         >
           <X className="w-4 h-4" />
         </button>

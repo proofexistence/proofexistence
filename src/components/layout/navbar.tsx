@@ -316,24 +316,24 @@ export function Navbar() {
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center gap-4 p-4 rounded-2xl text-lg font-medium transition-all ${
-                    link.featured
+                    'featured' in link && link.featured
                       ? 'bg-linear-to-r from-purple-500/20 via-blue-500/20 to-pink-500/20 backdrop-blur-xl border-2 border-white/30 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:border-white/50 hover:scale-[1.02]'
                       : 'text-zinc-300 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white'
                   }`}
                 >
                   <span
                     className={
-                      link.featured
+                      'featured' in link && link.featured
                         ? 'text-purple-300'
                         : 'text-zinc-400 group-hover:text-white'
                     }
                   >
                     {link.icon}
                   </span>
-                  <span className={link.featured ? 'font-bold' : ''}>
+                  <span className={'featured' in link && link.featured ? 'font-bold' : ''}>
                     {link.name}
                   </span>
-                  {link.featured && (
+                  {'featured' in link && link.featured && (
                     <span className="ml-auto">
                       <span className="relative flex h-3 w-3">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
