@@ -312,7 +312,7 @@ export async function GET(req: NextRequest) {
                     fontFamily: 'monospace',
                   }}
                 >
-                  proofexistence.com/proof/{session.id.slice(0, 8)}...
+                  proofexistence.com
                 </div>
               </div>
             </div>
