@@ -61,7 +61,8 @@ export async function GET(req: NextRequest) {
         }
 
         const displayTitle =
-          session.title || `Proof #${String(session.id || 'unknown').slice(0, 8)}`;
+          session.title ||
+          `Proof #${String(session.id || 'unknown').slice(0, 8)}`;
         const authorName =
           session.user?.name || session.user?.username || 'Anonymous';
         const duration = session.duration ? `${session.duration}s` : '';
@@ -433,8 +434,11 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     console.error('[OG Route] Error generating image:', error);
-    return new Response(`Failed to generate the image: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-      status: 500,
-    });
+    return new Response(
+      `Failed to generate the image: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      {
+        status: 500,
+      }
+    );
   }
 }

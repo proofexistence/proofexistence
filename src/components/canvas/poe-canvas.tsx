@@ -13,7 +13,6 @@ import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { LightTrail, CometHead, SpaceBackground } from './light-trail';
-import { DotMatrix } from './DotMatrix';
 import { CaptureScene } from './canvas-capture-scene';
 import { ParticleSystem } from './particles';
 import {
@@ -28,7 +27,6 @@ import {
   type PaymentMethod,
 } from './canvas-ui';
 import { useTrailRecorder } from '@/hooks/use-trail-recorder';
-import { useGravity } from '@/hooks/use-gravity';
 import {
   useGaslessEligibility,
   useGaslessMint,
@@ -197,9 +195,6 @@ function Scene({
       {/* Space background with stars */}
       <SpaceBackground starCount={800} />
 
-      {/* The Main Art: Dot Matrix */}
-      <DotMatrix cursorPosition={cursorPosition} theme={theme} />
-
       {/* Ambient Floating Particles */}
       <ParticleSystem
         count={150}
@@ -216,7 +211,11 @@ function Scene({
       />
 
       {/* The comet light trail */}
-      <LightTrail points={points} frozenChunks={frozenChunks} color={trailColor} />
+      <LightTrail
+        points={points}
+        frozenChunks={frozenChunks}
+        color={trailColor}
+      />
 
       {/* Comet head at cursor */}
       <CometHead
@@ -577,7 +576,7 @@ export function POECanvas() {
     setPoints([...session.points]);
     setIsValid(
       session.duration >= MIN_SESSION_DURATION &&
-      session.points.filter((p) => p.t !== -1).length >= 5
+        session.points.filter((p) => p.t !== -1).length >= 5
     );
   }, [isRecording, endStroke]);
 
@@ -1044,7 +1043,7 @@ export function POECanvas() {
                     overrides.maxPriorityFeePerGas =
                       feeData.maxPriorityFeePerGas
                         ? (feeData.maxPriorityFeePerGas * BigInt(120)) /
-                        BigInt(100)
+                          BigInt(100)
                         : undefined;
                   }
                 } catch (feeError) {
@@ -1325,17 +1324,16 @@ export function POECanvas() {
     ]
   );
 
-  const { applyGravity } = useGravity();
+  // Note: useGravity hook removed - magnetic pull was affecting user drawings
+  // The DotMatrix visual effect (dots lighting up on hover) is preserved
 
   const handleMove = useCallback(
     (x: number, y: number, z: number) => {
-      // Apply gravity field logic (magnetic pull)
-      const [gx, gy, gz] = applyGravity(x, y, z);
-
-      recordPoint(gx, gy, gz);
-      setCursorPosition([gx, gy, gz]);
+      // Direct position without magnetic pull - preserves user intent
+      recordPoint(x, y, z);
+      setCursorPosition([x, y, z]);
     },
-    [recordPoint, applyGravity]
+    [recordPoint]
   );
 
   const handleColorChange = useCallback((color: string) => {
@@ -1506,10 +1504,12 @@ export function POECanvas() {
               />
             </div>
           )}
-          <ColorPicker
-            trailColor={trailColor}
-            onColorChange={handleColorChange}
-          />
+          <div className="order-last md:order-none">
+            <ColorPicker
+              trailColor={trailColor}
+              onColorChange={handleColorChange}
+            />
+          </div>
           <WalletDropdown />
         </div>
 

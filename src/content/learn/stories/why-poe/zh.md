@@ -1,9 +1,9 @@
 ---
-title: "為什麼是 Proof of Existence？"
-description: "這個為期一年的集體藝術實驗背後的故事與願景"
-category: "stories"
+title: '為什麼是 Proof of Existence？'
+description: '這個為期一年的集體藝術實驗背後的故事與願景'
+category: 'stories'
 order: 1
-publishedAt: "2026-01-07"
+publishedAt: '2026-01-07'
 ---
 
 # 為什麼是 Proof of Existence？
@@ -36,4 +36,4 @@ Proof of Existence 是一場貫穿 2026 年的集體藝術實驗。每位參與�
 
 ---
 
-*能在這個網路上的角落留下一段話，何嘗不是一種浪漫。*
+_能在這個網路上的角落留下一段話，何嘗不是一種浪漫。_

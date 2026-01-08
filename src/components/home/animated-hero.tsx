@@ -158,10 +158,7 @@ export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
         </p>
 
         {/* CTA Buttons */}
-        <div
-          ref={ctaRef}
-          className="flex flex-col sm:flex-row gap-4 mb-12"
-        >
+        <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link
             href="/cosmos"
             className="group px-8 py-3 bg-cyan-500/20 hover:bg-cyan-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-cyan-400/30 hover:border-cyan-400/50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden justify-center"

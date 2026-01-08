@@ -1,9 +1,9 @@
 ---
-title: "Why Proof of Existence?"
-description: "The story and vision behind this year-long collective art experiment"
-category: "stories"
+title: 'Why Proof of Existence?'
+description: 'The story and vision behind this year-long collective art experiment'
+category: 'stories'
 order: 1
-publishedAt: "2026-01-07"
+publishedAt: '2026-01-07'
 ---
 
 # Why Proof of Existence?

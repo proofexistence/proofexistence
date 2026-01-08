@@ -170,7 +170,9 @@ export function useTrailRecorder() {
       (sum, chunk) => sum + chunk.filter((p) => p.t !== -1).length,
       0
     );
-    const activeCount = stateRef.current.points.filter((p) => p.t !== -1).length;
+    const activeCount = stateRef.current.points.filter(
+      (p) => p.t !== -1
+    ).length;
     return frozenCount + activeCount >= 5;
   }, []);
 
@@ -181,7 +183,10 @@ export function useTrailRecorder() {
 
   // Get all points combined (for submission)
   const getAllPoints = useCallback((): TrailPoint[] => {
-    const allChunks = [...stateRef.current.frozenChunks, stateRef.current.points];
+    const allChunks = [
+      ...stateRef.current.frozenChunks,
+      stateRef.current.points,
+    ];
     return allChunks.flat();
   }, []);
 

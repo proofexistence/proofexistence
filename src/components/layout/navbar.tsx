@@ -311,7 +311,11 @@ export function Navbar() {
                   >
                     {link.icon}
                   </span>
-                  <span className={'featured' in link && link.featured ? 'font-bold' : ''}>
+                  <span
+                    className={
+                      'featured' in link && link.featured ? 'font-bold' : ''
+                    }
+                  >
                     {link.name}
                   </span>
                   {'featured' in link && link.featured && (

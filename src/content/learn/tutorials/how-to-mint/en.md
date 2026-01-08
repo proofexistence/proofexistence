@@ -1,9 +1,9 @@
 ---
-title: "Choosing Your Proof Type: Standard vs Perpetual"
-description: "Understand which proof type is right for you and how to mint a Perpetual Proof NFT"
-category: "tutorials"
+title: 'Choosing Your Proof Type: Standard vs Perpetual'
+description: 'Understand which proof type is right for you and how to mint a Perpetual Proof NFT'
+category: 'tutorials'
 order: 1
-publishedAt: "2026-01-07"
+publishedAt: '2026-01-07'
 ---
 
 # Choosing Your Proof Type: Standard vs Perpetual
@@ -11,7 +11,7 @@ publishedAt: "2026-01-07"
 You've just created a beautiful light trail. Now comes an important decision: **how do you want to preserve it?**
 
 ![Perpetual Proof Example - Light trail artwork stored on Arweave](https://gateway.irys.xyz/DnRkJQhB3EWmZjgoeu8wPPvXo4s5JxGANE6FKUV2YCY)
-*This is an example of a Perpetual Proof. Your light trail creation can be permanently preserved on the blockchain like this.*
+_This is an example of a Perpetual Proof. Your light trail creation can be permanently preserved on the blockchain like this._
 
 This guide will help you understand the difference between Standard and Perpetual proofs, so you can make the choice that's right for you.
 
@@ -26,12 +26,14 @@ This guide will help you understand the difference between Standard and Perpetua
 - Care more about the experience than owning an NFT
 
 **What you get:**
+
 - Your trail is cryptographically verified on the Polygon blockchain
 - Included in the collective artwork
 - Visible on the Explore page and Cosmos
 - Proof that you existed at this moment in 2026
 
 **Trade-offs:**
+
 - Verification happens at midnight UTC (not instant)
 - No NFT ownership—you can't trade or sell it
 - Storage is managed by the protocol, not decentralized
@@ -48,6 +50,7 @@ This guide will help you understand the difference between Standard and Perpetua
 - Care about having a collectible badge on your profile
 
 **What you get:**
+
 - An ERC-721 NFT minted directly to your wallet
 - Permanent storage on Arweave (survives even if our servers go down)
 - Instant verification—no waiting until midnight
@@ -61,10 +64,10 @@ This guide will help you understand the difference between Standard and Perpetua
 
 Pricing is designed to be fair based on how long your trail is:
 
-| Trail Duration | Cost |
-|----------------|------|
-| 10-45 seconds | Base fee only |
-| 46+ seconds | Base fee + per-second fee |
+| Trail Duration | Cost                      |
+| -------------- | ------------------------- |
+| 10-45 seconds  | Base fee only             |
+| 46+ seconds    | Base fee + per-second fee |
 
 **Example:** A 60-second trail costs: `Base fee + (60-45) × per-second rate`
 
@@ -81,6 +84,7 @@ The first 45 seconds are included in the base fee, so shorter trails are more af
 - You'll need enough POL to cover the cost + small gas fee
 
 **How to get POL:**
+
 - Buy on exchanges (Coinbase, Binance, etc.)
 - Bridge from Ethereum
 - Use a fiat on-ramp service
@@ -96,6 +100,7 @@ The first 45 seconds are included in the base fee, so shorter trails are more af
 - Can be claimed from your pending rewards
 
 **How to get TIME26:**
+
 - Share your referral link—earn when friends join
 - Engage with proofs (like, save, view)
 - Participate in community events
@@ -118,6 +123,7 @@ Your unclaimed TIME26 rewards can be spent without ever claiming them to your wa
 ## Step-by-Step: Minting a Perpetual Proof
 
 ### Before You Start
+
 - Make sure you're [logged in](/learn/getting-started/first-proof)
 - Have payment ready (POL, TIME26, or unclaimed balance)
 - Create a trail you're proud of—this is permanent!
@@ -158,15 +164,18 @@ Your unclaimed TIME26 rewards can be spent without ever claiming them to your wa
 ## What Happens After I Mint?
 
 ### Immediately
+
 - Your proof appears on the [Explore](/explore) page
 - The NFT is in your wallet
 - Your "Perpetual Proof" badge is added to your profile
 
 ### Within Minutes
+
 - Metadata is uploaded to Arweave
 - You can view it on [OpenSea](https://opensea.io) and other marketplaces
 
 ### Forever
+
 - Your trail exists in the [Cosmos](/cosmos) visualization
 - The NFT remains in your wallet (or whoever you transfer it to)
 - Arweave storage is permanent—it will outlive this website
@@ -176,15 +185,19 @@ Your unclaimed TIME26 rewards can be spent without ever claiming them to your wa
 ## Frequently Asked Questions
 
 ### Can I upgrade a Standard Proof to Perpetual later?
+
 No, once submitted as Standard, it cannot be upgraded. If you think you might want a Perpetual Proof, choose it at submission time.
 
 ### What if I don't have any crypto?
+
 Use social login (Google, Facebook, etc.)—a wallet is created for you automatically. You can still submit Standard Proofs for free, or earn TIME26 through referrals to mint Perpetual Proofs without buying crypto.
 
 ### Is my Perpetual Proof really permanent?
+
 Yes. The NFT is on Polygon (a secure blockchain), and the artwork/metadata is on Arweave (permanent decentralized storage). Even if Proof of Existence shuts down, your proof survives.
 
 ### Can I sell my Perpetual Proof NFT?
+
 Yes! It's a standard ERC-721 NFT. You can list it on OpenSea, transfer it to friends, or hold it forever.
 
 ---

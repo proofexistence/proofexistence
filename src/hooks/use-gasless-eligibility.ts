@@ -62,7 +62,8 @@ export function useGaslessEligibility(
 
       return res.json();
     },
-    enabled: externalEnabled && isConnected && !!walletAddress && duration >= 10,
+    enabled:
+      externalEnabled && isConnected && !!walletAddress && duration >= 10,
     staleTime: 1000 * 30, // 30 seconds - gas prices change
     refetchInterval: 1000 * 60, // Refresh every minute
     retry: 2,

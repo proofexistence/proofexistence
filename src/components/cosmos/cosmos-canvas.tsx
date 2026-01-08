@@ -207,10 +207,14 @@ export function CosmosCanvas({
 
       {/* UI Overlay */}
       {/* Mobile: Search (left, below logo) and My Star (right, below menu) on same row */}
-      <div className={`md:hidden fixed top-[68px] left-0 right-0 pointer-events-none transition-all ${isSearchActive ? 'z-[70]' : 'z-[55]'}`}>
+      <div
+        className={`md:hidden fixed top-[68px] left-0 right-0 pointer-events-none transition-all ${isSearchActive ? 'z-[70]' : 'z-[55]'}`}
+      >
         <div className="flex items-center justify-between px-4 pb-2">
           {/* Search - expands to cover My Star when active */}
-          <div className={`pointer-events-auto transition-all duration-200 ${isSearchActive ? 'flex-1 mr-0' : 'flex-none'}`}>
+          <div
+            className={`pointer-events-auto transition-all duration-200 ${isSearchActive ? 'flex-1 mr-0' : 'flex-none'}`}
+          >
             <CosmosSearch
               trails={validTrails}
               onSelect={(t) => {

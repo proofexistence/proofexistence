@@ -1,8 +1,18 @@
 import { Metadata } from 'next';
 import { Link } from '@/i18n/navigation';
 import { getTranslations } from 'next-intl/server';
-import { getLearnArticles, LEARN_CATEGORIES, LearnCategory } from '@/lib/content';
-import { ArrowRight, BookOpen, Sparkles, MessageCircle, FileText } from 'lucide-react';
+import {
+  getLearnArticles,
+  LEARN_CATEGORIES,
+  LearnCategory,
+} from '@/lib/content';
+import {
+  ArrowRight,
+  BookOpen,
+  Sparkles,
+  MessageCircle,
+  FileText,
+} from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -60,9 +70,9 @@ export default async function LearnPage({ params }: LearnPageProps) {
   );
 
   // Get sorted categories
-  const sortedCategories = (Object.keys(LEARN_CATEGORIES) as LearnCategory[]).sort(
-    (a, b) => LEARN_CATEGORIES[a].order - LEARN_CATEGORIES[b].order
-  );
+  const sortedCategories = (
+    Object.keys(LEARN_CATEGORIES) as LearnCategory[]
+  ).sort((a, b) => LEARN_CATEGORIES[a].order - LEARN_CATEGORIES[b].order);
 
   return (
     <div className="min-h-screen bg-transparent text-zinc-100 font-sans selection:bg-purple-500/30">
@@ -96,7 +106,9 @@ export default async function LearnPage({ params }: LearnPageProps) {
                   {categoryArticles.map((article) => (
                     <Link
                       key={article.slug}
-                      href={`/learn/${article.category}/${article.slug}` as `/learn/${string}/${string}`}
+                      href={
+                        `/learn/${article.category}/${article.slug}` as `/learn/${string}/${string}`
+                      }
                       className="group block p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
                     >
                       <div className="flex items-center justify-between">

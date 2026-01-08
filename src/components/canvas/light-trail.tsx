@@ -248,7 +248,11 @@ export function LightTrail({
 
       {/* Active chunk - updates as user draws */}
       {activeStrokes.map((strokePoints, index) => (
-        <StrokeRenderer key={`active-${index}`} points={strokePoints} color={color} />
+        <StrokeRenderer
+          key={`active-${index}`}
+          points={strokePoints}
+          color={color}
+        />
       ))}
     </group>
   );
@@ -298,22 +302,42 @@ export function CometHead({
       {/* Outermost neon halo - smaller & more transparent */}
       <mesh ref={outerRef}>
         <sphereGeometry args={[0.18, 16, 16]} />
-        <meshBasicMaterial color={color} transparent opacity={0.05} depthWrite={false} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.05}
+          depthWrite={false}
+        />
       </mesh>
       {/* Wide neon glow */}
       <mesh ref={neonRef}>
         <sphereGeometry args={[0.12, 16, 16]} />
-        <meshBasicMaterial color={color} transparent opacity={0.1} depthWrite={false} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.1}
+          depthWrite={false}
+        />
       </mesh>
       {/* Colored glow layer */}
       <mesh ref={glowRef}>
         <sphereGeometry args={[0.07, 12, 12]} />
-        <meshBasicMaterial color={color} transparent opacity={0.25} depthWrite={false} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.25}
+          depthWrite={false}
+        />
       </mesh>
       {/* Core bright center */}
       <mesh ref={meshRef}>
         <sphereGeometry args={[0.035, 12, 12]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.9} depthWrite={false} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.9}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   );

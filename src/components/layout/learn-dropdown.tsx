@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, BookOpen, Sparkles, MessageCircle, FileText } from 'lucide-react';
+import {
+  ChevronDown,
+  BookOpen,
+  Sparkles,
+  MessageCircle,
+  FileText,
+} from 'lucide-react';
 
 export function LearnDropdown() {
   const t = useTranslations('nav');

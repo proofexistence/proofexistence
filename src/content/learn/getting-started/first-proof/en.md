@@ -1,9 +1,9 @@
 ---
-title: "Create Your First Proof"
-description: "A step-by-step guide to creating your first light trail on Proof of Existence"
-category: "getting-started"
+title: 'Create Your First Proof'
+description: 'A step-by-step guide to creating your first light trail on Proof of Existence'
+category: 'getting-started'
 order: 1
-publishedAt: "2026-01-07"
+publishedAt: '2026-01-07'
 ---
 
 # Create Your First Proof
@@ -20,7 +20,9 @@ Welcome to Proof of Existence! This guide will walk you through creating your ve
 Visit [proofexistence.com](/) and click "Login / Connect Wallet" in the top right corner. You have two options:
 
 ### Social Login (Recommended for beginners)
+
 Sign in with your existing account:
+
 - Google
 - Facebook
 - Apple
@@ -30,7 +32,9 @@ Sign in with your existing account:
 **No crypto wallet needed!** When you sign in with social login, Web3Auth automatically creates a secure blockchain wallet for you. You become a Web3 user without any technical setup.
 
 ### External Wallet
+
 If you already have a crypto wallet, you can connect:
+
 - MetaMask
 - WalletConnect
 - Other Web3 wallets
@@ -56,13 +60,13 @@ Once you've drawn for at least 10 seconds, click "Submit Proof" to choose your p
 
 **Best for:** Everyone who wants to participate without spending money.
 
-| Feature | Details |
-|---------|---------|
-| **Cost** | Completely free |
-| **Verification** | Batched daily at UTC 00:00 |
-| **Technology** | Merkle tree aggregation |
-| **On-chain** | Yes, via daily batch settlement |
-| **Storage** | Protocol-managed |
+| Feature          | Details                         |
+| ---------------- | ------------------------------- |
+| **Cost**         | Completely free                 |
+| **Verification** | Batched daily at UTC 00:00      |
+| **Technology**   | Merkle tree aggregation         |
+| **On-chain**     | Yes, via daily batch settlement |
+| **Storage**      | Protocol-managed                |
 
 **How it works:** Your proof is combined with others created that day into a Merkle tree. The root hash is submitted to the Polygon blockchain at midnight UTC, cryptographically proving your trail existed at that time. This efficient batching means you pay nothing—the protocol covers the gas fees.
 
@@ -70,19 +74,20 @@ Once you've drawn for at least 10 seconds, click "Submit Proof" to choose your p
 
 **Best for:** Those who want instant verification and full ownership as an NFT.
 
-| Feature | Details |
-|---------|---------|
-| **Cost** | POL or TIME26 tokens |
-| **Verification** | Instant (within seconds) |
-| **NFT** | Yes, ERC-721 token minted to your wallet |
-| **Storage** | Permanent on Arweave (decentralized) |
-| **Badge** | Exclusive collector badge |
+| Feature          | Details                                  |
+| ---------------- | ---------------------------------------- |
+| **Cost**         | POL or TIME26 tokens                     |
+| **Verification** | Instant (within seconds)                 |
+| **NFT**          | Yes, ERC-721 token minted to your wallet |
+| **Storage**      | Permanent on Arweave (decentralized)     |
+| **Badge**        | Exclusive collector badge                |
 
 **How it works:** Your trail is immediately uploaded to Arweave (permanent, decentralized storage) and minted as an NFT on Polygon. You receive full ownership of your proof as a tradeable digital asset, plus an exclusive badge for your profile.
 
 **Pricing:** Base fee + per-second fee for trails longer than 45 seconds. The first 45 seconds are included in the base fee.
 
 **Payment options:**
+
 - **POL** - Polygon's native token
 - **TIME26** - Our project token (earn through referrals and engagement)
 - **Gasless minting** - Use unclaimed TIME26 balance with no wallet signature needed
@@ -90,6 +95,7 @@ Once you've drawn for at least 10 seconds, click "Submit Proof" to choose your p
 ## What's Next?
 
 After submitting, you can:
+
 - View your proof on the [Explore](/explore) page
 - Share it on social media (X, Threads, Instagram)
 - Find it in the [Cosmos](/cosmos) 3D visualization
