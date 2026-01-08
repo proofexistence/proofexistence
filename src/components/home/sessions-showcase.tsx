@@ -33,10 +33,11 @@ function SessionCard({ session, index }: { session: Session; index: number }) {
   // Fetch image from IPFS metadata
   useEffect(() => {
     if (!session.ipfsHash) return;
+    const ipfsHash = session.ipfsHash; // Capture for closure
 
     const fetchImage = async () => {
       try {
-        const res = await fetch(getArweaveUrl(session.ipfsHash));
+        const res = await fetch(getArweaveUrl(ipfsHash));
         if (!res.ok) return;
         const data = await res.json();
         if (data.image) {
