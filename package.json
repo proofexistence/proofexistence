@@ -17,9 +17,9 @@
     "test:contracts": "hardhat test --config hardhat.config.cjs"
   },
   "dependencies": {
+    "@ardrive/turbo-sdk": "^1.39.2",
     "@aws-sdk/client-s3": "^3.958.0",
     "@gsap/react": "^2.1.2",
-    "@irys/sdk": "^0.2.11",
     "@neondatabase/serverless": "^1.0.2",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@openfort/openfort-js": "^0.10.39",

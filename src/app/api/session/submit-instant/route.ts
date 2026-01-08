@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users, sessions, badges, userBadges } from '@/db/schema';
 import { eq, sql, inArray } from 'drizzle-orm';
-import { uploadToIrys } from '@/lib/irys';
+import { uploadToArweave } from '@/lib/arweave-upload';
 import { getArweaveUrl } from '@/lib/arweave-gateway';
 import { checkRateLimit } from '@/lib/ratelimit';
 import { getCurrentUser } from '@/lib/auth/get-user';
@@ -88,9 +88,9 @@ export async function POST(req: NextRequest) {
       // OR if we are in strict development mode where we don't want to spend real mainnet funds
       // Mocking for dev ONLY if no key is present
       // Removed strict DEV mode check to allow real testing
-      if (!process.env.PRIVATE_KEY && !process.env.IRYS_PRIVATE_KEY) {
+      if (!process.env.ARWEAVE_JWK) {
         console.warn(
-          'Skipping Irys upload: IRYS_PRIVATE_KEY not set or DEV mode. Returning mock TXID.'
+          'Skipping Arweave upload: ARWEAVE_JWK not set. Returning mock TXID.'
         );
         arweaveTxId = 'mock_arweave_tx_' + Date.now();
         imageTxId = 'mock_image_tx_' + Date.now(); // Also mock image ID
@@ -108,9 +108,8 @@ export async function POST(req: NextRequest) {
 
         // A. Upload Image (Required)
         try {
-          imageTxId = await uploadToIrys(buffer, [
+          imageTxId = await uploadToArweave(buffer, [
             { name: 'Content-Type', value: 'image/jpeg' },
-            { name: 'App-Name', value: 'ProofOfExistence2026' },
           ]);
         } catch (imgError: unknown) {
           console.error('Image upload failed:', imgError);
@@ -160,9 +159,8 @@ export async function POST(req: NextRequest) {
 
         // C. Upload Metadata
         // This TXID is what the TokenURI will point to.
-        arweaveTxId = await uploadToIrys(JSON.stringify(metadata), [
+        arweaveTxId = await uploadToArweave(JSON.stringify(metadata), [
           { name: 'Content-Type', value: 'application/json' },
-          { name: 'App-Name', value: 'ProofOfExistence2026' },
           { name: 'Type', value: 'metadata' },
         ]);
       }

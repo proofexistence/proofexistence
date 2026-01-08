@@ -84,7 +84,11 @@ async function main() {
   console.log('Updating SnapshotNFT...');
   console.log('Address:', addresses.snapshotNFT);
 
-  const snapshotNFT = new ethers.Contract(addresses.snapshotNFT, NFT_ABI, signer);
+  const snapshotNFT = new ethers.Contract(
+    addresses.snapshotNFT,
+    NFT_ABI,
+    signer
+  );
 
   try {
     const owner = await snapshotNFT.owner();

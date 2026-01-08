@@ -41,13 +41,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'sprofile.line-scdn.net', // Line (alternative)
       },
-      {
-        protocol: 'https',
-        hostname: 'gateway.irys.xyz', // Legacy - keeping for old data
-      },
+
       {
         protocol: 'https',
         hostname: 'arweave.net', // Primary Arweave gateway
+      },
+      {
+        protocol: 'https',
+        hostname: 'ar-io.net', // AR.IO Gateway (Turbo)
       },
       {
         protocol: 'https',

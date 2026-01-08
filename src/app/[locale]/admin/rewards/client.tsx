@@ -33,7 +33,7 @@ interface RewardsStatus {
     balanceFormatted: string;
     hasEnoughGas: boolean;
   };
-  irys: {
+  arweave: {
     balance: string;
     balanceFormatted: string;
     network: string;
@@ -326,25 +326,25 @@ export function AdminRewardsClient() {
           </div>
 
           {/* Irys Balance */}
+          {/* Turbo Credits */}
           <div
             className={`rounded-xl border p-4 flex items-center gap-4 ${
-              data.irys.hasEnoughBalance
+              data.arweave.hasEnoughBalance
                 ? 'bg-green-500/10 border-green-500/20'
                 : 'bg-amber-500/10 border-amber-500/20'
             }`}
           >
             <Database
-              className={`w-8 h-8 shrink-0 ${data.irys.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`}
+              className={`w-8 h-8 shrink-0 ${data.arweave.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`}
             />
             <div className="min-w-0">
               <div
-                className={`font-bold ${data.irys.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`}
+                className={`font-bold ${data.arweave.hasEnoughBalance ? 'text-green-400' : 'text-amber-400'}`}
               >
-                Irys {data.irys.hasEnoughBalance ? 'OK' : 'Low!'}
+                Turbo {data.arweave.hasEnoughBalance ? 'OK' : 'Low!'}
               </div>
               <div className="text-sm text-zinc-400 truncate">
-                {formatNumber(data.irys.balanceFormatted, 6)}{' '}
-                {data.irys.network || 'N/A'}
+                {formatNumber(data.arweave.balanceFormatted, 6)} AR
               </div>
             </div>
           </div>
@@ -437,10 +437,10 @@ export function AdminRewardsClient() {
               </span>
             </div>
             <div>
-              <span className="text-zinc-500">Irys Balance:</span>
+              <span className="text-zinc-500">Turbo Credits:</span>
               <span className="ml-2 font-mono text-zinc-400">
-                {formatNumber(data.irys.balanceFormatted, 6)} (
-                {data.irys.network || 'N/A'})
+                {formatNumber(data.arweave.balanceFormatted, 6)} AR (
+                {data.arweave.network || 'Turbo'})
               </span>
             </div>
             <div className="md:col-span-2">

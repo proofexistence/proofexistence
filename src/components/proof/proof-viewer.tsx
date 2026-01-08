@@ -691,11 +691,7 @@ export function ProofViewer({
               </div>
             ) : (
               <a
-                href={
-                  nftImage
-                    ? nftImage
-                    : getArweaveUrl(session.ipfsHash)
-                }
+                href={nftImage ? nftImage : getArweaveUrl(session.ipfsHash)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/30 hover:bg-black/50 text-white/40 hover:text-white/80 rounded-full backdrop-blur-md border border-white/5 transition-all font-mono text-[10px]"

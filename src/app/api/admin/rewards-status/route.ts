@@ -90,18 +90,13 @@ export async function GET(req: NextRequest) {
       operatorBalance = balance.toString();
     }
 
-    // Get Irys balance (if configured)
-    let irysBalance = '0';
-    const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true';
-    const irysNetwork = isTestnet ? 'devnet' : 'mainnet';
+    // Get ArDrive Turbo balance (Credits in AR equivalent)
+    let arweaveBalance = '0';
     try {
-      // Use Irys SDK to get balance
-      const { getIrys } = await import('@/lib/irys');
-      const irys = await getIrys();
-      const balance = await irys.getLoadedBalance();
-      irysBalance = balance.toString();
+      const { getArweaveBalance } = await import('@/lib/arweave-upload');
+      arweaveBalance = await getArweaveBalance();
     } catch {
-      // Irys balance fetch failed, use fallback
+      // Turbo balance fetch failed
     }
 
     // ============================================================
@@ -251,12 +246,11 @@ export async function GET(req: NextRequest) {
         balanceFormatted: ethers.formatEther(operatorBalance),
         hasEnoughGas: BigInt(operatorBalance) >= ethers.parseEther('0.1'),
       },
-      irys: {
-        balance: irysBalance,
-        balanceFormatted: ethers.formatEther(irysBalance),
-        network: irysNetwork,
-        hasEnoughBalance:
-          BigInt(irysBalance || '0') >= ethers.parseEther('0.01'),
+      arweave: {
+        balance: arweaveBalance,
+        balanceFormatted: arweaveBalance, // Already formatted as AR string
+        network: 'ArDrive Turbo',
+        hasEnoughBalance: parseFloat(arweaveBalance) >= 0.1, // Threshold 0.1 AR
       },
       contractBalance: {
         raw: contractBalance.toString(),

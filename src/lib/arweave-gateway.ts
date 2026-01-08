@@ -8,11 +8,8 @@
 export const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true';
 
 // Gateway URLs
-// - Mainnet: arweave.net (data is on real Arweave)
-// - Testnet/Devnet: gateway.irys.xyz (data is only on Irys temporary storage)
-export const ARWEAVE_GATEWAY = isTestnet
-  ? 'https://gateway.irys.xyz'
-  : 'https://arweave.net';
+// - Use ar-io.net for instant access with Turbo
+export const ARWEAVE_GATEWAY = 'https://ar-io.net';
 
 /**
  * Get the full URL for an Arweave transaction ID
@@ -29,10 +26,8 @@ export function getArweaveUrl(txId: string): string {
 export function normalizeArweaveUrl(url: string): string {
   return url
     .replace('ar://', `${ARWEAVE_GATEWAY}/`)
-    .replace(
-      isTestnet ? 'https://arweave.net/' : 'https://gateway.irys.xyz/',
-      `${ARWEAVE_GATEWAY}/`
-    );
+    .replace('https://gateway.irys.xyz/', `${ARWEAVE_GATEWAY}/`)
+    .replace('https://arweave.net/', `${ARWEAVE_GATEWAY}/`);
 }
 
 /**

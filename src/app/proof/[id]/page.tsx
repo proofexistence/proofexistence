@@ -1,10 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ProofViewer } from '@/components/proof/proof-viewer';
-import {
-  getArweaveUrl,
-  normalizeArweaveUrl,
-} from '@/lib/arweave-gateway';
+import { fetchArweaveMetadata } from '@/lib/arweave-gateway';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -94,26 +91,9 @@ export async function generateMetadata({
     // Try to get Arweave image if available
     let finalImage = session.previewUrl;
     if (session.ipfsHash) {
-      try {
-        const metadataUrl = getArweaveUrl(session.ipfsHash);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
-
-        const res = await fetch(metadataUrl, {
-          signal: controller.signal,
-          next: { revalidate: 3600 },
-        });
-        clearTimeout(timeoutId);
-
-        if (res.ok) {
-          const metadata = await res.json();
-          if (metadata.image) {
-            finalImage = normalizeArweaveUrl(metadata.image);
-          }
-        }
-      } catch (e) {
-        // Silently fail - use fallback image
-        console.warn('Failed to fetch Arweave metadata for OG:', e);
+      const metadata = await fetchArweaveMetadata(session.ipfsHash, 2000);
+      if (metadata?.image) {
+        finalImage = metadata.image;
       }
     }
 
@@ -189,27 +169,12 @@ export default async function ProofPage({ params }: PageProps) {
   let isSyncing = false;
 
   if (session.ipfsHash) {
-    try {
-      const metadataUrl = getArweaveUrl(session.ipfsHash);
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-      const response = await fetch(metadataUrl, {
-        signal: controller.signal,
-        next: { revalidate: 60 },
-      });
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const metadata = await response.json();
-        if (metadata.image) {
-          nftImage = normalizeArweaveUrl(metadata.image);
-        }
-      } else {
-        isSyncing = true;
+    const metadata = await fetchArweaveMetadata(session.ipfsHash);
+    if (metadata) {
+      if (metadata.image) {
+        nftImage = metadata.image;
       }
-    } catch (error) {
-      console.warn('Failed to fetch Arweave metadata:', error);
+    } else {
       isSyncing = true;
     }
   }

@@ -3,7 +3,7 @@ import { db } from '@/db';
 import { sessions, dailySnapshots } from '@/db/schema';
 import { eq, inArray } from 'drizzle-orm';
 import { generateMerkleTree } from '@/lib/merkle';
-import { uploadToIrys } from '@/lib/irys';
+import { uploadToArweave } from '@/lib/arweave-upload';
 import { ethers } from 'ethers';
 import {
   PROOF_OF_EXISTENCE_ADDRESS,
@@ -43,11 +43,11 @@ export async function GET(req: NextRequest) {
     const tree = generateMerkleTree(treeSessions);
     const root = tree.getHexRoot();
 
-    // 4. Upload Batch to Arweave (Irys)
+    // 4. Upload Batch to Arweave
     // We upload the full session details for archival
-    // console.log('[Settle] Uploading to Irys...');
+    // console.log('[Settle] Uploading to Arweave...');
     const batchData = JSON.stringify(pendingSessions);
-    const ipfsCid = await uploadToIrys(batchData, [
+    const ipfsCid = await uploadToArweave(batchData, [
       { name: 'Content-Type', value: 'application/json' },
       { name: 'Batch-Size', value: pendingSessions.length.toString() },
       { name: 'Merkle-Root', value: root },

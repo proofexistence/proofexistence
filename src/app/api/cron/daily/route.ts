@@ -25,7 +25,7 @@ import {
   getRewardsRoot,
   type UserRewardEntry,
 } from '@/lib/merkle/rewards';
-import { uploadToIrys } from '@/lib/irys';
+import { uploadToArweave } from '@/lib/arweave-upload';
 import { ethers } from 'ethers';
 import {
   PROOF_OF_EXISTENCE_ADDRESS,
@@ -87,10 +87,10 @@ async function runSettle(): Promise<{
     const tree = generateMerkleTree(treeSessions);
     const root = tree.getHexRoot();
 
-    // Upload Batch to Arweave (Irys)
-    // console.log('[Daily Cron] Uploading to Irys...');
+    // Upload Batch to ArDrive Turbo
+    // console.log('[Daily Cron] Uploading to ArDrive Turbo...');
     const batchData = JSON.stringify(pendingSessions);
-    const ipfsCid = await uploadToIrys(batchData, [
+    const ipfsCid = await uploadToArweave(batchData, [
       { name: 'Content-Type', value: 'application/json' },
       { name: 'Batch-Size', value: pendingSessions.length.toString() },
       { name: 'Merkle-Root', value: root },

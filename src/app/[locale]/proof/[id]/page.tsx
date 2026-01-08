@@ -1,10 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ProofViewer } from '@/components/proof/proof-viewer';
-import {
-  getArweaveUrl,
-  normalizeArweaveUrl,
-} from '@/lib/arweave-gateway';
+import { getArweaveUrl, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
