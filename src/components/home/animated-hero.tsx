@@ -241,10 +241,11 @@ function OrbitItem({
       return;
     }
     if (session.ipfsHash) {
+      const ipfsHash = session.ipfsHash; // Capture for closure
       let cancelled = false;
       const fetchIpfs = async () => {
         try {
-          const res = await fetch(getArweaveUrl(session.ipfsHash));
+          const res = await fetch(getArweaveUrl(ipfsHash));
           if (res.ok && !cancelled) {
             const data = await res.json();
             if (data.image) setImageUrl(normalizeArweaveUrl(data.image));
