@@ -10,7 +10,7 @@ publishedAt: '2026-01-07'
 
 你剛剛創作了一條美麗的光軌。現在面臨一個重要決定：**你想如何保存它？**
 
-![永恆證明範例 - 存儲在 Arweave 上的光軌藝術作品](https://gateway.irys.xyz/DnRkJQhB3EWmZjgoeu8wPPvXo4s5JxGANE6FKUV2YCY)
+![永恆證明範例 - 存儲在 Arweave 上的光軌藝術作品](https://arweave.net/DnRkJQhB3EWmZjgoeu8wPPvXo4s5JxGANE6FKUV2YCY)
 _這是一個永恆證明的範例。你的光軌創作可以像這樣被永久保存在區塊鏈上。_
 
 本指南將幫助你理解標準證明和永恆證明的區別，讓你做出最適合自己的選擇。

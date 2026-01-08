@@ -66,7 +66,7 @@ async function main() {
     console.log('');
     console.log('   Commands to execute from owner wallet:');
     console.log(`   - setMinter("${NEW_PROOF_RECORDER}")`);
-    console.log(`   - setBaseURI("https://gateway.irys.xyz/")`);
+    console.log(`   - setBaseURI("https://arweave.net/")`);
   } else {
     // Update minter
     console.log('   Setting new minter...');
@@ -76,9 +76,9 @@ async function main() {
 
     // Update base URI
     console.log('   Setting new base URI...');
-    tx = await trailNFT.setBaseURI('https://gateway.irys.xyz/');
+    tx = await trailNFT.setBaseURI('https://arweave.net/');
     await tx.wait();
-    console.log('   ✅ Base URI updated to: https://gateway.irys.xyz/');
+    console.log('   ✅ Base URI updated to: https://arweave.net/');
   }
   console.log('');
 

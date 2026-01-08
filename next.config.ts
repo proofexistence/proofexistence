@@ -43,7 +43,15 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'gateway.irys.xyz',
+        hostname: 'gateway.irys.xyz', // Legacy - keeping for old data
+      },
+      {
+        protocol: 'https',
+        hostname: 'arweave.net', // Primary Arweave gateway
+      },
+      {
+        protocol: 'https',
+        hostname: '*.arweave.net', // Arweave sandbox subdomains
       },
     ],
   },

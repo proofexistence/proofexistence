@@ -10,7 +10,7 @@ publishedAt: '2026-01-07'
 
 You've just created a beautiful light trail. Now comes an important decision: **how do you want to preserve it?**
 
-![Perpetual Proof Example - Light trail artwork stored on Arweave](https://gateway.irys.xyz/DnRkJQhB3EWmZjgoeu8wPPvXo4s5JxGANE6FKUV2YCY)
+![Perpetual Proof Example - Light trail artwork stored on Arweave](https://arweave.net/DnRkJQhB3EWmZjgoeu8wPPvXo4s5JxGANE6FKUV2YCY)
 _This is an example of a Perpetual Proof. Your light trail creation can be permanently preserved on the blockchain like this._
 
 This guide will help you understand the difference between Standard and Perpetual proofs, so you can make the choice that's right for you.

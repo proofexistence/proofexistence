@@ -1,6 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { ProofViewer } from '@/components/proof/proof-viewer';
+import {
+  getArweaveUrl,
+  normalizeArweaveUrl,
+} from '@/lib/arweave-gateway';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -91,7 +95,7 @@ export async function generateMetadata({
     let finalImage = session.previewUrl;
     if (session.ipfsHash) {
       try {
-        const metadataUrl = `https://gateway.irys.xyz/${session.ipfsHash}`;
+        const metadataUrl = getArweaveUrl(session.ipfsHash);
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
 
@@ -104,9 +108,7 @@ export async function generateMetadata({
         if (res.ok) {
           const metadata = await res.json();
           if (metadata.image) {
-            finalImage = metadata.image
-              .replace('ar://', 'https://gateway.irys.xyz/')
-              .replace('https://arweave.net/', 'https://gateway.irys.xyz/');
+            finalImage = normalizeArweaveUrl(metadata.image);
           }
         }
       } catch (e) {
@@ -188,7 +190,7 @@ export default async function ProofPage({ params }: PageProps) {
 
   if (session.ipfsHash) {
     try {
-      const metadataUrl = `https://gateway.irys.xyz/${session.ipfsHash}`;
+      const metadataUrl = getArweaveUrl(session.ipfsHash);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
 
@@ -201,9 +203,7 @@ export default async function ProofPage({ params }: PageProps) {
       if (response.ok) {
         const metadata = await response.json();
         if (metadata.image) {
-          nftImage = metadata.image
-            .replace('ar://', 'https://gateway.irys.xyz/')
-            .replace('https://arweave.net/', 'https://gateway.irys.xyz/');
+          nftImage = normalizeArweaveUrl(metadata.image);
         }
       } else {
         isSyncing = true;

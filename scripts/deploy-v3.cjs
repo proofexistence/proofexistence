@@ -160,7 +160,7 @@ async function main() {
   console.log(`   TrailNFT.setMinter("${proofRecorderAddress}")`);
   console.log('');
   console.log('2. Update TrailNFT base URI:');
-  console.log(`   TrailNFT.setBaseURI("https://gateway.irys.xyz/")`);
+  console.log(`   TrailNFT.setBaseURI("https://arweave.net/")`);
   console.log('');
   console.log('3. Distribute TIME26 tokens from deployer wallet:');
   console.log(

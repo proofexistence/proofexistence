@@ -39,7 +39,7 @@ async function main() {
   if (existence.metadataURI.startsWith('ar://')) {
     console.log(
       'View Metadata:',
-      'https://gateway.irys.xyz/' + existence.metadataURI.slice(5)
+      'https://arweave.net/' + existence.metadataURI.slice(5)
     );
   }
 }

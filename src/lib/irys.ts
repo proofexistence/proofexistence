@@ -1,15 +1,24 @@
 import Irys from '@irys/sdk';
 import * as Sentry from '@sentry/nextjs';
 
+// Re-export gateway utilities for convenience
+export {
+  ARWEAVE_GATEWAY,
+  getArweaveUrl,
+  normalizeArweaveUrl,
+  fetchArweaveMetadata,
+  isTestnet,
+} from './arweave-gateway';
+
 // Initialize Irys on the server (Polygon/Matic)
 export const getIrys = async () => {
   const key = process.env.PRIVATE_KEY || process.env.IRYS_PRIVATE_KEY;
   // Check for testnet flag (respects explicit false even in dev mode)
-  const isTestnet =
+  const isTestnetEnv =
     process.env.NEXT_PUBLIC_IS_TESTNET === 'true' ||
     (process.env.NODE_ENV === 'development' &&
       process.env.NEXT_PUBLIC_IS_TESTNET !== 'false');
-  const network = isTestnet ? 'devnet' : 'mainnet';
+  const network = isTestnetEnv ? 'devnet' : 'mainnet';
 
   // Select RPC based on network
   // Devnet = Amoy, Mainnet = Polygon Mainnet

@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { users, sessions, badges, userBadges } from '@/db/schema';
 import { eq, sql, inArray } from 'drizzle-orm';
 import { uploadToIrys } from '@/lib/irys';
+import { getArweaveUrl } from '@/lib/arweave-gateway';
 import { checkRateLimit } from '@/lib/ratelimit';
 import { getCurrentUser } from '@/lib/auth/get-user';
 
@@ -133,7 +134,7 @@ export async function POST(req: NextRequest) {
         const metadata = {
           name: metadataName,
           description: metadataDescription,
-          image: `https://gateway.irys.xyz/${imageTxId}`, // Use gateway URL for immediate OpenSea compatibility
+          image: getArweaveUrl(imageTxId), // Use appropriate gateway based on network
           external_url: `https://proofofexistence.com/proof/${session.id}`,
           attributes: [
             { trait_type: 'Artist', value: username || 'Anonymous' },

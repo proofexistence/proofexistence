@@ -1,6 +1,7 @@
 'use client';
 
 import { BLOCK_EXPLORER, isTestnet } from '@/lib/contracts';
+import { getArweaveUrl } from '@/lib/arweave-gateway';
 
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -293,7 +294,7 @@ export function ProofViewer({
     // 1. If MINTED with ipfsHash, try to get NFT image from Arweave metadata
     if (session.status === 'MINTED' && session.ipfsHash) {
       try {
-        const metadataUrl = `https://gateway.irys.xyz/${session.ipfsHash}`;
+        const metadataUrl = getArweaveUrl(session.ipfsHash);
         const res = await fetch(metadataUrl);
         if (res.ok) {
           const metadata = await res.json();
@@ -693,7 +694,7 @@ export function ProofViewer({
                 href={
                   nftImage
                     ? nftImage
-                    : `https://gateway.irys.xyz/${session.ipfsHash}`
+                    : getArweaveUrl(session.ipfsHash)
                 }
                 target="_blank"
                 rel="noopener noreferrer"

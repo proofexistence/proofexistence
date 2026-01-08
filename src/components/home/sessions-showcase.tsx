@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import { Heart, Eye } from 'lucide-react';
+import { getArweaveUrl, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
 // Register ScrollTrigger
 if (typeof window !== 'undefined') {
@@ -35,11 +36,11 @@ function SessionCard({ session, index }: { session: Session; index: number }) {
 
     const fetchImage = async () => {
       try {
-        const res = await fetch(`https://gateway.irys.xyz/${session.ipfsHash}`);
+        const res = await fetch(getArweaveUrl(session.ipfsHash));
         if (!res.ok) return;
         const data = await res.json();
         if (data.image) {
-          setImageUrl(data.image.replace('ar://', 'https://gateway.irys.xyz/'));
+          setImageUrl(normalizeArweaveUrl(data.image));
         }
       } catch {
         // Ignore errors

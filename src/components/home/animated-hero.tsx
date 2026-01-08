@@ -6,6 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Pencil } from 'lucide-react';
+import { getArweaveUrl, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
 interface Session {
   id: string;
@@ -243,15 +244,10 @@ function OrbitItem({
       let cancelled = false;
       const fetchIpfs = async () => {
         try {
-          const res = await fetch(
-            `https://gateway.irys.xyz/${session.ipfsHash}`
-          );
+          const res = await fetch(getArweaveUrl(session.ipfsHash));
           if (res.ok && !cancelled) {
             const data = await res.json();
-            if (data.image)
-              setImageUrl(
-                data.image.replace('ar://', 'https://gateway.irys.xyz/')
-              );
+            if (data.image) setImageUrl(normalizeArweaveUrl(data.image));
           }
         } catch {
           // Ignore fetch errors

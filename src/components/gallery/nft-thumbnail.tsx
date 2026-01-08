@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getArweaveUrl, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
 interface NFTThumbnailProps {
   ipfsHash: string;
@@ -14,18 +15,14 @@ export function NFTThumbnail({ ipfsHash, alt }: NFTThumbnailProps) {
     let mounted = true;
     const fetchImage = async () => {
       try {
-        // Fetch metadata from Irys gateway
-        const metadataUrl = `https://gateway.irys.xyz/${ipfsHash}`;
+        // Fetch metadata from Arweave gateway
+        const metadataUrl = getArweaveUrl(ipfsHash);
         const res = await fetch(metadataUrl, { next: { revalidate: 86400 } }); // Cache 1 day
         if (!res.ok) return;
 
         const data = await res.json();
         if (data.image && mounted) {
-          setSrc(
-            data.image
-              .replace('ar://', 'https://gateway.irys.xyz/')
-              .replace('https://arweave.net/', 'https://gateway.irys.xyz/')
-          );
+          setSrc(normalizeArweaveUrl(data.image));
         }
       } catch {
         // Ignore errors
