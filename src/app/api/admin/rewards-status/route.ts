@@ -85,7 +85,11 @@ export async function GET(req: NextRequest) {
     let totalBurned = BigInt(0);
     try {
       const burnFilter = proofRecorder.filters.RewardsBurned();
-      const burnEvents = await proofRecorder.queryFilter(burnFilter, 0, 'latest');
+      const burnEvents = await proofRecorder.queryFilter(
+        burnFilter,
+        0,
+        'latest'
+      );
       for (const event of burnEvents) {
         const args = (event as ethers.EventLog).args;
         if (args && args[0]) {
@@ -249,9 +253,11 @@ export async function GET(req: NextRequest) {
     const initialDeposit = BigInt('31500000') * BigInt(10 ** 18);
 
     // Verification: Initial = Contract Balance + Burned + Claimed
-    const verificationSum = contractBalanceBigInt + totalBurned + totalOnChainClaimed;
+    const verificationSum =
+      contractBalanceBigInt + totalBurned + totalOnChainClaimed;
     const verificationDiff = initialDeposit - verificationSum;
-    const isVerified = verificationDiff >= BigInt(0) && verificationDiff < BigInt(10 ** 18); // Allow < 1 token diff
+    const isVerified =
+      verificationDiff >= BigInt(0) && verificationDiff < BigInt(10 ** 18); // Allow < 1 token diff
 
     // Surplus = Contract Balance - Still Claimable
     // This is how much "extra" is available beyond what users can claim

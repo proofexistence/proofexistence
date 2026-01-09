@@ -50,7 +50,11 @@ interface RewardsStatus {
   summary: {
     initialDeposit: { raw: string; formatted: string; description: string };
     totalBurned: { raw: string; formatted: string; description: string };
-    totalOnChainClaimed: { raw: string; formatted: string; description: string };
+    totalOnChainClaimed: {
+      raw: string;
+      formatted: string;
+      description: string;
+    };
     totalDbBalance: { raw: string; formatted: string; description: string };
     totalClaimable: { raw: string; formatted: string; description: string };
     totalPendingBurn: { raw: string; formatted: string; description: string };
@@ -359,7 +363,9 @@ export function AdminRewardsClient() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
           <StatCard
             title="Initial Deposit"
-            value={formatNumber(data.summary.initialDeposit?.formatted || '31500000')}
+            value={formatNumber(
+              data.summary.initialDeposit?.formatted || '31500000'
+            )}
             description="31.5M TIME26"
             icon={Coins}
             color="blue"
@@ -399,15 +405,21 @@ export function AdminRewardsClient() {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <div className="font-bold text-sm mb-1">
-                  {data.summary.verification.isValid ? '✅' : '⚠️'} Verification: {data.summary.verification.formula}
+                  {data.summary.verification.isValid ? '✅' : '⚠️'}{' '}
+                  Verification: {data.summary.verification.formula}
                 </div>
                 <div className="text-xs text-zinc-400 font-mono">
-                  {formatNumber(data.summary.verification.initialDeposit)} = {formatNumber(data.contractBalance.formatted)} + {formatNumber(data.summary.totalBurned?.formatted || '0')} + {formatNumber(data.summary.totalOnChainClaimed.formatted)}
+                  {formatNumber(data.summary.verification.initialDeposit)} ={' '}
+                  {formatNumber(data.contractBalance.formatted)} +{' '}
+                  {formatNumber(data.summary.totalBurned?.formatted || '0')} +{' '}
+                  {formatNumber(data.summary.totalOnChainClaimed.formatted)}
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-xs text-zinc-500">Difference</div>
-                <div className={`font-mono ${data.summary.verification.isValid ? 'text-green-400' : 'text-red-400'}`}>
+                <div
+                  className={`font-mono ${data.summary.verification.isValid ? 'text-green-400' : 'text-red-400'}`}
+                >
                   {formatNumber(data.summary.verification.difference)}
                 </div>
               </div>

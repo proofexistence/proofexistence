@@ -361,6 +361,7 @@ async function runBurnAndMerkle(): Promise<{
   userCount: number;
   txHash?: string;
   error?: string;
+  skipped: boolean;
 }> {
   // console.log('[Daily Cron] Running burn and merkle task...');
 
@@ -452,6 +453,7 @@ async function runBurnAndMerkle(): Promise<{
         totalBurned: totalPendingBurn.toString(),
         userCount: 0,
         txHash: burnTxHash,
+        skipped: false,
       };
     }
 
@@ -499,6 +501,7 @@ async function runBurnAndMerkle(): Promise<{
       merkleRoot: root,
       userCount: usersWithBalance.length,
       txHash: tx.hash,
+      skipped: false,
     };
   } catch (error) {
     console.error('[Daily Cron] Burn and merkle error:', error);
@@ -507,6 +510,7 @@ async function runBurnAndMerkle(): Promise<{
       totalBurned: '0',
       userCount: 0,
       error: String(error),
+      skipped: false,
     };
   }
 }
@@ -542,13 +546,17 @@ export async function GET(req: NextRequest) {
     rewardsResults.push(result);
     // Stop if a day fails (to maintain order integrity)
     if (!result.success) {
-      console.error(`[Daily Cron] Failed to process rewards for ${dayId}, stopping`);
+      console.error(
+        `[Daily Cron] Failed to process rewards for ${dayId}, stopping`
+      );
       break;
     }
   }
 
   // Task 3: Burn and update merkle root (only if all rewards succeeded)
-  const allRewardsSucceeded = rewardsResults.every((r) => r.success || r.skipped);
+  const allRewardsSucceeded = rewardsResults.every(
+    (r) => r.success || r.skipped
+  );
   let burnMerkleResult = {
     success: true,
     totalBurned: '0',
@@ -561,9 +569,7 @@ export async function GET(req: NextRequest) {
   }
 
   const success =
-    settleResult.success &&
-    allRewardsSucceeded &&
-    burnMerkleResult.success;
+    settleResult.success && allRewardsSucceeded && burnMerkleResult.success;
 
   return NextResponse.json({
     success,
