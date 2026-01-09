@@ -68,6 +68,7 @@ export async function GET(req: NextRequest) {
       [
         'function totalClaimed(address) view returns (uint256)',
         'function rewardsMerkleRoot() view returns (bytes32)',
+        'event RewardsBurned(uint256 amount, string reason)',
       ],
       provider
     );
@@ -77,6 +78,23 @@ export async function GET(req: NextRequest) {
       time26Contract.totalSupply(),
       proofRecorder.rewardsMerkleRoot(),
     ]);
+
+    // ============================================================
+    // 1b. Query Total Burned from blockchain events
+    // ============================================================
+    let totalBurned = BigInt(0);
+    try {
+      const burnFilter = proofRecorder.filters.RewardsBurned();
+      const burnEvents = await proofRecorder.queryFilter(burnFilter, 0, 'latest');
+      for (const event of burnEvents) {
+        const args = (event as ethers.EventLog).args;
+        if (args && args[0]) {
+          totalBurned += BigInt(args[0].toString());
+        }
+      }
+    } catch (err) {
+      console.warn('[Admin] Could not fetch burn events:', err);
+    }
 
     // Get operator wallet balance
     let operatorBalance = '0';
@@ -226,6 +244,17 @@ export async function GET(req: NextRequest) {
     // 5. Summary Calculations
     // ============================================================
     const contractBalanceBigInt = BigInt(contractBalance.toString());
+
+    // Initial deposit: 31.5M TIME26
+    const initialDeposit = BigInt('31500000') * BigInt(10 ** 18);
+
+    // Verification: Initial = Contract Balance + Burned + Claimed
+    const verificationSum = contractBalanceBigInt + totalBurned + totalOnChainClaimed;
+    const verificationDiff = initialDeposit - verificationSum;
+    const isVerified = verificationDiff >= BigInt(0) && verificationDiff < BigInt(10 ** 18); // Allow < 1 token diff
+
+    // Surplus = Contract Balance - Still Claimable
+    // This is how much "extra" is available beyond what users can claim
     const surplus = contractBalanceBigInt - totalClaimable;
     const hasSufficientFunds = surplus >= BigInt(0);
 
@@ -261,25 +290,35 @@ export async function GET(req: NextRequest) {
         formatted: ethers.formatEther(totalSupply),
       },
       summary: {
-        totalDbBalance: {
-          raw: totalDbBalance.toString(),
-          formatted: ethers.formatEther(totalDbBalance),
-          description: 'Total cumulative rewards in database',
+        initialDeposit: {
+          raw: initialDeposit.toString(),
+          formatted: ethers.formatEther(initialDeposit),
+          description: 'Initial TIME26 deposited (31.5M)',
         },
-        totalPendingBurn: {
-          raw: totalPendingBurn.toString(),
-          formatted: ethers.formatEther(totalPendingBurn),
-          description: 'Pending to be burned in next cron',
+        totalBurned: {
+          raw: totalBurned.toString(),
+          formatted: ethers.formatEther(totalBurned),
+          description: 'Total burned from contract (from events)',
         },
         totalOnChainClaimed: {
           raw: totalOnChainClaimed.toString(),
           formatted: ethers.formatEther(totalOnChainClaimed),
-          description: 'Total already claimed on-chain',
+          description: 'Total claimed on-chain by users',
+        },
+        totalDbBalance: {
+          raw: totalDbBalance.toString(),
+          formatted: ethers.formatEther(totalDbBalance),
+          description: 'Total rewards recorded in database',
         },
         totalClaimable: {
           raw: totalClaimable.toString(),
           formatted: ethers.formatEther(totalClaimable),
-          description: 'Total still claimable by users',
+          description: 'Still claimable (DB Balance - Claimed)',
+        },
+        totalPendingBurn: {
+          raw: totalPendingBurn.toString(),
+          formatted: ethers.formatEther(totalPendingBurn),
+          description: 'Pending burn in next cron',
         },
         totalDistributed: {
           raw: totalDistributed.toString(),
@@ -289,9 +328,16 @@ export async function GET(req: NextRequest) {
         surplus: {
           raw: surplus.toString(),
           formatted: ethers.formatEther(surplus),
-          description: 'Contract balance minus claimable (positive = healthy)',
+          description: 'Contract Balance - Claimable (positive = healthy)',
         },
         hasSufficientFunds,
+        verification: {
+          formula: 'Initial Deposit = Contract Balance + Burned + Claimed',
+          initialDeposit: ethers.formatEther(initialDeposit),
+          sum: ethers.formatEther(verificationSum),
+          difference: ethers.formatEther(verificationDiff),
+          isValid: isVerified,
+        },
       },
       users: userDetails,
       dailyRewards: dailyRewardsFormatted,

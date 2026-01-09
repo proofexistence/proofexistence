@@ -48,17 +48,22 @@ interface RewardsStatus {
     formatted: string;
   };
   summary: {
+    initialDeposit: { raw: string; formatted: string; description: string };
+    totalBurned: { raw: string; formatted: string; description: string };
+    totalOnChainClaimed: { raw: string; formatted: string; description: string };
     totalDbBalance: { raw: string; formatted: string; description: string };
-    totalPendingBurn: { raw: string; formatted: string; description: string };
-    totalOnChainClaimed: {
-      raw: string;
-      formatted: string;
-      description: string;
-    };
     totalClaimable: { raw: string; formatted: string; description: string };
+    totalPendingBurn: { raw: string; formatted: string; description: string };
     totalDistributed: { raw: string; formatted: string; description: string };
     surplus: { raw: string; formatted: string; description: string };
     hasSufficientFunds: boolean;
+    verification: {
+      formula: string;
+      initialDeposit: string;
+      sum: string;
+      difference: string;
+      isValid: boolean;
+    };
   };
   users: Array<{
     id: string;
@@ -351,32 +356,78 @@ export function AdminRewardsClient() {
         </div>
 
         {/* Main Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Initial Deposit"
+            value={formatNumber(data.summary.initialDeposit?.formatted || '31500000')}
+            description="31.5M TIME26"
+            icon={Coins}
+            color="blue"
+          />
           <StatCard
             title="Contract Balance"
             value={formatNumber(data.contractBalance.formatted)}
-            description="TIME26 in contract"
+            description="Currently in contract"
             icon={Wallet}
             color="blue"
           />
           <StatCard
-            title="Total Distributed"
-            value={formatNumber(data.summary.totalDbBalance.formatted)}
-            description="Cumulative in DB"
-            icon={TrendingUp}
-            color="purple"
+            title="Total Burned"
+            value={formatNumber(data.summary.totalBurned?.formatted || '0')}
+            description="From spending"
+            icon={Flame}
+            color="red"
           />
           <StatCard
-            title="Already Claimed"
+            title="Total Claimed"
             value={formatNumber(data.summary.totalOnChainClaimed.formatted)}
             description="On-chain claimed"
             icon={CheckCircle}
             color="green"
           />
+        </div>
+
+        {/* Verification Banner */}
+        {data.summary.verification && (
+          <div
+            className={`rounded-xl border p-4 ${
+              data.summary.verification.isValid
+                ? 'bg-green-500/10 border-green-500/20'
+                : 'bg-red-500/10 border-red-500/20'
+            }`}
+          >
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <div className="font-bold text-sm mb-1">
+                  {data.summary.verification.isValid ? '✅' : '⚠️'} Verification: {data.summary.verification.formula}
+                </div>
+                <div className="text-xs text-zinc-400 font-mono">
+                  {formatNumber(data.summary.verification.initialDeposit)} = {formatNumber(data.contractBalance.formatted)} + {formatNumber(data.summary.totalBurned?.formatted || '0')} + {formatNumber(data.summary.totalOnChainClaimed.formatted)}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-zinc-500">Difference</div>
+                <div className={`font-mono ${data.summary.verification.isValid ? 'text-green-400' : 'text-red-400'}`}>
+                  {formatNumber(data.summary.verification.difference)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Secondary Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard
+            title="DB Distributed"
+            value={formatNumber(data.summary.totalDbBalance.formatted)}
+            description="Total rewards in DB"
+            icon={TrendingUp}
+            color="purple"
+          />
           <StatCard
             title="Still Claimable"
             value={formatNumber(data.summary.totalClaimable.formatted)}
-            description="Waiting to claim"
+            description="DB - Claimed"
             icon={Gift}
             color="amber"
           />
@@ -385,12 +436,12 @@ export function AdminRewardsClient() {
             value={formatNumber(data.summary.totalPendingBurn.formatted)}
             description="Next cron burn"
             icon={Flame}
-            color="red"
+            color="amber"
           />
           <StatCard
             title="Surplus"
             value={formatNumber(data.summary.surplus.formatted)}
-            description="Contract - Claimable"
+            description="Balance - Claimable"
             icon={Coins}
             color={data.summary.hasSufficientFunds ? 'green' : 'red'}
           />
