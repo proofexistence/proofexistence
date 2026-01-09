@@ -47,9 +47,58 @@ import {
   formatTime26,
   type DrawingPeriod,
 } from '@/lib/rewards/calculate';
+import { desc } from 'drizzle-orm';
 
 // Force dynamic to avoid caching
 export const dynamic = 'force-dynamic';
+
+// ============================================================
+// Helper: Find Missing Days
+// ============================================================
+
+/**
+ * Get all days that need rewards processing
+ * Returns days from (last processed + 1) to yesterday, in chronological order
+ */
+async function getMissingDays(): Promise<string[]> {
+  const yesterday = getYesterdayDayId();
+
+  // Find the most recent processed day
+  const lastProcessed = await db
+    .select({ dayId: dailyRewards.dayId })
+    .from(dailyRewards)
+    .orderBy(desc(dailyRewards.dayId))
+    .limit(1);
+
+  // If no rewards have been processed yet, start from yesterday only
+  if (lastProcessed.length === 0) {
+    return [yesterday];
+  }
+
+  const lastDayId = lastProcessed[0].dayId;
+
+  // If last processed is yesterday or later, nothing to do
+  if (lastDayId >= yesterday) {
+    return [];
+  }
+
+  // Calculate all missing days between lastDayId and yesterday
+  const missingDays: string[] = [];
+  const lastDate = new Date(lastDayId + 'T00:00:00Z');
+  const yesterdayDate = new Date(yesterday + 'T00:00:00Z');
+
+  // Start from day after last processed
+  const currentDate = new Date(lastDate);
+  currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+
+  while (currentDate <= yesterdayDate) {
+    const dayId = currentDate.toISOString().split('T')[0];
+    missingDays.push(dayId);
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+  }
+
+  return missingDays;
+}
 
 // ============================================================
 // Task 1: Settle Pending Sessions
@@ -177,7 +226,7 @@ async function runSettle(): Promise<{
 // ============================================================
 // Task 2: Calculate and Distribute Rewards
 // ============================================================
-async function runRewards(): Promise<{
+async function runRewardsForDay(dayId: string): Promise<{
   success: boolean;
   dayId: string;
   participantCount: number;
@@ -185,9 +234,7 @@ async function runRewards(): Promise<{
   skipped?: boolean;
   error?: string;
 }> {
-  // console.log('[Daily Cron] Running rewards task...');
-
-  const dayId = getYesterdayDayId();
+  // console.log(`[Daily Cron] Running rewards for ${dayId}...`);
 
   try {
     // Check if already settled
@@ -476,18 +523,55 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Run all tasks sequentially
+  // Task 1: Settle pending sessions
   const settleResult = await runSettle();
-  const rewardsResult = await runRewards();
-  const burnMerkleResult = await runBurnAndMerkle();
+
+  // Task 2: Process rewards for all missing days (in chronological order)
+  const missingDays = await getMissingDays();
+  const rewardsResults: Array<{
+    success: boolean;
+    dayId: string;
+    participantCount: number;
+    totalDistributed: string;
+    skipped?: boolean;
+    error?: string;
+  }> = [];
+
+  for (const dayId of missingDays) {
+    const result = await runRewardsForDay(dayId);
+    rewardsResults.push(result);
+    // Stop if a day fails (to maintain order integrity)
+    if (!result.success) {
+      console.error(`[Daily Cron] Failed to process rewards for ${dayId}, stopping`);
+      break;
+    }
+  }
+
+  // Task 3: Burn and update merkle root (only if all rewards succeeded)
+  const allRewardsSucceeded = rewardsResults.every((r) => r.success || r.skipped);
+  let burnMerkleResult = {
+    success: true,
+    totalBurned: '0',
+    userCount: 0,
+    skipped: true,
+  };
+
+  if (allRewardsSucceeded) {
+    burnMerkleResult = await runBurnAndMerkle();
+  }
 
   const success =
-    settleResult.success && rewardsResult.success && burnMerkleResult.success;
+    settleResult.success &&
+    allRewardsSucceeded &&
+    burnMerkleResult.success;
 
   return NextResponse.json({
     success,
     settle: settleResult,
-    rewards: rewardsResult,
+    rewards: {
+      processedDays: missingDays,
+      results: rewardsResults,
+    },
     burnMerkle: burnMerkleResult,
   });
 }
