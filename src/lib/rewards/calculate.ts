@@ -6,7 +6,7 @@
  * 2. For each second in the day, divide reward among all active users
  * 3. Exclusive time gets full weight, shared time is split proportionally
  *
- * Budget: 31,500,000 TIME26 / 365 days = ~86,301.37 TIME26 per day
+ * Budget: 31,536,000 TIME26 / 365 days = 86,400 TIME26 per day (seconds in a day)
  */
 
 import Decimal from 'decimal.js';
@@ -14,13 +14,13 @@ import Decimal from 'decimal.js';
 // Configure Decimal.js for high precision
 Decimal.set({ precision: 36, rounding: Decimal.ROUND_DOWN });
 
-// Daily budget: 31.5M TIME26 / 365 days (in wei - 18 decimals)
-export const TOTAL_REWARD_POOL = new Decimal('31500000').times(
+// Daily budget: 31,536,000 TIME26 (365 * 24 * 60 * 60) / 365 days (in wei - 18 decimals)
+export const TOTAL_REWARD_POOL = new Decimal('31536000').times(
   new Decimal(10).pow(18)
 );
 export const DAYS_IN_YEAR = 365;
 export const DAILY_BUDGET = TOTAL_REWARD_POOL.div(DAYS_IN_YEAR);
-// ~86,301.369863013698630137 TIME26 per day
+// 86,400 TIME26 per day (seconds in a day)
 
 export interface DrawingPeriod {
   userId: string;

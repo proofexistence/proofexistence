@@ -26,12 +26,8 @@ const TREASURY_SAFE = '0xBDA2B288154339F88F886949F4CC9dF7D2491f6D';
 // Distribution amounts (in wei, 18 decimals)
 const DISTRIBUTION = {
   // User Rewards → ProofRecorder v4
-  // Whitepaper says 31,500,000 but v3 has 31,536,000 (seconds in a year)
-  // We'll use what's actually in v3
-  REWARDS_POOL: ethers.parseUnits('31500000', 18), // 31.5M for rewards
-
-  // The remaining 36,000 can go to treasury for operations
-  // 31,536,000 - 31,500,000 = 36,000 extra
+  // 31,536,000 = 365 * 24 * 60 * 60 (seconds in a year)
+  REWARDS_POOL: ethers.parseUnits('31536000', 18), // 31,536,000 for rewards
 
   // Expected distribution for remaining 16,884,000:
   LIQUIDITY_POOL: ethers.parseUnits('10000000', 18), // 10M for DEX

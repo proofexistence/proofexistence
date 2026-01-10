@@ -364,9 +364,9 @@ export function AdminRewardsClient() {
           <StatCard
             title="Initial Deposit"
             value={formatNumber(
-              data.summary.initialDeposit?.formatted || '31500000'
+              data.summary.initialDeposit?.formatted || '31536000'
             )}
-            description="31.5M TIME26"
+            description="31,536,000 TIME26"
             icon={Coins}
             color="blue"
           />

@@ -249,8 +249,8 @@ export async function GET(req: NextRequest) {
     // ============================================================
     const contractBalanceBigInt = BigInt(contractBalance.toString());
 
-    // Initial deposit: 31.5M TIME26
-    const initialDeposit = BigInt('31500000') * BigInt(10 ** 18);
+    // Initial deposit: 365 * 24 * 60 * 60 = 31,536,000 TIME26
+    const initialDeposit = BigInt('31536000') * BigInt(10 ** 18);
 
     // Verification: Initial = Contract Balance + Burned + Claimed
     const verificationSum =
@@ -299,7 +299,7 @@ export async function GET(req: NextRequest) {
         initialDeposit: {
           raw: initialDeposit.toString(),
           formatted: ethers.formatEther(initialDeposit),
-          description: 'Initial TIME26 deposited (31.5M)',
+          description: 'Initial TIME26 deposited (31,536,000)',
         },
         totalBurned: {
           raw: totalBurned.toString(),
