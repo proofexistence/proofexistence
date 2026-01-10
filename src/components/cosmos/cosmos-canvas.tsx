@@ -125,8 +125,12 @@ export function CosmosCanvas({
   if (!mounted) return <div className="w-full h-full bg-black" />;
 
   return (
-    <div className="w-full h-full bg-black relative">
-      <Canvas camera={{ position: [0, 20, 100], fov: 50 }}>
+    <div className="w-full h-full bg-black relative" style={{ isolation: 'isolate' }}>
+      <div className="absolute inset-0 z-0">
+        <Canvas
+          camera={{ position: [0, 20, 100], fov: 50 }}
+          style={{ touchAction: 'none' }}
+        >
         <color attach="background" args={['#000000']} />
 
         <ScreenPositionTracker
@@ -204,6 +208,7 @@ export function CosmosCanvas({
           target={targetPos || new THREE.Vector3(0, 0, 0)}
         />
       </Canvas>
+      </div>
 
       {/* UI Overlay */}
       {/* Mobile: Search (left, below logo) and My Star (right, below menu) on same row */}
@@ -281,7 +286,7 @@ export function CosmosCanvas({
       </div>
 
       {/* Desktop Find Me Button - Bottom Right */}
-      <div className="absolute bottom-8 right-8 z-20 hidden md:flex flex-col gap-2">
+      <div className="absolute bottom-8 right-8 z-20 hidden md:flex flex-col gap-2 pointer-events-auto">
         <FindMeButton trails={validTrails} onFocus={selectStar} />
       </div>
 
