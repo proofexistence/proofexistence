@@ -28,7 +28,12 @@ export default async function CosmosPage({
     .filter((t) => Array.isArray(t.trailData) && t.trailData.length > 0)
     .map((t) => ({
       ...t,
-      trailData: t.trailData as { x: number; y: number; z?: number }[],
+      trailData: t.trailData as {
+        x: number;
+        y: number;
+        z?: number;
+        t?: number;
+      }[],
       color: t.color || undefined,
       userName: t.userName || undefined,
       walletAddress: t.walletAddress || undefined,

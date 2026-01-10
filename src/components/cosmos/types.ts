@@ -1,7 +1,7 @@
 export interface CosmosTrail {
   id: string;
   createdAt: string | Date;
-  trailData: { x: number; y: number; z?: number }[];
+  trailData: { x: number; y: number; z?: number; t?: number }[];
   duration: number;
   color?: string;
   title?: string;

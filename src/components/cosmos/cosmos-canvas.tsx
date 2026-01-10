@@ -16,6 +16,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { StarField } from './star-field';
 import { CosmosTrail } from './types';
 import { getStarPosition } from './utils';
+import { splitIntoStrokes } from '@/components/canvas/light-trail';
 
 // Helper to track 3D position to 2D screen coordinates
 function ScreenPositionTracker({
@@ -125,89 +126,92 @@ export function CosmosCanvas({
   if (!mounted) return <div className="w-full h-full bg-black" />;
 
   return (
-    <div className="w-full h-full bg-black relative" style={{ isolation: 'isolate' }}>
+    <div
+      className="w-full h-full bg-black relative"
+      style={{ isolation: 'isolate' }}
+    >
       <div className="absolute inset-0 z-0">
         <Canvas
           camera={{ position: [0, 20, 100], fov: 50 }}
           style={{ touchAction: 'none' }}
         >
-        <color attach="background" args={['#000000']} />
+          <color attach="background" args={['#000000']} />
 
-        <ScreenPositionTracker
-          targetPosition={targetPos}
-          onUpdate={setScreenPos}
-        />
-
-        <Stars
-          radius={150}
-          depth={50}
-          count={7000}
-          factor={4}
-          saturation={0}
-          fade
-          speed={0.5}
-        />
-        <ambientLight intensity={0.2} />
-        <pointLight position={[0, 0, 0]} intensity={2} color="purple" />
-
-        {/* Pass computed time props down */}
-        <StarField
-          trails={validTrails}
-          minTime={minTime}
-          timeSpan={timeSpan}
-          onSelect={selectStar}
-          isFocused={!!selectedTrail}
-          onLayoutComputed={setStarPositions}
-        />
-
-        <TimeMarkers minTime={minTime} maxTime={maxTime} />
-        <ReferenceGrid />
-
-        {ACTIVE_BRANDS.map((brand) => (
-          <BrandConstellation
-            key={brand.id}
-            brandName={brand.name}
-            logoType={brand.logoType}
-            position={brand.position}
-            color={brand.color}
-            scale={brand.scale}
+          <ScreenPositionTracker
+            targetPosition={targetPos}
+            onUpdate={setScreenPos}
           />
-        ))}
 
-        {selectedTrail && (
-          <group>
-            {targetPos && (
-              <group position={targetPos}>
-                {/* Render the Trail */}
-                <StaticTrail
-                  points={selectedTrail.trailData}
-                  color={selectedTrail.color || '#ffffff'}
-                  offsetZ={0}
-                  scale={2}
-                />
-              </group>
-            )}
-          </group>
-        )}
-
-        <EffectComposer>
-          <Bloom
-            luminanceThreshold={0.2}
-            luminanceSmoothing={0.9}
-            height={300}
-            intensity={1.0}
+          <Stars
+            radius={150}
+            depth={50}
+            count={7000}
+            factor={4}
+            saturation={0}
+            fade
+            speed={0.5}
           />
-        </EffectComposer>
+          <ambientLight intensity={0.2} />
+          <pointLight position={[0, 0, 0]} intensity={2} color="purple" />
 
-        <OrbitControls
-          autoRotate={!selectedTrail}
-          autoRotateSpeed={0.5}
-          enableZoom={true}
-          maxDistance={800}
-          minDistance={10}
-          target={targetPos || new THREE.Vector3(0, 0, 0)}
-        />
-      </Canvas>
+          {/* Pass computed time props down */}
+          <StarField
+            trails={validTrails}
+            minTime={minTime}
+            timeSpan={timeSpan}
+            onSelect={selectStar}
+            isFocused={!!selectedTrail}
+            onLayoutComputed={setStarPositions}
+          />
+
+          <TimeMarkers minTime={minTime} maxTime={maxTime} />
+          <ReferenceGrid />
+
+          {ACTIVE_BRANDS.map((brand) => (
+            <BrandConstellation
+              key={brand.id}
+              brandName={brand.name}
+              logoType={brand.logoType}
+              position={brand.position}
+              color={brand.color}
+              scale={brand.scale}
+            />
+          ))}
+
+          {selectedTrail && (
+            <group>
+              {targetPos && (
+                <group position={targetPos}>
+                  {/* Render the Trail */}
+                  <StaticTrail
+                    points={selectedTrail.trailData}
+                    color={selectedTrail.color || '#ffffff'}
+                    offsetZ={0}
+                    scale={2}
+                  />
+                </group>
+              )}
+            </group>
+          )}
+
+          <EffectComposer>
+            <Bloom
+              luminanceThreshold={0.2}
+              luminanceSmoothing={0.9}
+              height={300}
+              intensity={1.0}
+            />
+          </EffectComposer>
+
+          <OrbitControls
+            autoRotate={!selectedTrail}
+            autoRotateSpeed={0.5}
+            enableZoom={true}
+            maxDistance={800}
+            minDistance={10}
+            target={targetPos || new THREE.Vector3(0, 0, 0)}
+          />
+        </Canvas>
       </div>
 
       {/* UI Overlay */}
@@ -480,40 +484,33 @@ function FindMeButton({
   );
 }
 
-function StaticTrail({
+// Single stroke line renderer
+function StrokeLine({
   points,
   color,
   offsetZ,
-  scale = 1,
+  scale,
+  centroid,
 }: {
-  points: { x: number; y: number; z?: number }[];
+  points: { x: number; y: number; z?: number; t?: number }[];
   color: string;
   offsetZ: number;
-  scale?: number;
+  scale: number;
+  centroid: { x: number; y: number };
 }) {
   const lineGeometry = useMemo(() => {
-    if (!points || !Array.isArray(points) || points.length < 2) return null;
-
-    // Calculate Centroid to center the trail at (0,0) locally
-    let avgX = 0,
-      avgY = 0;
-    points.forEach((p) => {
-      avgX += p.x;
-      avgY += p.y;
-    });
-    avgX /= points.length;
-    avgY /= points.length;
+    if (!points || points.length < 2) return null;
 
     const vectorPoints = points.map(
       (p) =>
         new THREE.Vector3(
-          (p.x - avgX) * scale, // Center and scale
-          (p.y - avgY) * scale,
+          (p.x - centroid.x) * scale,
+          (p.y - centroid.y) * scale,
           (p.z || 0) * scale + offsetZ
         )
     );
     return new THREE.BufferGeometry().setFromPoints(vectorPoints);
-  }, [points, offsetZ, scale]);
+  }, [points, offsetZ, scale, centroid]);
 
   if (!lineGeometry) return null;
   return (
@@ -521,5 +518,71 @@ function StaticTrail({
       <bufferGeometry {...lineGeometry} />
       <lineBasicMaterial color={color} transparent opacity={1} linewidth={2} />
     </line>
+  );
+}
+
+function StaticTrail({
+  points,
+  color,
+  offsetZ,
+  scale = 1,
+}: {
+  points: { x: number; y: number; z?: number; t?: number }[];
+  color: string;
+  offsetZ: number;
+  scale?: number;
+}) {
+  // Split into strokes and calculate centroid
+  const { strokes, centroid } = useMemo(() => {
+    if (!points || !Array.isArray(points) || points.length < 2) {
+      return { strokes: [], centroid: { x: 0, y: 0 } };
+    }
+
+    // Calculate centroid for all points (for centering)
+    let avgX = 0,
+      avgY = 0;
+    let count = 0;
+    points.forEach((p) => {
+      if (p.t !== -1) {
+        avgX += p.x;
+        avgY += p.y;
+        count++;
+      }
+    });
+    if (count > 0) {
+      avgX /= count;
+      avgY /= count;
+    }
+
+    // Split into separate strokes (cast to TrailPoint[] with defaults)
+    const normalizedPoints = points.map((p) => ({
+      x: p.x,
+      y: p.y,
+      z: p.z ?? 0,
+      t: p.t ?? 0,
+    }));
+    const strokesArray = splitIntoStrokes(normalizedPoints);
+
+    return {
+      strokes: strokesArray,
+      centroid: { x: avgX, y: avgY },
+    };
+  }, [points]);
+
+  if (strokes.length === 0) return null;
+
+  return (
+    <group>
+      {strokes.map((strokePoints, index) => (
+        <StrokeLine
+          key={index}
+          points={strokePoints}
+          color={color}
+          offsetZ={offsetZ}
+          scale={scale}
+          centroid={centroid}
+        />
+      ))}
+    </group>
   );
 }
