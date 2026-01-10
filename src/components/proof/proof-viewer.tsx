@@ -186,7 +186,48 @@ export function ProofViewer({
       return;
     }
 
-    // Composite with Title
+    // For upload-only mode, just upload the clean canvas without overlay
+    if (mode === 'upload-only') {
+      // Create a clean canvas with black background + art only
+      const canvas = document.createElement('canvas');
+      canvas.width = 1920;
+      canvas.height = 1080;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const img = new Image();
+      img.src = imgData;
+      img.onload = async () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(
+          async (blob) => {
+            if (!blob) return;
+
+            const formData = new FormData();
+            formData.append('file', blob, 'preview.webp');
+            formData.append('sessionId', session.id);
+
+            try {
+              await fetch('/api/storage/upload', {
+                method: 'POST',
+                body: formData,
+              });
+            } catch (e) {
+              console.error('Failed to upload preview:', e);
+            }
+          },
+          'image/webp',
+          0.9
+        );
+      };
+      return;
+    }
+
+    // Composite with Title (for 'with-title' mode)
     const canvas = document.createElement('canvas');
     // Set HiDPI / 1080p target
     canvas.width = 1920;
@@ -249,32 +290,15 @@ export function ProofViewer({
         ctx.fillText('proofexistence.com', canvas.width - 60, 170);
       }
 
-      // Convert to WebP and Upload
+      // Convert to WebP and Download (with-title mode only downloads, doesn't upload)
       canvas.toBlob(
-        async (blob) => {
+        (blob) => {
           if (!blob) return;
 
-          if (mode !== 'upload-only') {
-            // 1. Download locally (UX)
-            const url = URL.createObjectURL(blob);
-            downloadImage(url, `proof-${session.id}-referral.webp`);
-            URL.revokeObjectURL(url);
-          }
-
-          // 2. Upload to R2 (Auto-save preview)
-          // Always upload on regular screenshot, OR if specific update requested
-          const formData = new FormData();
-          formData.append('file', blob, 'preview.webp');
-          formData.append('sessionId', session.id);
-
-          try {
-            await fetch('/api/storage/upload', {
-              method: 'POST',
-              body: formData,
-            });
-          } catch (e) {
-            console.error('Failed to upload preview:', e);
-          }
+          // Download locally (UX) - no upload for with-title mode
+          const url = URL.createObjectURL(blob);
+          downloadImage(url, `proof-${session.id}-referral.webp`);
+          URL.revokeObjectURL(url);
         },
         'image/webp',
         0.9
