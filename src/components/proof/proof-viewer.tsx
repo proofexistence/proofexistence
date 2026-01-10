@@ -3,7 +3,7 @@
 import { BLOCK_EXPLORER, isTestnet } from '@/lib/contracts';
 import { getArweaveUrl } from '@/lib/arweave-gateway';
 
-import { useRef, useState, useMemo, useEffect } from 'react';
+import { useRef, useState, useMemo, useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { ReplayCanvasRef } from '@/components/canvas/replay-canvas';
@@ -82,48 +82,6 @@ export function ProofViewer({
     recordView(session.id);
   }, [session.id, recordView]);
 
-  // Auto-generate preview if missing
-  // Auto-generate preview if missing
-  useEffect(() => {
-    // If we already have a preview OR if we have an NFT (ipfsHash), do nothing
-    if (session.previewUrl || session.ipfsHash) {
-      return;
-    }
-
-    let attempts = 0;
-    const maxAttempts = 20; // Try for 10 seconds (20 * 500ms)
-
-    const checkAndUpload = setInterval(() => {
-      attempts++;
-
-      // Check if canvas exists and is ready
-      if (canvasRef.current) {
-        clearInterval(checkAndUpload);
-
-        // Canvas is mounted. Stabilize view for screenshot.
-        // 1. Stop spinning
-        setIsSpinning(false);
-
-        // 2. Wait for render cycle, then reset view and capture
-        setTimeout(() => {
-          if (canvasRef.current) {
-            canvasRef.current.resetView(); // Force standard angle
-          }
-
-          setTimeout(() => {
-            handleScreenshot('upload-only');
-            setIsSpinning(true); // Resume spinning
-          }, 500); // Small delay after reset to ensure frame is rendered
-        }, 2000);
-      } else if (attempts >= maxAttempts) {
-        clearInterval(checkAndUpload);
-        console.warn('[Auto-Preview] Timed out waiting for canvas ref');
-      }
-    }, 500);
-
-    return () => clearInterval(checkAndUpload);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session.previewUrl, session.id]);
 
   const { points: trailData, color: trailColor } = useMemo(() => {
     const raw = session.trailData as
@@ -143,18 +101,23 @@ export function ProofViewer({
   }, [session.trailData, session.color]);
 
   // Format date on client-side only to avoid hydration mismatch (server/client timezone differences)
-  const [date, setDate] = useState<string>('');
-  useEffect(() => {
-    setDate(
-      new Date(session.createdAt as string).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    );
-  }, [session.createdAt]);
+  // useSyncExternalStore with empty subscribe ensures consistent server/client rendering
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  const date = useMemo(() => {
+    if (!isClient) return '';
+    return new Date(session.createdAt as string).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }, [isClient, session.createdAt]);
 
   const handleExit = () => {
     // Smart Exit:
@@ -172,9 +135,7 @@ export function ProofViewer({
     }
   };
 
-  const handleScreenshot = (
-    mode: 'art-only' | 'with-title' | 'upload-only'
-  ) => {
+  const handleScreenshot = (mode: 'art-only' | 'with-title') => {
     if (!canvasRef.current) return;
     setShowMenu(false);
 
@@ -183,47 +144,6 @@ export function ProofViewer({
 
     if (mode === 'art-only') {
       downloadImage(imgData, `proof-${session.id}-art.png`);
-      return;
-    }
-
-    // For upload-only mode, just upload the clean canvas without overlay
-    if (mode === 'upload-only') {
-      // Create a clean canvas with black background + art only
-      const canvas = document.createElement('canvas');
-      canvas.width = 1920;
-      canvas.height = 1080;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const img = new Image();
-      img.src = imgData;
-      img.onload = async () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        canvas.toBlob(
-          async (blob) => {
-            if (!blob) return;
-
-            const formData = new FormData();
-            formData.append('file', blob, 'preview.webp');
-            formData.append('sessionId', session.id);
-
-            try {
-              await fetch('/api/storage/upload', {
-                method: 'POST',
-                body: formData,
-              });
-            } catch (e) {
-              console.error('Failed to upload preview:', e);
-            }
-          },
-          'image/webp',
-          0.9
-        );
-      };
       return;
     }
 
