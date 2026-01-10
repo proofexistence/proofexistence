@@ -390,13 +390,7 @@ export function ProofViewer({
     : null;
 
   return (
-    <div
-      className="w-full h-screen relative bg-transparent overflow-hidden flex flex-col"
-      onContextMenu={(e) => {
-        e.preventDefault();
-        handleScreenshot('with-title'); // Right click -> Full Screenshot
-      }}
-    >
+    <div className="w-full h-screen relative bg-transparent overflow-hidden flex flex-col">
       {/* Header Overlay */}
       <div className="absolute top-8 left-0 w-full p-6 z-10 flex justify-between items-start pointer-events-none">
         <div className="animate-in slide-in-from-top-4 fade-in duration-700 max-w-xl mr-12 md:mr-0">
