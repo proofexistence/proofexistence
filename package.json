@@ -101,7 +101,7 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": "20.x",
+    "node": "24.x",
     "bun": ">=1.0.0"
   },
   "overrides": {

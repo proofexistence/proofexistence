@@ -62,10 +62,14 @@ export function Footer() {
             <div className="flex flex-wrap items-center gap-4">
               <button
                 onClick={() => setSponsorOpen(true)}
-                className="group flex items-center gap-3 px-6 py-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 transition-all duration-300"
+                className="group relative flex items-center gap-3 px-6 py-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 overflow-hidden"
               >
-                <Heart className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
-                <div className="text-left">
+                {/* Animated border light */}
+                <span className="absolute inset-0 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors" />
+                <span className="absolute inset-0 rounded-xl animate-border-light" />
+
+                <Heart className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform relative z-10" />
+                <div className="text-left relative z-10">
                   <span className="font-medium text-zinc-200 group-hover:text-white transition-colors">
                     {t('sponsorStranger')}
                   </span>
@@ -85,6 +89,7 @@ export function Footer() {
                   alt="PROOF OF EXISTENCE 2026 - Prove you existed in 2026 - draw, recorded forever | Product Hunt"
                   width={250}
                   height={54}
+                  priority
                   unoptimized
                 />
               </a>

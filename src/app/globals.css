@@ -100,6 +100,43 @@
   }
 }
 
+/* Animated border light effect */
+.animate-border-light {
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    transparent 25%,
+    rgba(168, 85, 247, 0.6) 50%,
+    transparent 75%,
+    transparent 100%
+  );
+  animation: border-light-rotate 4s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 1px;
+}
+
+@keyframes border-light-rotate {
+  0% {
+    --border-angle: 0deg;
+  }
+  100% {
+    --border-angle: 360deg;
+  }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }

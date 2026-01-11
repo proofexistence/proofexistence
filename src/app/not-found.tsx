@@ -1,7 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Lottie404 } from '@/components/ui/lottie-404';
+import dynamic from 'next/dynamic';
+
+const Lottie404 = dynamic(
+  () => import('@/components/ui/lottie-404').then((mod) => mod.Lottie404),
+  {
+    ssr: false,
+  }
+);
 
 export default function NotFound() {
   return (
