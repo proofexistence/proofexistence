@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { usePathname as useNextPathname } from 'next/navigation';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Heart, Wallet } from 'lucide-react';
@@ -58,20 +59,36 @@ export function Footer() {
               </h4>
             </div>
 
-            <button
-              onClick={() => setSponsorOpen(true)}
-              className="group flex items-center gap-3 px-6 py-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 transition-all duration-300"
-            >
-              <Heart className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
-              <div className="text-left">
-                <span className="font-medium text-zinc-200 group-hover:text-white transition-colors">
-                  {t('sponsorStranger')}
-                </span>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  {t('sponsorDescription')}
-                </p>
-              </div>
-            </button>
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={() => setSponsorOpen(true)}
+                className="group flex items-center gap-3 px-6 py-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 transition-all duration-300"
+              >
+                <Heart className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+                <div className="text-left">
+                  <span className="font-medium text-zinc-200 group-hover:text-white transition-colors">
+                    {t('sponsorStranger')}
+                  </span>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    {t('sponsorDescription')}
+                  </p>
+                </div>
+              </button>
+
+              <a
+                href="https://www.producthunt.com/products/proof-of-existence-2026?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-proof-of-existence-2026"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1060897&theme=dark&t=1768141836161"
+                  alt="PROOF OF EXISTENCE 2026 - Prove you existed in 2026 - draw, recorded forever | Product Hunt"
+                  width={250}
+                  height={54}
+                  unoptimized
+                />
+              </a>
+            </div>
 
             <p className="text-xs text-zinc-500 mt-3 pl-1">
               {t('donationNote')}

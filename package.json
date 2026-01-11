@@ -19,6 +19,7 @@
   "dependencies": {
     "@ardrive/turbo-sdk": "^1.39.2",
     "@aws-sdk/client-s3": "^3.958.0",
+    "@dotlottie/react-player": "^1.6.19",
     "@gsap/react": "^2.1.2",
     "@neondatabase/serverless": "^1.0.2",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
