@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search, Filter, Loader2 } from 'lucide-react';
+import { useExplore } from '@/hooks/use-explore';
 
 interface Proof {
   id: string;
@@ -37,12 +38,6 @@ export function ExploreClient({
   initialProofs,
   initialTotal,
 }: ExploreClientProps) {
-  const [proofs, setProofs] = useState<Proof[]>(initialProofs);
-  const [total, setTotal] = useState(initialTotal);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
   // Filters
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -50,64 +45,27 @@ export function ExploreClient({
   const [sortBy, setSortBy] = useState('recent');
   const [timeframe, setTimeframe] = useState('all');
 
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useExplore({
+      search,
+      status,
+      sortBy,
+      timeframe,
+    });
+
+  const proofs = data?.pages.flatMap((page) => page.proofs) || initialProofs;
+  const total = data?.pages[0]?.pagination.total ?? initialTotal;
+
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Fetch proofs with current filters
-  const fetchProofs = useCallback(
-    async (pageNum: number, reset = false) => {
-      if (loading) return;
-
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page: pageNum.toString(),
-          limit: '20',
-          ...(search && { search }),
-          ...(status !== 'all' && { status }),
-          ...(sortBy && { sortBy }),
-          ...(timeframe !== 'all' && { timeframe }),
-        });
-
-        const response = await fetch(`/api/explore?${params}`);
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch proofs');
-        }
-
-        const data = await response.json();
-        const newProofs = data.proofs ?? [];
-
-        if (reset) {
-          setProofs(newProofs);
-        } else {
-          setProofs((prev) => [...prev, ...newProofs]);
-        }
-
-        setTotal(data.pagination?.total ?? 0);
-        setHasMore(data.pagination?.hasMore ?? false);
-        setPage(pageNum);
-      } catch (error) {
-        console.error('Error fetching proofs:', error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [search, status, sortBy, timeframe, loading]
-  );
-
-  // Handle filter changes - reset to page 1
-  useEffect(() => {
-    setPage(1);
-    fetchProofs(1, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, status, sortBy, timeframe]);
+  // Removed fetchProofs and filter effect - handled by react-query
 
   // Infinite scroll observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting && hasMore && !loading) {
-          fetchProofs(page + 1, false);
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
       },
       { threshold: 0.1 }
@@ -123,7 +81,7 @@ export function ExploreClient({
         observer.unobserve(currentTarget);
       }
     };
-  }, [hasMore, loading, page, fetchProofs]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Handle search submit
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -236,7 +194,7 @@ export function ExploreClient({
         </div>
 
         {/* Gallery Grid */}
-        {loading && proofs.length === 0 ? (
+        {isLoading && proofs.length === 0 ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-white/40" />
           </div>
@@ -245,16 +203,16 @@ export function ExploreClient({
             <GalleryGrid proofs={proofs} />
 
             {/* Infinite Scroll Trigger */}
-            {hasMore && (
+            {hasNextPage && (
               <div ref={observerTarget} className="flex justify-center py-8">
-                {loading && (
+                {isFetchingNextPage && (
                   <Loader2 className="h-6 w-6 animate-spin text-white/40" />
                 )}
               </div>
             )}
 
             {/* No More Results */}
-            {!hasMore && proofs.length > 0 && (
+            {!hasNextPage && proofs.length > 0 && (
               <div className="text-center py-8">
                 <p className="text-white/40 text-sm">
                   You&apos;ve reached the end
@@ -263,7 +221,7 @@ export function ExploreClient({
             )}
 
             {/* No Results */}
-            {proofs.length === 0 && !loading && (
+            {proofs.length === 0 && !isLoading && (
               <div className="text-center py-20">
                 <p className="text-white/40">
                   No proofs found. Try adjusting your filters.

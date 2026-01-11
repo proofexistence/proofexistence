@@ -10,6 +10,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { useProfile } from '@/hooks/use-profile';
+import { useReferrals } from '@/hooks/use-referrals';
 
 interface ReferralDialogProps {
   open: boolean;
@@ -19,44 +20,17 @@ interface ReferralDialogProps {
 export function ReferralDialog({ open, onOpenChange }: ReferralDialogProps) {
   const { profile } = useProfile();
   const [copied, setCopied] = useState(false);
-  const [referralCount, setReferralCount] = useState<number | null>(null);
-  const [isLoadingCount, setIsLoadingCount] = useState(false);
+  // Removed: const [referralCount, setReferralCount] = useState<number | null>(null);
+  // Removed: const [isLoadingCount, setIsLoadingCount] = useState(false);
 
   const referralLink =
     typeof window !== 'undefined' && profile?.referralCode
       ? `${window.location.origin}/?ref=${profile.referralCode}`
       : '';
 
-  // Fetch referral count when dialog opens
-  useEffect(() => {
-    if (!open || !profile) return;
-
-    let cancelled = false;
-
-    const fetchReferrals = async () => {
-      try {
-        const res = await fetch(`/api/user/referrals`);
-        const data = await res.json();
-        if (!cancelled) {
-          setReferralCount(data.count ?? 0);
-          setIsLoadingCount(false);
-        }
-      } catch {
-        if (!cancelled) {
-          setReferralCount(0);
-          setIsLoadingCount(false);
-        }
-      }
-    };
-
-    setIsLoadingCount(true);
-    fetchReferrals();
-
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, profile?.clerkId]);
+  // Replaced useEffect fetch with useReferrals hook
+  const { data: referrals, isLoading: isLoadingCount } = useReferrals();
+  const referralCount = referrals?.count;
 
   const handleCopy = async () => {
     if (!referralLink) return;

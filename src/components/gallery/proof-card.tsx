@@ -18,6 +18,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useProfile } from '@/hooks/use-profile';
 import { useSavedProofs } from '@/hooks/use-saved-proofs';
 import { useLikes } from '@/hooks/use-likes';
+import { useVisibility } from '@/hooks/use-visibility';
 import { useWeb3Auth } from '@/lib/web3auth';
 
 interface ProofCardProps {
@@ -106,6 +107,7 @@ export function ProofCard({
 
   // React Query Hook for Likes
   const { toggleLike } = useLikes();
+  const { toggleVisibility } = useVisibility();
 
   const handleToggleVisibility = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -115,18 +117,11 @@ export function ProofCard({
 
     setIsTogglingVisibility(true);
     try {
-      const res = await fetch(`/api/sessions/${id}/visibility`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Wallet-Address': user.walletAddress,
-        },
-        body: JSON.stringify({ hidden: hidden === 0 }),
+      await toggleVisibility.mutateAsync({
+        sessionId: id,
+        hidden: hidden === 0, // toggle check is based on previous state
       });
-
-      if (res.ok) {
-        onVisibilityChange?.();
-      }
+      onVisibilityChange?.();
     } catch (error) {
       console.error('Failed to toggle visibility:', error);
     } finally {

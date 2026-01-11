@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getArweaveUrl, normalizeArweaveUrl } from '@/lib/arweave-gateway';
+import { getArweaveUrls, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
 interface NFTThumbnailProps {
   ipfsHash: string;
@@ -14,18 +14,22 @@ export function NFTThumbnail({ ipfsHash, alt }: NFTThumbnailProps) {
   useEffect(() => {
     let mounted = true;
     const fetchImage = async () => {
-      try {
-        // Fetch metadata from Arweave gateway
-        const metadataUrl = getArweaveUrl(ipfsHash);
-        const res = await fetch(metadataUrl, { next: { revalidate: 86400 } }); // Cache 1 day
-        if (!res.ok) return;
+      // Try each gateway in order (primary + fallbacks)
+      const urls = getArweaveUrls(ipfsHash);
+      for (const metadataUrl of urls) {
+        try {
+          const res = await fetch(metadataUrl, { next: { revalidate: 86400 } }); // Cache 1 day
+          if (!res.ok) continue;
 
-        const data = await res.json();
-        if (data.image && mounted) {
-          setSrc(normalizeArweaveUrl(data.image));
+          const data = await res.json();
+          if (data.image && mounted) {
+            setSrc(normalizeArweaveUrl(data.image));
+            return; // Success, stop trying
+          }
+        } catch {
+          // Try next gateway
+          continue;
         }
-      } catch {
-        // Ignore errors
       }
     };
 

@@ -6,7 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Pencil } from 'lucide-react';
-import { getArweaveUrl, normalizeArweaveUrl } from '@/lib/arweave-gateway';
+import { getArweaveUrls, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
 interface Session {
   id: string;

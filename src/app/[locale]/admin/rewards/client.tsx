@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useWeb3Auth } from '@/lib/web3auth/context';
+import { useRewardsStatus } from '@/hooks/use-rewards';
 import { ShieldX } from 'lucide-react';
 import {
   RefreshCw,
@@ -19,89 +20,7 @@ import {
   Database,
 } from 'lucide-react';
 
-interface RewardsStatus {
-  timestamp: string;
-  network: string;
-  contracts: {
-    proofRecorder: string;
-    time26: string;
-    merkleRoot: string;
-  };
-  operator: {
-    address: string;
-    balance: string;
-    balanceFormatted: string;
-    hasEnoughGas: boolean;
-  };
-  arweave: {
-    balance: string;
-    balanceFormatted: string;
-    network: string;
-    hasEnoughBalance: boolean;
-  };
-  contractBalance: {
-    raw: string;
-    formatted: string;
-  };
-  totalSupply: {
-    raw: string;
-    formatted: string;
-  };
-  summary: {
-    initialDeposit: { raw: string; formatted: string; description: string };
-    totalBurned: { raw: string; formatted: string; description: string };
-    totalOnChainClaimed: {
-      raw: string;
-      formatted: string;
-      description: string;
-    };
-    totalDbBalance: { raw: string; formatted: string; description: string };
-    totalClaimable: { raw: string; formatted: string; description: string };
-    totalPendingBurn: { raw: string; formatted: string; description: string };
-    totalDistributed: { raw: string; formatted: string; description: string };
-    surplus: { raw: string; formatted: string; description: string };
-    hasSufficientFunds: boolean;
-    verification: {
-      formula: string;
-      initialDeposit: string;
-      sum: string;
-      difference: string;
-      isValid: boolean;
-    };
-  };
-  users: Array<{
-    id: string;
-    walletAddress: string;
-    username: string | null;
-    dbBalance: string;
-    dbBalanceFormatted: string;
-    pendingBurn: string;
-    pendingBurnFormatted: string;
-    claimed: string;
-    claimedFormatted: string;
-    claimable: string;
-    claimableFormatted: string;
-  }>;
-  dailyRewards: Array<{
-    dayId: string;
-    totalBudgetFormatted: string;
-    totalSeconds: number;
-    totalDistributedFormatted: string;
-    participantCount: number;
-    settledAt: string;
-  }>;
-  recentUserRewards: Array<{
-    dayId: string;
-    walletAddress: string;
-    username: string | null;
-    totalSeconds: number;
-    exclusiveSeconds: number;
-    sharedSeconds: number;
-    baseRewardFormatted: string;
-    bonusRewardFormatted: string;
-    totalRewardFormatted: string;
-  }>;
-}
+// Local interface removed, using type from hook if needed or inferred.
 
 function formatNumber(value: string, decimals = 2): string {
   const num = parseFloat(value);
@@ -153,49 +72,18 @@ function StatCard({
 
 export function AdminRewardsClient() {
   const { user, isConnected, isLoading: authLoading } = useWeb3Auth();
-  const [data, setData] = useState<RewardsStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [unauthorized, setUnauthorized] = useState(false);
+  const {
+    data,
+    isLoading: rewardsLoading,
+    error: rewardsError,
+    refetch,
+  } = useRewardsStatus();
 
-  const fetchData = useCallback(async () => {
-    if (!user?.walletAddress) {
-      setUnauthorized(true);
-      setLoading(false);
-      return;
-    }
+  const loading = rewardsLoading;
+  const error = rewardsError ? (rewardsError as Error).message : null;
+  const unauthorized = error === 'Access Denied';
 
-    setLoading(true);
-    setError(null);
-    setUnauthorized(false);
-    try {
-      const res = await fetch('/api/admin/rewards-status', {
-        headers: {
-          'X-Wallet-Address': user.walletAddress,
-        },
-      });
-      if (res.status === 403) {
-        setUnauthorized(true);
-        return;
-      }
-      if (!res.ok) throw new Error('Failed to fetch');
-      const json = await res.json();
-      setData(json);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.walletAddress]);
-
-  useEffect(() => {
-    if (!authLoading && isConnected) {
-      fetchData();
-    } else if (!authLoading && !isConnected) {
-      setUnauthorized(true);
-      setLoading(false);
-    }
-  }, [authLoading, isConnected, fetchData]);
+  const fetchData = () => refetch();
 
   if (authLoading || (loading && !data)) {
     return (

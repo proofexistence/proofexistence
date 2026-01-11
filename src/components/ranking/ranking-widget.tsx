@@ -4,44 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Trophy, Heart, Eye, Clock } from 'lucide-react';
 
-type RankingEntry = {
-  id: string;
-  userName: string | null;
-  walletAddress: string | null;
-  duration: number;
-  likes: number;
-  views: number;
-  message: string | null;
-};
-
-type RankingData = {
-  topDuration: RankingEntry[];
-  mostLiked: RankingEntry[];
-  mostViewed: RankingEntry[];
-};
+import { useRankings } from '@/hooks/use-rankings';
+// Actually, I'll keep RankingType local if it's UI specific, but the data types come from the hook.
 
 type RankingType = 'duration' | 'likes' | 'views';
 
 export function RankingWidget() {
-  const [rankings, setRankings] = useState<RankingData | null>(null);
+  const { data: rankings, isLoading: loading } = useRankings();
   const [activeTab, setActiveTab] = useState<RankingType>('likes');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchRankings() {
-      try {
-        const response = await fetch('/api/rankings');
-        const data = await response.json();
-        setRankings(data);
-      } catch (error) {
-        console.error('Failed to fetch rankings:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchRankings();
-  }, []);
 
   const tabs = [
     {

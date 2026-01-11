@@ -15,7 +15,14 @@ import { useWeb3Auth } from '@/lib/web3auth';
  * - Caches with React Query
  */
 export function ProfileSettingsForm() {
-  const { profile, isLoading, updateProfile } = useProfile();
+  const {
+    profile,
+    isLoading,
+    updateProfile,
+    uploadAvatar,
+    isUpdating,
+    isUploading,
+  } = useProfile();
   const { user } = useWeb3Auth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,7 +40,8 @@ export function ProfileSettingsForm() {
     type: string;
   } | null>(null);
 
-  const [isSaving, setIsSaving] = useState(false);
+  // const [isSaving, setIsSaving] = useState(false); // Removed separate state, use hook state if desired, but for now we might keep local saving state to combine both
+  const isSaving = isUpdating || isUploading;
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -77,31 +85,19 @@ export function ProfileSettingsForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaving(true);
+    // setIsSaving(true); // handled by hook state derived above
     setError(null);
     setSuccess(false);
 
     try {
       // Upload image to R2 if changed
+      // Upload image to R2 if changed
       let avatarUrl: string | undefined;
       if (imageFile && user?.walletAddress) {
-        const uploadRes = await fetch('/api/web3auth/upload-avatar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            walletAddress: user.walletAddress,
-            imageBase64: imageFile.base64,
-            imageType: imageFile.type,
-          }),
+        avatarUrl = await uploadAvatar({
+          imageBase64: imageFile.base64,
+          imageType: imageFile.type,
         });
-
-        if (!uploadRes.ok) {
-          const err = await uploadRes.json().catch(() => ({}));
-          throw new Error(err.error || 'Failed to upload image');
-        }
-
-        const uploadData = await uploadRes.json();
-        avatarUrl = uploadData.url;
       }
 
       await updateProfile({
@@ -120,7 +116,7 @@ export function ProfileSettingsForm() {
       console.error('[Settings] Error:', err);
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
-      setIsSaving(false);
+      // setIsSaving(false);
     }
   };
 

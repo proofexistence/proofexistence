@@ -1,9 +1,15 @@
 'use client';
 
 import { BLOCK_EXPLORER, isTestnet } from '@/lib/contracts';
-import { getArweaveUrl } from '@/lib/arweave-gateway';
+import { getArweaveUrls, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
-import { useRef, useState, useMemo, useEffect, useSyncExternalStore } from 'react';
+import {
+  useRef,
+  useState,
+  useMemo,
+  useEffect,
+  useSyncExternalStore,
+} from 'react';
 import { useRouter } from 'next/navigation';
 
 import { ReplayCanvasRef } from '@/components/canvas/replay-canvas';
@@ -81,7 +87,6 @@ export function ProofViewer({
   useEffect(() => {
     recordView(session.id);
   }, [session.id, recordView]);
-
 
   const { points: trailData, color: trailColor } = useMemo(() => {
     const raw = session.trailData as

@@ -31,6 +31,8 @@ import {
   useGaslessEligibility,
   useGaslessMint,
 } from '@/hooks/use-gasless-eligibility';
+import { useSessions } from '@/hooks/use-sessions';
+import { useProofSubmission } from '@/hooks/use-proof-submission';
 import { TrailPoint, MIN_SESSION_DURATION } from '@/types/session';
 import { TRAIL_COLORS } from './light-trail';
 import { useWeb3Auth } from '@/lib/web3auth';
@@ -428,7 +430,11 @@ export function POECanvas() {
   const [mounted, setMounted] = useState(false);
 
   // Auth & Submission State
-  const { profile } = useProfile();
+  const { profile, updateProfile } = useProfile();
+  const { createSession, deleteSession } = useSessions();
+  const { uploadPreview, submitStandard, submitInstant, mintProof } =
+    useProofSubmission();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -678,65 +684,33 @@ export function POECanvas() {
     // Effect will pick this up, render CaptureScene, capture, then open modal
   }, [authenticated, login]);
 
-  // Helper to build auth headers (token for social login, wallet address for external wallet)
-  const getAuthHeaders = useCallback(async (): Promise<
-    Record<string, string>
-  > => {
-    const token = await getIdToken();
-    if (token) {
-      return { Authorization: `Bearer ${token}` };
-    }
-    // Fallback to wallet address for external wallets
-    if (web3User?.walletAddress) {
-      return { 'X-Wallet-Address': web3User.walletAddress };
-    }
-    throw new Error('Not authenticated');
-  }, [getIdToken, web3User?.walletAddress]);
+  // Auth headers helper removed - handled by hooks
 
   // Helper function to create session
-  const createSession = useCallback(async () => {
+  const handleCreateSession = useCallback(async () => {
     const session = completedSessionRef.current;
     if (!session) throw new Error('No session data found');
 
-    const authHeaders = await getAuthHeaders();
-
-    const response = await fetch('/api/sessions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeaders,
-      },
-      body: JSON.stringify({
-        duration: session.duration,
-        points: session.points,
-        sectorId: session.sectorId,
-        color: trailColor, // Use current state (allows changing color after recording)
-      }),
+    const sessionId = await createSession.mutateAsync({
+      duration: session.duration,
+      points: session.points,
+      sectorId: session.sectorId,
+      color: trailColor,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Failed to create session');
-    }
-    const data = await response.json();
-    return data.session.id; // Return the new session ID
-  }, [trailColor, getAuthHeaders]);
+    return sessionId;
+  }, [trailColor, createSession]);
 
   // Helper function to delete session
-  const deleteSession = useCallback(
+  const handleDeleteSession = useCallback(
     async (sessionId: string) => {
       try {
-        const authHeaders = await getAuthHeaders();
-        await fetch(`/api/sessions?id=${sessionId}`, {
-          method: 'DELETE',
-          headers: authHeaders,
-        });
+        await deleteSession.mutateAsync(sessionId);
         setCurrentSessionId(null);
       } catch (e) {
         console.error('Failed to cleanup session:', e);
       }
     },
-    [getAuthHeaders]
+    [deleteSession]
   );
 
   // Request mint confirmation for non-Web3 users
@@ -796,7 +770,7 @@ export function POECanvas() {
 
         // 2. Create or Reuse Session
         if (!sessionId) {
-          sessionId = await createSession();
+          sessionId = await handleCreateSession();
           setCurrentSessionId(sessionId); // Store for idempotency
         }
 
@@ -821,9 +795,9 @@ export function POECanvas() {
               formData.append('file', file);
               formData.append('sessionId', sessionId!);
 
-              await fetch('/api/storage/upload', {
-                method: 'POST',
-                body: formData,
+              await uploadPreview.mutateAsync({
+                sessionId: sessionId!,
+                imageBlob: blob,
               });
             } catch (uploadErr) {
               console.warn('Preview upload failed (non-critical):', uploadErr);
@@ -831,26 +805,14 @@ export function POECanvas() {
           }
 
           setLoadingStatus('Submitting proof...');
-          const authHeaders = await getAuthHeaders();
-          const response = await fetch('/api/session/submit-standard', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...authHeaders,
-            },
-            body: JSON.stringify({
-              sessionId: sessionId,
-              message: data.message,
-              title: data.title,
-              description: data.description,
-              color: trailColor,
-            }),
+          setLoadingStatus('Submitting proof...');
+          await submitStandard.mutateAsync({
+            sessionId: sessionId,
+            message: data.message,
+            title: data.title,
+            description: data.description,
+            color: trailColor,
           });
-
-          if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.error || 'Standard submission failed');
-          }
 
           // Close submission modal explicitly before success dialog
           setShowSubmissionModal(false);
@@ -880,34 +842,17 @@ export function POECanvas() {
         } else {
           // INSTANT
           const imageData = screenshotRef.current || screenshotData;
-          const instantAuthHeaders = await getAuthHeaders();
-          const response = await fetch('/api/session/submit-instant', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...instantAuthHeaders,
-            },
-            body: JSON.stringify({
-              sessionId: sessionId,
-              imageData: imageData, // Send the screenshot
-              message: data.message,
-              title: data.title,
-              description: data.description,
-              color: trailColor,
-              username: data.username,
-              existingArweaveTxId: existingArweaveTxId || undefined,
-            }),
+          const dataRes = await submitInstant.mutateAsync({
+            sessionId: sessionId,
+            imageData: imageData!,
+            message: data.message,
+            title: data.title,
+            description: data.description,
+            color: trailColor,
+            username: data.username,
+            existingArweaveTxId: existingArweaveTxId || undefined,
           });
 
-          if (!response.ok) {
-            const err = await response.json();
-            console.error('Instant submission failed details:', err);
-            throw new Error(
-              err.details || err.error || 'Instant submission failed'
-            );
-          }
-
-          const dataRes = await response.json();
           setExistingArweaveTxId(dataRes.arweaveTxId); // Save for retry optimization
 
           // --- SMART CONTRACT INTEGRATION ---
@@ -1158,28 +1103,16 @@ export function POECanvas() {
               );
 
               // Call API endpoint
-              const mintRes = await fetch('/api/mint', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  ...instantAuthHeaders,
-                },
-                body: JSON.stringify({
-                  sessionId: sessionId,
-                  arweaveTxId: dataRes.arweaveTxId,
-                  duration: session.duration,
-                  paymentMethod: data.paymentMethod || 'NATIVE',
-                  username: displayName,
-                  message: data.message,
-                }),
+              // Call API endpoint
+              const mintData = await mintProof.mutateAsync({
+                sessionId: sessionId,
+                arweaveTxId: dataRes.arweaveTxId,
+                duration: session.duration,
+                paymentMethod: data.paymentMethod || 'NATIVE',
+                username: displayName,
+                message: data.message,
               });
 
-              if (!mintRes.ok) {
-                const errData = await mintRes.json();
-                throw new Error(errData.error || 'Minting API failed');
-              }
-
-              const mintData = await mintRes.json();
               txHash = mintData.txHash;
 
               setLoadingStatus('Transaction Submitted!');
@@ -1288,7 +1221,7 @@ export function POECanvas() {
 
         // Cleanup failed session
         if (sessionId) {
-          await deleteSession(sessionId);
+          await handleDeleteSession(sessionId);
         }
 
         setDialogState({
@@ -1309,18 +1242,18 @@ export function POECanvas() {
       }
     },
     [
-      getAuthHeaders,
-      clearTrail,
-      router,
-      screenshotData,
-      trailColor,
-      createSession,
+      handleCreateSession,
       currentSessionId,
       existingArweaveTxId,
-      deleteSession,
+      handleDeleteSession,
       setLoadingStatus,
       requestMintConfirmation,
       gaslessMint,
+      uploadPreview,
+      submitStandard,
+      submitInstant,
+      mintProof,
+      deleteSession,
     ]
   );
 
@@ -1544,19 +1477,7 @@ export function POECanvas() {
               : '0'
           }
           onSetAsDisplayName={async (name: string) => {
-            const headers = await getAuthHeaders();
-            const res = await fetch('/api/user/update', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...headers,
-              },
-              body: JSON.stringify({ name }),
-            });
-            if (!res.ok) {
-              const err = await res.json();
-              throw new Error(err.error || 'Failed to update display name');
-            }
+            await updateProfile({ name });
           }}
         />
 

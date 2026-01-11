@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useWeb3Auth } from '@/lib/web3auth';
 
 export interface Profile {
@@ -75,32 +75,60 @@ export function useProfile() {
     refetchOnWindowFocus: false,
   });
 
-  // Helper to update and refetch
-  const updateProfile = async (data: {
-    username?: string | null;
-    name?: string | null;
-    avatarUrl?: string | null;
-  }): Promise<Profile> => {
-    if (!user?.walletAddress) throw new Error('Not authenticated');
+  // Update Profile Mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: {
+      username?: string | null;
+      name?: string | null;
+      avatarUrl?: string | null;
+    }) => {
+      if (!user?.walletAddress) throw new Error('Not authenticated');
 
-    const res = await fetch('/api/web3auth/update-profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ walletAddress: user.walletAddress, ...data }),
-    });
+      const res = await fetch('/api/web3auth/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: user.walletAddress, ...data }),
+      });
 
-    if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.error || 'Failed to update profile');
-    }
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || 'Failed to update profile');
+      }
 
-    const result = await res.json();
+      const result = await res.json();
+      return result.user as Profile;
+    },
+    onSuccess: (updatedUser) => {
+      if (user?.walletAddress) {
+        queryClient.setQueryData(['profile', user.walletAddress], updatedUser);
+      }
+    },
+  });
 
-    // Update cache
-    queryClient.setQueryData(['profile', user.walletAddress], result.user);
+  // Upload Avatar Mutation
+  const uploadAvatarMutation = useMutation({
+    mutationFn: async (data: { imageBase64: string; imageType: string }) => {
+      if (!user?.walletAddress) throw new Error('Not authenticated');
 
-    return result.user;
-  };
+      const res = await fetch('/api/web3auth/upload-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: user.walletAddress,
+          imageBase64: data.imageBase64,
+          imageType: data.imageType,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to upload image');
+      }
+
+      const uploadData = await res.json();
+      return uploadData.url as string;
+    },
+  });
 
   // Computed display label: name > truncated wallet
   const displayLabel = profile
@@ -114,6 +142,9 @@ export function useProfile() {
     isAuthenticated: isConnected && !!profile,
     error,
     refetch,
-    updateProfile,
+    updateProfile: updateProfileMutation.mutateAsync,
+    isUpdating: updateProfileMutation.isPending,
+    uploadAvatar: uploadAvatarMutation.mutateAsync,
+    isUploading: uploadAvatarMutation.isPending,
   };
 }
