@@ -122,8 +122,14 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   org: 'proof-existence',
   project: 'proofofexistence-web',
 
+  // Auth token for source map uploads (set SENTRY_AUTH_TOKEN env var in CI/Vercel)
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
+
+  // Disable Sentry telemetry
+  telemetry: false,
 
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
@@ -133,4 +139,9 @@ export default withSentryConfig(withNextIntl(nextConfig), {
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: '/monitoring',
+
+  // Disable source map upload if no auth token (for local dev)
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
 });
