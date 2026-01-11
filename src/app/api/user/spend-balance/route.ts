@@ -13,7 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/get-user';
 import { db } from '@/db';
-import { users } from '@/db/schema';
+import { users, time26Transactions } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { formatTime26 } from '@/lib/rewards/calculate';
 
@@ -81,21 +81,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Deduct from balance and add to pending burn
-    await db
-      .update(users)
-      .set({
-        time26Balance: sql`${users.time26Balance} - ${amount}::numeric`,
-        time26PendingBurn: sql`${users.time26PendingBurn} + ${amount}::numeric`,
-      })
-      .where(eq(users.id, dbUser.id));
-
     // Calculate new balance
     const newBalance = balance - amountBigInt;
 
-    // console.log(
-    //   `[SpendBalance] User ${user.walletAddress} spent ${formatTime26(amount)} TIME26 for ${reason}${sessionId ? ` (session: ${sessionId})` : ''}`
-    // );
+    // Map reason to transaction type
+    const typeMap: Record<string, string> = {
+      instant_proof: 'instant_proof_payment',
+      nft_mint: 'nft_mint_payment',
+    };
+    const transactionType = typeMap[reason] || reason;
+
+    // Deduct from balance, add to pending burn, and log transaction
+    await db.transaction(async (tx) => {
+      await tx
+        .update(users)
+        .set({
+          time26Balance: sql`${users.time26Balance} - ${amount}::numeric`,
+          time26PendingBurn: sql`${users.time26PendingBurn} + ${amount}::numeric`,
+        })
+        .where(eq(users.id, dbUser.id));
+
+      await tx.insert(time26Transactions).values({
+        userId: dbUser.id,
+        type: transactionType,
+        amount: amount,
+        direction: 'debit',
+        balanceBefore: balance.toString(),
+        balanceAfter: newBalance.toString(),
+        referenceId: sessionId || null,
+        referenceType: sessionId ? 'session' : null,
+        description: `Payment for ${reason}${sessionId ? ` (session: ${sessionId})` : ''}`,
+      });
+    });
+
+    console.log(
+      `[SpendBalance] User ${user.walletAddress} spent ${formatTime26(amount)} TIME26 for ${reason}${sessionId ? ` (session: ${sessionId})` : ''}`
+    );
 
     return NextResponse.json({
       success: true,

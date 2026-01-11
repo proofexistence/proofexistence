@@ -32,35 +32,63 @@ function getAdminWallets(): string[] {
     .filter((addr) => addr.length > 0);
 }
 
-function isAdminWallet(walletAddress: string | null): boolean {
-  if (!walletAddress) return false;
+// Check via Env Var (Fallback/Bootstrap)
+function isEnvAdmin(walletAddress: string): boolean {
   const admins = getAdminWallets();
-  // If no admins configured, deny all access
-  if (admins.length === 0) return false;
   return admins.includes(walletAddress.toLowerCase());
 }
 
 export async function GET(req: NextRequest) {
-  // Check admin access
-  const authHeader = req.headers.get('authorization');
-  let walletAddress: string | null = null;
-
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.slice(7);
-    const verified = await verifyWeb3AuthToken(token);
-    if (verified) {
-      walletAddress = verified.walletAddress;
-    }
-  }
-
-  if (!isAdminWallet(walletAddress)) {
-    return NextResponse.json(
-      { error: 'Unauthorized', message: 'Admin access required' },
-      { status: 403 }
-    );
-  }
-
   try {
+    // 1. Authenticate User (Verify Signature)
+    const authHeader = req.headers.get('authorization');
+    let walletAddress: string | null = null;
+    let authMethod = 'none';
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      const verified = await verifyWeb3AuthToken(token);
+      if (verified) {
+        walletAddress = verified.walletAddress;
+        authMethod = 'token';
+      }
+    }
+
+    if (!walletAddress) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Missing or invalid token' },
+        { status: 401 }
+      );
+    }
+
+    // 2. Authorize (Check Admin Status)
+    let isAdmin = false;
+
+    // A. Check Database (Primary)
+    const dbUser = await db.query.users.findFirst({
+      where: eq(users.walletAddress, walletAddress),
+      columns: {
+        isAdmin: true,
+      },
+    });
+
+    if (dbUser?.isAdmin) {
+      isAdmin = true;
+    }
+
+    // B. Check Env Var (Fallback for bootstrapping)
+    if (!isAdmin && isEnvAdmin(walletAddress)) {
+      isAdmin = true;
+    }
+
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden', message: 'Not an admin' },
+        { status: 403 }
+      );
+    }
+
+    // ... Proceed with API logic
     const provider = createPolygonProvider();
 
     // ============================================================

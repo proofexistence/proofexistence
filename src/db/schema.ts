@@ -12,6 +12,7 @@ import {
   index,
   check,
   primaryKey,
+  boolean,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -29,6 +30,7 @@ export const users = pgTable(
     username: varchar('username', { length: 30 }).unique(),
     name: varchar('name', { length: 50 }), // Display Name (shown everywhere, "Anonymous" if empty)
     avatarUrl: varchar('avatar_url', { length: 500 }),
+    isAdmin: boolean('is_admin').default(false).notNull(),
 
     // Referral System
     referralCode: varchar('referral_code', { length: 10 }).unique(), // Short hash of wallet
@@ -273,6 +275,48 @@ export const bonusRewards = pgTable(
     index('bonus_rewards_user_id_idx').on(table.userId),
     index('bonus_rewards_type_idx').on(table.type),
     index('bonus_rewards_status_idx').on(table.status),
+  ]
+);
+
+// ============================================================================
+// TIME26 TRANSACTIONS TABLE
+// Complete audit trail for all TIME26 balance changes
+// ============================================================================
+export const time26Transactions = pgTable(
+  'time26_transactions',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    type: varchar('type', { length: 50 }).notNull(),
+    // Types: 'daily_reward' | 'referral_bonus' | 'ranking_bonus' | 'airdrop' |
+    //        'contest' | 'kol' | 'instant_proof_payment' | 'nft_mint_payment' |
+    //        'burn' | 'historical_credit' | 'historical_debit'
+    amount: decimal('amount', { precision: 78, scale: 0 }).notNull(), // Always positive
+    direction: varchar('direction', { length: 10 }).notNull(), // 'credit' | 'debit'
+    balanceBefore: decimal('balance_before', {
+      precision: 78,
+      scale: 0,
+    }).notNull(),
+    balanceAfter: decimal('balance_after', {
+      precision: 78,
+      scale: 0,
+    }).notNull(),
+    referenceId: varchar('reference_id', { length: 100 }), // sessionId, rewardId, dayId, etc.
+    referenceType: varchar('reference_type', { length: 50 }), // 'session' | 'daily_reward' | 'bonus_reward'
+    description: varchar('description', { length: 500 }),
+    metadata: jsonb('metadata'), // Additional context (e.g., tx hash, original timestamp)
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('time26_transactions_user_id_idx').on(table.userId),
+    index('time26_transactions_type_idx').on(table.type),
+    index('time26_transactions_created_at_idx').on(table.createdAt),
+    index('time26_transactions_reference_idx').on(
+      table.referenceId,
+      table.referenceType
+    ),
   ]
 );
 

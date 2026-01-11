@@ -9,7 +9,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { sessions, users, dailyRewards, userDailyRewards } from '@/db/schema';
+import {
+  sessions,
+  users,
+  dailyRewards,
+  userDailyRewards,
+  time26Transactions,
+} from '@/db/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
 import {
   calculateDailyRewards,
@@ -123,6 +129,17 @@ export async function GET(req: NextRequest) {
     // 8. Record per-user rewards and update balances
     // Note: neon-http doesn't support transactions, so we do individual inserts
     for (const userReward of rewardResult.userRewards) {
+      // Get user's current balance for transaction logging
+      const [currentUser] = await db
+        .select({ time26Balance: users.time26Balance })
+        .from(users)
+        .where(eq(users.id, userReward.userId))
+        .limit(1);
+
+      const balanceBefore = BigInt(currentUser?.time26Balance || '0');
+      const rewardAmount = BigInt(userReward.totalReward);
+      const balanceAfter = balanceBefore + rewardAmount;
+
       // Record reward breakdown
       await db.insert(userDailyRewards).values({
         userId: userReward.userId,
@@ -142,6 +159,27 @@ export async function GET(req: NextRequest) {
           time26Balance: sql`${users.time26Balance} + ${userReward.totalReward}::numeric`,
         })
         .where(eq(users.id, userReward.userId));
+
+      // Log transaction
+      await db.insert(time26Transactions).values({
+        userId: userReward.userId,
+        type: 'daily_reward',
+        amount: userReward.totalReward,
+        direction: 'credit',
+        balanceBefore: balanceBefore.toString(),
+        balanceAfter: balanceAfter.toString(),
+        referenceId: dayId,
+        referenceType: 'daily_reward',
+        description: `Daily reward for ${dayId} (${userReward.totalSeconds}s drawing)`,
+        metadata: {
+          dayId,
+          totalSeconds: userReward.totalSeconds,
+          exclusiveSeconds: userReward.exclusiveSeconds,
+          sharedSeconds: userReward.sharedSeconds,
+          baseReward: userReward.baseReward,
+          bonusReward: userReward.bonusReward,
+        },
+      });
     }
 
     // console.log(`[Rewards Cron] Settlement complete for ${dayId}`);

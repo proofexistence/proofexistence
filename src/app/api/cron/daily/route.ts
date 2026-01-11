@@ -17,6 +17,7 @@ import {
   users,
   dailyRewards,
   userDailyRewards,
+  time26Transactions,
 } from '@/db/schema';
 import { eq, and, gte, lte, gt, inArray, sql } from 'drizzle-orm';
 import { generateMerkleTree } from '@/lib/merkle';
@@ -314,6 +315,17 @@ async function runRewardsForDay(dayId: string): Promise<{
     // Note: neon-http doesn't support transactions, so we do individual inserts
     // The dailyRewards PK insert above prevents duplicate processing
     for (const userReward of rewardResult.userRewards) {
+      // Get user's current balance for transaction logging
+      const [currentUser] = await db
+        .select({ time26Balance: users.time26Balance })
+        .from(users)
+        .where(eq(users.id, userReward.userId))
+        .limit(1);
+
+      const balanceBefore = BigInt(currentUser?.time26Balance || '0');
+      const rewardAmount = BigInt(userReward.totalReward);
+      const balanceAfter = balanceBefore + rewardAmount;
+
       await db.insert(userDailyRewards).values({
         userId: userReward.userId,
         dayId,
@@ -331,6 +343,27 @@ async function runRewardsForDay(dayId: string): Promise<{
           time26Balance: sql`${users.time26Balance} + ${userReward.totalReward}::numeric`,
         })
         .where(eq(users.id, userReward.userId));
+
+      // Log transaction
+      await db.insert(time26Transactions).values({
+        userId: userReward.userId,
+        type: 'daily_reward',
+        amount: userReward.totalReward,
+        direction: 'credit',
+        balanceBefore: balanceBefore.toString(),
+        balanceAfter: balanceAfter.toString(),
+        referenceId: dayId,
+        referenceType: 'daily_reward',
+        description: `Daily reward for ${dayId} (${userReward.totalSeconds}s drawing)`,
+        metadata: {
+          dayId,
+          totalSeconds: userReward.totalSeconds,
+          exclusiveSeconds: userReward.exclusiveSeconds,
+          sharedSeconds: userReward.sharedSeconds,
+          baseReward: userReward.baseReward,
+          bonusReward: userReward.bonusReward,
+        },
+      });
     }
 
     return {
@@ -426,12 +459,32 @@ async function runBurnAndMerkle(): Promise<{
       burnTxHash = tx.hash;
       await waitForTransaction(provider, tx.hash, 1, 60000);
 
-      // Reset pending burn for all users after successful burn
+      // Reset pending burn for all users after successful burn and log transactions
       for (const user of usersWithPendingBurn) {
         await db
           .update(users)
           .set({ time26PendingBurn: '0' })
           .where(eq(users.id, user.id));
+
+        // Log burn transaction (note: balance was already deducted when spent)
+        // This records the on-chain confirmation of the burn
+        await db.insert(time26Transactions).values({
+          userId: user.id,
+          type: 'burn',
+          amount: user.time26PendingBurn,
+          direction: 'debit',
+          balanceBefore: '0', // Burn doesn't change balance (already deducted)
+          balanceAfter: '0',
+          referenceId: tx.hash,
+          referenceType: 'burn_tx',
+          description: `On-chain burn confirmed: ${formatTime26(user.time26PendingBurn)} TIME26`,
+          metadata: {
+            txHash: tx.hash,
+            burnDate: today,
+            totalBurnedInBatch: totalPendingBurn.toString(),
+            usersInBatch: usersWithPendingBurn.length,
+          },
+        });
       }
 
       // console.log(`[Daily Cron] Burned ${formatTime26(totalPendingBurn.toString())} TIME26, tx: ${tx.hash}`);

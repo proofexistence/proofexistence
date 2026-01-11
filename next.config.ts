@@ -125,8 +125,8 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   // Auth token for source map uploads (set SENTRY_AUTH_TOKEN env var in CI/Vercel)
   authToken: process.env.SENTRY_AUTH_TOKEN,
 
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
+  // Silent mode: suppress warnings in local dev (no auth token)
+  silent: !process.env.SENTRY_AUTH_TOKEN,
 
   // Disable Sentry telemetry
   telemetry: false,
@@ -140,8 +140,11 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: '/monitoring',
 
-  // Disable source map upload if no auth token (for local dev)
+  // Disable source map upload and release creation if no auth token (for local dev)
   sourcemaps: {
     disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+  release: {
+    create: !!process.env.SENTRY_AUTH_TOKEN,
   },
 });
