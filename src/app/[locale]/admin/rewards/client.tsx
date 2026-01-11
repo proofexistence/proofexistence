@@ -121,7 +121,7 @@ export function AdminRewardsClient() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-white p-8">
+      <div className="min-h-screen bg-zinc-950 text-white p-8 pt-24">
         <div className="max-w-6xl mx-auto">
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
             <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />

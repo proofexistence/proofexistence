@@ -11,77 +11,38 @@
  * Protected by ADMIN_WALLETS environment variable
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users, dailyRewards, userDailyRewards } from '@/db/schema';
 import { gt, desc, sql, eq } from 'drizzle-orm';
 import { ethers } from 'ethers';
 import { PROOF_RECORDER_ADDRESS, TIME26_ADDRESS } from '@/lib/contracts';
 import { createPolygonProvider } from '@/lib/provider';
+import { getCurrentUser } from '@/lib/auth/get-user';
 
 export const dynamic = 'force-dynamic';
 
-import { verifyWeb3AuthToken } from '@/lib/web3auth/verify';
-
-// Get admin wallets from env (comma-separated)
-function getAdminWallets(): string[] {
-  const admins = process.env.ADMIN_WALLETS || '';
-  return admins
-    .split(',')
-    .map((addr) => addr.trim().toLowerCase())
-    .filter((addr) => addr.length > 0);
-}
-
-// Check via Env Var (Fallback/Bootstrap)
-function isEnvAdmin(walletAddress: string): boolean {
-  const admins = getAdminWallets();
-  return admins.includes(walletAddress.toLowerCase());
-}
-
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    // 1. Authenticate User (Verify Signature)
-    const authHeader = req.headers.get('authorization');
-    let walletAddress: string | null = null;
-    let authMethod = 'none';
+    // 1. Authenticate User (supports Bearer token or X-Wallet-Address header)
+    const currentUser = await getCurrentUser();
 
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.slice(7);
-      const verified = await verifyWeb3AuthToken(token);
-      if (verified) {
-        walletAddress = verified.walletAddress;
-        authMethod = 'token';
-      }
-    }
-
-    if (!walletAddress) {
+    if (!currentUser) {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'Missing or invalid token' },
+        { error: 'Unauthorized', message: 'Not authenticated' },
         { status: 401 }
       );
     }
 
-    // 2. Authorize (Check Admin Status)
-    let isAdmin = false;
-
-    // A. Check Database (Primary)
+    // 2. Authorize (Check Admin Status via DB is_admin column)
     const dbUser = await db.query.users.findFirst({
-      where: eq(users.walletAddress, walletAddress),
+      where: eq(users.walletAddress, currentUser.walletAddress),
       columns: {
         isAdmin: true,
       },
     });
 
-    if (dbUser?.isAdmin) {
-      isAdmin = true;
-    }
-
-    // B. Check Env Var (Fallback for bootstrapping)
-    if (!isAdmin && isEnvAdmin(walletAddress)) {
-      isAdmin = true;
-    }
-
-    if (!isAdmin) {
+    if (!dbUser?.isAdmin) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Not an admin' },
         { status: 403 }
