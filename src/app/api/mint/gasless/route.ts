@@ -285,9 +285,6 @@ async function rollbackBalance(
         .returning({ id: users.id });
 
       if (result.length > 0) {
-        // console.log(
-        //   `[Gasless Mint] Rolled back ${amount.toString()} for user ${userId}`
-        // );
         return true;
       }
     } catch (error) {

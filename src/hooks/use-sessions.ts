@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useWeb3Auth } from '@/lib/web3auth';
 
 import { TrailPoint } from '@/types/session';
@@ -19,7 +19,6 @@ interface CreateSessionResponse {
 
 export function useSessions() {
   const { getIdToken, user } = useWeb3Auth();
-  const queryClient = useQueryClient();
 
   const getAuthHeaders = async (): Promise<Record<string, string>> => {
     const token = await getIdToken();

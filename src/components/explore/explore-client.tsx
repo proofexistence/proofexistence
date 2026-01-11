@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { GalleryGrid } from '@/components/gallery/gallery-grid';
 import { PageHeader } from '@/components/layout/page-header';
 import { Input } from '@/components/ui/input';

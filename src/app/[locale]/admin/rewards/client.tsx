@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useWeb3Auth } from '@/lib/web3auth/context';
 import { useRewardsStatus } from '@/hooks/use-rewards';
 import { ShieldX } from 'lucide-react';
@@ -71,7 +70,7 @@ function StatCard({
 }
 
 export function AdminRewardsClient() {
-  const { user, isConnected, isLoading: authLoading } = useWeb3Auth();
+  const { user, isLoading: authLoading } = useWeb3Auth();
   const {
     data,
     isLoading: rewardsLoading,

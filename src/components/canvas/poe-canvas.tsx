@@ -615,7 +615,7 @@ export function POECanvas() {
   // Capture Mode handling
   const [captureMode, setCaptureMode] = useState(false);
 
-  const { isConnected, user: web3User, login, getIdToken } = useWeb3Auth();
+  const { isConnected, user: web3User, login } = useWeb3Auth();
   const authenticated = isConnected;
 
   // Trigger capture when mode is active
@@ -1253,7 +1253,10 @@ export function POECanvas() {
       submitStandard,
       submitInstant,
       mintProof,
-      deleteSession,
+      clearTrail,
+      router,
+      screenshotData,
+      trailColor,
     ]
   );
 

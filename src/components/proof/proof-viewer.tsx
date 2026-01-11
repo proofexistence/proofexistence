@@ -1,7 +1,7 @@
 'use client';
 
 import { BLOCK_EXPLORER, isTestnet } from '@/lib/contracts';
-import { getArweaveUrls, normalizeArweaveUrl } from '@/lib/arweave-gateway';
+import { getArweaveUrl } from '@/lib/arweave-gateway';
 
 import {
   useRef,

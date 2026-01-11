@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import { Heart, Eye } from 'lucide-react';
-import { getArweaveUrls, normalizeArweaveUrl } from '@/lib/arweave-gateway';
+import { normalizeArweaveUrl, getArweaveUrl } from '@/lib/arweave-gateway';
 
 // Register ScrollTrigger
 if (typeof window !== 'undefined') {

@@ -122,12 +122,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
             navigator.userAgent
           );
 
-        // console.log('[Web3Auth] Initializing...', {
-        //   isMobile,
-        //   clientId: web3AuthConfig.clientId ? 'present' : 'missing',
-        //   network: web3AuthConfig.web3AuthNetwork,
-        // });
-
         const web3authInstance = new Web3Auth({
           clientId: web3AuthConfig.clientId,
           web3AuthNetwork: web3AuthConfig.web3AuthNetwork,
@@ -165,15 +159,11 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           console.warn('[Web3Auth] Adapter error:', error);
         });
 
-        // console.log('[Web3Auth] Calling init()...');
         await web3authInstance.init().catch((initError) => {
           // Catch init errors but don't throw - allow app to continue
           console.warn('[Web3Auth] Init warning:', initError);
         });
-        // console.log(
-        //   '[Web3Auth] Init complete, status:',
-        //   web3authInstance.status
-        // );
+
         setWeb3auth(web3authInstance);
 
         // Check if already connected (session restore)
@@ -219,9 +209,9 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     }
     try {
       setIsLoggingIn(true);
-      // console.log('[Web3Auth] Calling connect(), status:', web3auth.status);
+
       const web3authProvider = await web3auth.connect();
-      // console.log('[Web3Auth] Connect complete, provider:', !!web3authProvider);
+
       setProvider(web3authProvider);
       await fetchUserData(web3auth);
     } catch (error) {
@@ -281,8 +271,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         );
       }
 
-      // console.log('[Web3Auth] Requesting private key export...');
-
       // Request private key from Web3Auth provider
       // This uses the openlogin adapter's capability to export the key
       const privateKey = (await web3auth.provider.request({
@@ -293,7 +281,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Failed to retrieve private key from provider');
       }
 
-      // console.log('[Web3Auth] Private key exported successfully');
       return privateKey;
     } catch (error) {
       console.error('[Web3Auth] Private key export failed:', error);

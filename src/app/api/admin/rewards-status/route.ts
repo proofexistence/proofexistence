@@ -21,6 +21,8 @@ import { createPolygonProvider } from '@/lib/provider';
 
 export const dynamic = 'force-dynamic';
 
+import { verifyWeb3AuthToken } from '@/lib/web3auth/verify';
+
 // Get admin wallets from env (comma-separated)
 function getAdminWallets(): string[] {
   const admins = process.env.ADMIN_WALLETS || '';
@@ -40,7 +42,17 @@ function isAdminWallet(walletAddress: string | null): boolean {
 
 export async function GET(req: NextRequest) {
   // Check admin access
-  const walletAddress = req.headers.get('x-wallet-address');
+  const authHeader = req.headers.get('authorization');
+  let walletAddress: string | null = null;
+
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.slice(7);
+    const verified = await verifyWeb3AuthToken(token);
+    if (verified) {
+      walletAddress = verified.walletAddress;
+    }
+  }
+
   if (!isAdminWallet(walletAddress)) {
     return NextResponse.json(
       { error: 'Unauthorized', message: 'Admin access required' },
