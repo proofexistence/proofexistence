@@ -6,10 +6,11 @@ import * as THREE from 'three';
 import { TrailPoint } from '@/types/session';
 import { PerspectiveCamera } from '@react-three/drei';
 import { SpaceBackground, splitIntoStrokes } from './light-trail';
-import { ParticleSystem } from './particles';
 
 // Reusing the exact visual style from ReplayCanvas
 // Only differences: No OrbitControls (static camera), No Rotation, Fixed Auto-Focus
+// Note: ParticleSystem intentionally excluded to prevent random particles
+// from appearing in NFT screenshots (they can overlap with the trail art)
 
 export function CaptureScene({
   points,
@@ -23,7 +24,6 @@ export function CaptureScene({
       <color attach="background" args={['#050508']} />
       <fog attach="fog" args={['#050508', 20, 80]} />
       <SpaceBackground starCount={800} />
-      <ParticleSystem count={150} color={color} area={[30, 30, 30]} />
       <CaptureContent points={points} color={color} />
       <ambientLight intensity={0.5} />
     </>
