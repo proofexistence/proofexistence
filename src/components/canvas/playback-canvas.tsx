@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useMemo, useRef, useEffect, useCallback, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -279,6 +279,7 @@ export function PlaybackCanvas({
   const playback = useTrailPlayback(trailData);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const videoExport = useVideoExport();
+  const [downloadMessage, setDownloadMessage] = useState<string | null>(null);
 
   // Auto-play on mount
   useEffect(() => {
@@ -300,6 +301,7 @@ export function PlaybackCanvas({
 
     // Pause current playback
     playback.pause();
+    setDownloadMessage(null);
 
     try {
       const blob = await videoExport.exportVideo(
@@ -320,7 +322,15 @@ export function PlaybackCanvas({
       if (blob) {
         const timestamp = new Date().toISOString().slice(0, 10);
         const extension = getVideoExtension(blob);
-        downloadVideoBlob(blob, `proof-replay-${timestamp}.${extension}`);
+        const success = await downloadVideoBlob(
+          blob,
+          `proof-replay-${timestamp}.${extension}`
+        );
+
+        if (success) {
+          setDownloadMessage('Video saved!');
+          setTimeout(() => setDownloadMessage(null), 3000);
+        }
       }
     } finally {
       // Reset to normal speed and beginning
@@ -365,6 +375,15 @@ export function PlaybackCanvas({
         exportProgress={videoExport.progress}
         exportStatus={videoExport.status}
       />
+
+      {/* Download Success Toast */}
+      {downloadMessage && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="px-4 py-2 bg-green-500/90 text-white text-sm font-medium rounded-full shadow-lg backdrop-blur-sm">
+            {downloadMessage}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

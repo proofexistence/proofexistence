@@ -353,14 +353,47 @@ export function useVideoExport(): UseVideoExportReturn {
 
 /**
  * Helper function to download a blob as a file
+ * Returns true if download was initiated successfully
  */
-export function downloadVideoBlob(blob: Blob, filename: string): void {
+export async function downloadVideoBlob(
+  blob: Blob,
+  filename: string
+): Promise<boolean> {
+  // On mobile, try to use Web Share API for better UX
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (isMobile && navigator.canShare && navigator.share) {
+    try {
+      const file = new File([blob], filename, { type: blob.type });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Proof Replay',
+        });
+        return true;
+      }
+    } catch (e) {
+      // User cancelled or share failed, fall through to anchor download
+      if ((e as Error).name === 'AbortError') {
+        return false; // User cancelled
+      }
+      console.warn('[VideoExport] Share failed, trying download:', e);
+    }
+  }
+
+  // Fallback: anchor element download
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
+  document.body.appendChild(link);
   link.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(link);
+
+  // Small delay before revoking to ensure download starts
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  return true;
 }
 
 /**

@@ -186,24 +186,24 @@ export function PlaybackControls({
             </div>
 
             {/* Controls Row */}
-            <div className="flex items-center justify-between gap-4">
-              {/* Left: Time Display */}
-              <div className="text-white/60 text-sm font-mono min-w-[100px]">
+            <div className="flex items-center justify-between gap-2 md:gap-4">
+              {/* Left: Time Display - hidden on very small screens */}
+              <div className="hidden sm:block text-white/60 text-xs md:text-sm font-mono whitespace-nowrap">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </div>
 
               {/* Center: Main Controls */}
-              <div className="flex items-center gap-2">
-                {/* Speed Control */}
+              <div className="flex items-center gap-1 md:gap-2 flex-1 sm:flex-none justify-center">
+                {/* Speed Control - compact on mobile */}
                 <div className="relative">
                   <button
                     onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                    className="px-3 py-1.5 text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                    className="px-2 md:px-3 py-1.5 text-xs md:text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
                   >
                     {speed}x
                   </button>
                   {showSpeedMenu && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black/90 backdrop-blur-xl rounded-lg border border-white/10 overflow-hidden">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black/90 backdrop-blur-xl rounded-lg border border-white/10 overflow-hidden z-10">
                       {SPEED_OPTIONS.map((s) => (
                         <button
                           key={s}
@@ -227,22 +227,22 @@ export function PlaybackControls({
                 {/* Reset Button */}
                 <button
                   onClick={reset}
-                  className="p-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-1.5 md:p-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
                   title="Reset (R)"
                 >
-                  <RotateCcw size={18} />
+                  <RotateCcw size={16} className="md:w-[18px] md:h-[18px]" />
                 </button>
 
                 {/* Play/Pause Button */}
                 <button
                   onClick={toggle}
-                  className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:brightness-110 text-white rounded-full shadow-lg shadow-purple-500/30 transition-all hover:scale-105 active:scale-95"
+                  className="p-2 md:p-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:brightness-110 text-white rounded-full shadow-lg shadow-purple-500/30 transition-all hover:scale-105 active:scale-95"
                   title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
                 >
                   {isPlaying ? (
-                    <Pause size={24} />
+                    <Pause size={20} className="md:w-6 md:h-6" />
                   ) : (
-                    <Play size={24} className="ml-0.5" />
+                    <Play size={20} className="ml-0.5 md:w-6 md:h-6" />
                   )}
                 </button>
 
@@ -251,8 +251,8 @@ export function PlaybackControls({
                   <button
                     onClick={onExportVideo}
                     disabled={isExporting}
-                    className="relative px-3 py-1.5 text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors disabled:cursor-wait flex items-center gap-1.5 overflow-hidden"
-                    title="Export Video (WebM/MP4)"
+                    className="relative px-2 md:px-3 py-1.5 text-xs md:text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors disabled:cursor-wait flex items-center gap-1 md:gap-1.5 overflow-hidden"
+                    title="Export Video (MP4)"
                   >
                     {isExporting && (
                       <div
@@ -260,19 +260,22 @@ export function PlaybackControls({
                         style={{ width: `${exportProgress * 100}%` }}
                       />
                     )}
-                    <span className="relative flex items-center gap-1.5">
+                    <span className="relative flex items-center gap-1 md:gap-1.5">
                       {isExporting ? (
                         <>
                           <Loader2 size={14} className="animate-spin" />
-                          <span>
+                          <span className="hidden sm:inline">
                             {exportStatus ||
                               `${Math.round(exportProgress * 100)}%`}
+                          </span>
+                          <span className="sm:hidden">
+                            {Math.round(exportProgress * 100)}%
                           </span>
                         </>
                       ) : (
                         <>
                           <Video size={14} />
-                          <span>MP4</span>
+                          <span className="hidden sm:inline">MP4</span>
                           <Download size={12} />
                         </>
                       )}
@@ -282,14 +285,14 @@ export function PlaybackControls({
               </div>
 
               {/* Right: Exit Button */}
-              <div className="min-w-[100px] flex justify-end">
+              <div className="flex justify-end">
                 {onExit && (
                   <button
                     onClick={onExit}
-                    className="p-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-1.5 md:p-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
                     title="Exit Playback (Esc)"
                   >
-                    <X size={20} />
+                    <X size={18} className="md:w-5 md:h-5" />
                   </button>
                 )}
               </div>
