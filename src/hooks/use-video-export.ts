@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 
 export interface WatermarkInfo {
@@ -52,13 +52,132 @@ function isWebCodecsSupported(): boolean {
 }
 
 /**
+ * Check if MediaRecorder is available for WebM recording (fallback)
+ */
+function isMediaRecorderSupported(): boolean {
+  if (typeof MediaRecorder === 'undefined') return false;
+  // Check if video recording is supported
+  return MediaRecorder.isTypeSupported('video/webm') ||
+         MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ||
+         MediaRecorder.isTypeSupported('video/webm;codecs=vp9');
+}
+
+/**
+ * Get supported MIME type for MediaRecorder
+ */
+function getSupportedMimeType(): string | null {
+  const types = [
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+  ];
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) {
+      return type;
+    }
+  }
+  return null;
+}
+
+/**
+ * MediaRecorder-based export (WebM format) - fallback for browsers without WebCodecs
+ */
+async function exportWithMediaRecorder(
+  canvasElement: HTMLCanvasElement,
+  durationMs: number,
+  playbackSpeed: number,
+  videoBitsPerSecond: number,
+  playAnimation: (speed: number) => void,
+  pauseAnimation: () => void,
+  seekToStart: () => void,
+  setProgress: (p: number) => void,
+  setStatus: (s: string) => void,
+  cancelledRef: React.MutableRefObject<boolean>
+): Promise<Blob | null> {
+  const mimeType = getSupportedMimeType();
+  if (!mimeType) {
+    throw new Error('No supported video format found');
+  }
+
+  console.log('[VideoExport] Using MediaRecorder fallback with:', mimeType);
+
+  // Get canvas stream
+  const stream = canvasElement.captureStream(30);
+
+  return new Promise((resolve, reject) => {
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond,
+    });
+
+    const chunks: Blob[] = [];
+    const recordingDuration = durationMs / playbackSpeed;
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        chunks.push(e.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      pauseAnimation();
+      if (cancelledRef.current) {
+        resolve(null);
+        return;
+      }
+      const blob = new Blob(chunks, { type: mimeType });
+      console.log('[VideoExport] WebM created:', blob.size, 'bytes');
+      resolve(blob);
+    };
+
+    mediaRecorder.onerror = () => {
+      pauseAnimation();
+      reject(new Error('Recording failed'));
+    };
+
+    // Start from beginning
+    seekToStart();
+
+    // Small delay to ensure seek is applied
+    setTimeout(() => {
+      setStatus('Recording...');
+      mediaRecorder.start(100);
+      playAnimation(playbackSpeed);
+
+      // Update progress
+      const startTime = Date.now();
+      const progressInterval = setInterval(() => {
+        if (cancelledRef.current) {
+          clearInterval(progressInterval);
+          mediaRecorder.stop();
+          return;
+        }
+        const elapsed = Date.now() - startTime;
+        setProgress(Math.min(elapsed / recordingDuration, 0.99));
+      }, 100);
+
+      // Stop after duration
+      setTimeout(() => {
+        clearInterval(progressInterval);
+        if (mediaRecorder.state !== 'inactive') {
+          setStatus('Finalizing...');
+          setProgress(1);
+          mediaRecorder.stop();
+        }
+      }, recordingDuration + 500);
+    }, 100);
+  });
+}
+
+/**
  * Hook for exporting trail playback as MP4 video
  *
  * Uses WebCodecs API + mp4-muxer for native MP4 encoding.
- * Falls back to WebM if WebCodecs is not available.
+ * Falls back to WebM via MediaRecorder if WebCodecs is not available.
  *
  * Benefits:
  * - Native MP4 output (H.264) - compatible with X/Twitter, Instagram, etc.
+ * - WebM fallback for iOS Safari
  * - No FFmpeg WASM overhead
  * - Smaller file size than GIF
  */
@@ -108,16 +227,36 @@ export function useVideoExport(): UseVideoExportReturn {
       setStatus('Preparing...');
       cancelledRef.current = false;
 
-      // Check WebCodecs support
-      if (!isWebCodecsSupported()) {
+      // Check codec support - prefer WebCodecs, fallback to MediaRecorder
+      const useWebCodecs = isWebCodecsSupported();
+      const useMediaRecorder = !useWebCodecs && isMediaRecorderSupported();
+
+      if (!useWebCodecs && !useMediaRecorder) {
         setError(
-          'Your browser does not support MP4 encoding. Please use Chrome or Edge.'
+          'Video export is not supported on this browser. Please use Chrome, Edge, or a newer Safari.'
         );
         setIsExporting(false);
         return null;
       }
 
       try {
+        // Use MediaRecorder fallback for browsers without WebCodecs (e.g., iOS Safari)
+        if (useMediaRecorder) {
+          return await exportWithMediaRecorder(
+            canvasElement,
+            durationMs,
+            playbackSpeed,
+            videoBitsPerSecond,
+            playAnimation,
+            pauseAnimation,
+            seekToStart,
+            setProgress,
+            setStatus,
+            cancelledRef
+          );
+        }
+
+        // WebCodecs path (MP4)
         // H.264 requires even dimensions
         const width = Math.floor(canvasElement.width / 2) * 2;
         const height = Math.floor(canvasElement.height / 2) * 2;

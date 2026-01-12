@@ -398,6 +398,15 @@ export function PlaybackCanvas({
           </div>
         </div>
       )}
+
+      {/* Error Toast */}
+      {videoExport.error && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300 max-w-[90vw]">
+          <div className="px-4 py-2 bg-red-500/90 text-white text-sm font-medium rounded-xl shadow-lg backdrop-blur-sm text-center">
+            {videoExport.error}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

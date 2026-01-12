@@ -275,7 +275,7 @@ export function PlaybackControls({
                       ) : (
                         <>
                           <Video size={14} />
-                          <span className="hidden sm:inline">MP4</span>
+                          <span className="hidden sm:inline">Video</span>
                           <Download size={12} />
                         </>
                       )}
