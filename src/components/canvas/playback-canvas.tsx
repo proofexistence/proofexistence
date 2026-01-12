@@ -18,10 +18,17 @@ import {
 } from '@/hooks/use-video-export';
 import { PlaybackControls } from './playback-controls';
 
+export interface WatermarkInfo {
+  title?: string; // e.g., "My Proof Title"
+  username?: string; // e.g., "@username"
+  siteUrl?: string; // e.g., "proofexistence.com"
+}
+
 interface PlaybackCanvasProps {
   trailData: TrailPoint[];
   color?: string;
   onExitPlayback?: () => void;
+  watermark?: WatermarkInfo;
 }
 
 // Process points: filter duplicates for smoother rendering
@@ -267,6 +274,7 @@ export function PlaybackCanvas({
   trailData,
   color = '#A855F7',
   onExitPlayback,
+  watermark,
 }: PlaybackCanvasProps) {
   const playback = useTrailPlayback(trailData);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -303,7 +311,10 @@ export function PlaybackCanvas({
         },
         () => playback.pause(),
         () => playback.seek(0),
-        { playbackSpeed: 2 } // Export at 2x speed for faster processing
+        {
+          playbackSpeed: 2, // Export at 2x speed for faster processing
+          watermark: watermark,
+        }
       );
 
       if (blob) {
@@ -316,7 +327,7 @@ export function PlaybackCanvas({
       playback.setSpeed(1);
       playback.seek(0);
     }
-  }, [playback, videoExport]);
+  }, [playback, videoExport, watermark]);
 
   return (
     <div
@@ -352,6 +363,7 @@ export function PlaybackCanvas({
         onExportVideo={handleExportVideo}
         isExporting={videoExport.isExporting}
         exportProgress={videoExport.progress}
+        exportStatus={videoExport.status}
       />
     </div>
   );

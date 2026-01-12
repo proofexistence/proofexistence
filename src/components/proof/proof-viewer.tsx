@@ -11,6 +11,8 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 
 import { ReplayCanvasRef } from '@/components/canvas/replay-canvas';
 import { TrailPoint } from '@/types/session';
@@ -177,7 +179,7 @@ export function ProofViewer({
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const img = new Image();
+    const img = new window.Image();
     img.src = imgData;
     img.onload = async () => {
       // Draw Art
@@ -358,6 +360,18 @@ export function ProofViewer({
         <div className="animate-in slide-in-from-top-4 fade-in duration-700 max-w-xl mr-12 md:mr-0">
           {/* Title & Badge */}
           <div className="flex items-start gap-3 mb-2">
+            <Link
+              href="/"
+              className="pointer-events-auto shrink-0 hover:opacity-80 transition-opacity"
+            >
+              <Image
+                src="/proof_existence_logo.png"
+                alt="POE"
+                width={72}
+                height={72}
+                className="h-[1.875rem] md:h-[2.25rem] w-auto drop-shadow-lg"
+              />
+            </Link>
             <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg font-mono tracking-tight">
               {session.title || `PROOF #${session.id.slice(0, 8)}`}
             </h1>
@@ -400,7 +414,7 @@ export function ProofViewer({
                     </div>
                   </div>
                   <div>
-                    <div className="text-white font-medium text-sm leading-none">
+                    <div className="text-white font-mono font-medium text-sm leading-none">
                       {authorName}
                     </div>
                     <div className="text-white/50 text-xs font-mono mt-1">
@@ -425,7 +439,7 @@ export function ProofViewer({
                     )}
                   </div>
                   <div>
-                    <div className="text-white font-medium text-sm leading-none">
+                    <div className="text-white font-mono font-medium text-sm leading-none">
                       {authorName}
                     </div>
                     <div className="text-white/50 text-xs font-mono mt-1">
@@ -446,7 +460,7 @@ export function ProofViewer({
             </div>
 
             {session.description && (
-              <p className="text-white/80 text-sm italic border-l-2 border-white/20 pl-3 py-1 max-w-md">
+              <p className="text-white/80 text-sm font-mono italic border-l-2 border-white/20 pl-3 py-1 max-w-md">
                 {session.description}
               </p>
             )}
@@ -621,6 +635,14 @@ export function ProofViewer({
             trailData={trailData}
             color={trailColor}
             onExitPlayback={() => setViewMode('static')}
+            watermark={{
+              title: session.title || `Proof #${session.id.slice(0, 8)}`,
+              username:
+                session.user?.username ||
+                session.user?.walletAddress?.slice(0, 10) ||
+                undefined,
+              siteUrl: 'proofexistence.com',
+            }}
           />
         )}
       </div>

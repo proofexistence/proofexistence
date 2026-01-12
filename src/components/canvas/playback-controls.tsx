@@ -18,6 +18,7 @@ interface PlaybackControlsProps {
   onExportVideo?: () => void;
   isExporting?: boolean;
   exportProgress?: number;
+  exportStatus?: string;
 }
 
 // Format time in mm:ss format
@@ -37,6 +38,7 @@ export function PlaybackControls({
   onExportVideo,
   isExporting = false,
   exportProgress = 0,
+  exportStatus = '',
 }: PlaybackControlsProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -262,12 +264,15 @@ export function PlaybackControls({
                       {isExporting ? (
                         <>
                           <Loader2 size={14} className="animate-spin" />
-                          <span>{Math.round(exportProgress * 100)}%</span>
+                          <span>
+                            {exportStatus ||
+                              `${Math.round(exportProgress * 100)}%`}
+                          </span>
                         </>
                       ) : (
                         <>
                           <Video size={14} />
-                          <span>影片</span>
+                          <span>MP4</span>
                           <Download size={12} />
                         </>
                       )}
