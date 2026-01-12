@@ -142,7 +142,7 @@ export function ProofViewer({
   const handleExit = () => {
     // Smart Exit:
     // If we have history AND the referrer is from our own site, go back.
-    // Otherwise (direct link, external referrer), go home.
+    // Otherwise (direct link, external referrer), go to explore page.
     const isInternalReferrer =
       typeof document !== 'undefined' &&
       document.referrer &&
@@ -151,7 +151,7 @@ export function ProofViewer({
     if (window.history.length > 1 && isInternalReferrer) {
       router.back();
     } else {
-      router.push('/');
+      router.push('/explore');
     }
   };
 
