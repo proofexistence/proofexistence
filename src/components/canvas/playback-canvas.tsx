@@ -322,14 +322,28 @@ export function PlaybackCanvas({
       if (blob) {
         const timestamp = new Date().toISOString().slice(0, 10);
         const extension = getVideoExtension(blob);
-        const success = await downloadVideoBlob(
+        const result = await downloadVideoBlob(
           blob,
           `proof-replay-${timestamp}.${extension}`
         );
 
-        if (success) {
-          setDownloadMessage('Video saved!');
-          setTimeout(() => setDownloadMessage(null), 3000);
+        switch (result) {
+          case 'shared':
+            setDownloadMessage('Video shared!');
+            break;
+          case 'downloaded':
+            setDownloadMessage('Video saved!');
+            break;
+          case 'opened':
+            setDownloadMessage('Long press video to save to Photos');
+            break;
+          case 'cancelled':
+            // User cancelled, no message needed
+            break;
+        }
+
+        if (result !== 'cancelled') {
+          setTimeout(() => setDownloadMessage(null), 4000);
         }
       }
     } finally {

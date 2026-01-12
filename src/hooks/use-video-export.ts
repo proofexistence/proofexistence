@@ -353,15 +353,17 @@ export function useVideoExport(): UseVideoExportReturn {
 
 /**
  * Helper function to download a blob as a file
- * Returns true if download was initiated successfully
+ * Returns: 'shared' | 'downloaded' | 'opened' | 'cancelled'
  */
 export async function downloadVideoBlob(
   blob: Blob,
   filename: string
-): Promise<boolean> {
-  // On mobile, try to use Web Share API for better UX
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+): Promise<'shared' | 'downloaded' | 'opened' | 'cancelled'> {
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isMobile = isIOS || isAndroid;
 
+  // Try Web Share API first (works well on Android, sometimes on iOS)
   if (isMobile && navigator.canShare && navigator.share) {
     try {
       const file = new File([blob], filename, { type: blob.type });
@@ -370,18 +372,26 @@ export async function downloadVideoBlob(
           files: [file],
           title: 'Proof Replay',
         });
-        return true;
+        return 'shared';
       }
     } catch (e) {
-      // User cancelled or share failed, fall through to anchor download
       if ((e as Error).name === 'AbortError') {
-        return false; // User cancelled
+        return 'cancelled';
       }
-      console.warn('[VideoExport] Share failed, trying download:', e);
+      console.warn('[VideoExport] Share failed, trying fallback:', e);
     }
   }
 
-  // Fallback: anchor element download
+  // iOS fallback: open in new tab for long-press save
+  if (isIOS) {
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    // Don't revoke immediately - user needs time to save
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    return 'opened';
+  }
+
+  // Desktop/Android fallback: anchor element download
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -389,11 +399,9 @@ export async function downloadVideoBlob(
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-
-  // Small delay before revoking to ensure download starts
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-  return true;
+  return 'downloaded';
 }
 
 /**
