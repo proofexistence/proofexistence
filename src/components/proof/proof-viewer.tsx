@@ -358,8 +358,8 @@ export function ProofViewer({
       {/* Header Overlay */}
       <div className="absolute top-8 left-0 w-full p-6 z-10 flex justify-between items-start pointer-events-none">
         <div className="animate-in slide-in-from-top-4 fade-in duration-700 max-w-xl mr-12 md:mr-0">
-          {/* Title & Badge */}
-          <div className="flex items-start gap-3 mb-2">
+          {/* Navbar: Logo & Badge */}
+          <div className="flex items-center gap-3 mb-2">
             <Link
               href="/"
               className="pointer-events-auto shrink-0 hover:opacity-80 transition-opacity"
@@ -372,11 +372,8 @@ export function ProofViewer({
                 className="h-[1.875rem] md:h-[2.25rem] w-auto drop-shadow-lg"
               />
             </Link>
-            <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg font-mono tracking-tight">
-              {session.title || `PROOF #${session.id.slice(0, 8)}`}
-            </h1>
             <div
-              className={`px-3 py-1 rounded-full text-[10px] font-bold border backdrop-blur-md uppercase tracking-wider shrink-0 mt-2
+              className={`px-3 py-1 rounded-full text-[10px] font-bold border backdrop-blur-md uppercase tracking-wider shrink-0
                         ${
                           session.status === 'MINTED'
                             ? 'bg-purple-500/20 text-purple-200 border-purple-500/50'
@@ -388,6 +385,11 @@ export function ProofViewer({
               {session.status as string}
             </div>
           </div>
+
+          {/* Title - below navbar on mobile, truncate if too long */}
+          <h1 className="text-2xl md:text-4xl font-bold text-white drop-shadow-lg font-mono tracking-tight mb-2 truncate max-w-[calc(100vw-6rem)] md:max-w-xl">
+            {session.title || `PROOF #${session.id.slice(0, 8)}`}
+          </h1>
 
           {/* Author */}
           {session.user && (
