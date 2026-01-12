@@ -279,7 +279,10 @@ export function PlaybackCanvas({
   const playback = useTrailPlayback(trailData);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const videoExport = useVideoExport();
-  const [downloadMessage, setDownloadMessage] = useState<string | null>(null);
+  const [downloadMessage, setDownloadMessage] = useState<{
+    text: string;
+    type: 'success' | 'info';
+  } | null>(null);
 
   // Auto-play on mount
   useEffect(() => {
@@ -293,6 +296,17 @@ export function PlaybackCanvas({
 
   // Handle video export
   const handleExportVideo = useCallback(async () => {
+    // Check if iOS - show message instead of attempting export
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS) {
+      setDownloadMessage({
+        text: 'Please use desktop Chrome/Edge to export video',
+        type: 'info',
+      });
+      setTimeout(() => setDownloadMessage(null), 4000);
+      return;
+    }
+
     const container = canvasContainerRef.current;
     if (!container) return;
 
@@ -329,13 +343,16 @@ export function PlaybackCanvas({
 
         switch (result) {
           case 'shared':
-            setDownloadMessage('Video shared!');
+            setDownloadMessage({ text: 'Video shared!', type: 'success' });
             break;
           case 'downloaded':
-            setDownloadMessage('Video saved!');
+            setDownloadMessage({ text: 'Video saved!', type: 'success' });
             break;
           case 'opened':
-            setDownloadMessage('Long press video to save to Photos');
+            setDownloadMessage({
+              text: 'Long press video to save to Photos',
+              type: 'info',
+            });
             break;
           case 'cancelled':
             // User cancelled, no message needed
@@ -390,11 +407,17 @@ export function PlaybackCanvas({
         exportStatus={videoExport.status}
       />
 
-      {/* Download Success Toast */}
+      {/* Download Message Toast */}
       {downloadMessage && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="px-4 py-2 bg-green-500/90 text-white text-sm font-medium rounded-full shadow-lg backdrop-blur-sm">
-            {downloadMessage}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300 max-w-[90vw]">
+          <div
+            className={`px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg backdrop-blur-sm text-center ${
+              downloadMessage.type === 'success'
+                ? 'bg-green-500/90'
+                : 'bg-amber-500/90'
+            }`}
+          >
+            {downloadMessage.text}
           </div>
         </div>
       )}
