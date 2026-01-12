@@ -44,22 +44,32 @@ const DEFAULT_OPTIONS: Omit<Required<VideoExportOptions>, 'watermark'> = {
 
 /**
  * Check if WebCodecs API is available for MP4 encoding
+ * Note: iOS/iPadOS reports partial WebCodecs support but doesn't work reliably
  */
 function isWebCodecsSupported(): boolean {
+  // Skip WebCodecs on iOS/iPadOS - it's not reliable even if APIs exist
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isIOS) return false;
+
   return (
     typeof VideoEncoder !== 'undefined' && typeof VideoFrame !== 'undefined'
   );
 }
 
 /**
- * Check if MediaRecorder is available for WebM recording (fallback)
+ * Check if MediaRecorder is available for video recording (fallback)
  */
 function isMediaRecorderSupported(): boolean {
   if (typeof MediaRecorder === 'undefined') return false;
-  // Check if video recording is supported
-  return MediaRecorder.isTypeSupported('video/webm') ||
-         MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ||
-         MediaRecorder.isTypeSupported('video/webm;codecs=vp9');
+  // Check if video recording is supported (WebM or MP4)
+  try {
+    return MediaRecorder.isTypeSupported('video/webm') ||
+           MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ||
+           MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ||
+           MediaRecorder.isTypeSupported('video/mp4');
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -70,10 +80,16 @@ function getSupportedMimeType(): string | null {
     'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm',
+    'video/mp4',  // Safari might support mp4
   ];
   for (const type of types) {
-    if (MediaRecorder.isTypeSupported(type)) {
-      return type;
+    try {
+      if (MediaRecorder.isTypeSupported(type)) {
+        return type;
+      }
+    } catch {
+      // isTypeSupported might throw on some browsers
+      continue;
     }
   }
   return null;
@@ -101,14 +117,30 @@ async function exportWithMediaRecorder(
 
   console.log('[VideoExport] Using MediaRecorder fallback with:', mimeType);
 
-  // Get canvas stream
-  const stream = canvasElement.captureStream(30);
+  // Get canvas stream - may fail on some browsers with WebGL canvas
+  let stream: MediaStream;
+  try {
+    stream = canvasElement.captureStream(30);
+    if (!stream || stream.getVideoTracks().length === 0) {
+      throw new Error('Failed to capture video stream from canvas');
+    }
+  } catch (e) {
+    console.error('[VideoExport] captureStream failed:', e);
+    throw new Error('Video recording is not supported on this device');
+  }
 
   return new Promise((resolve, reject) => {
-    const mediaRecorder = new MediaRecorder(stream, {
-      mimeType,
-      videoBitsPerSecond,
-    });
+    let mediaRecorder: MediaRecorder;
+    try {
+      mediaRecorder = new MediaRecorder(stream, {
+        mimeType,
+        videoBitsPerSecond,
+      });
+    } catch (e) {
+      console.error('[VideoExport] MediaRecorder creation failed:', e);
+      reject(new Error('Video recording is not supported on this device'));
+      return;
+    }
 
     const chunks: Blob[] = [];
     const recordingDuration = durationMs / playbackSpeed;
