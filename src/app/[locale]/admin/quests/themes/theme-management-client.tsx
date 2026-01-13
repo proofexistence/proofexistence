@@ -134,7 +134,7 @@ export function ThemeManagementClient({ defaultThemes, overrides }: Props) {
   });
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto pt-24 pb-8 px-4 space-y-8">
       <h1 className="text-2xl font-bold text-white">Theme Management</h1>
 
       {/* Default Themes Section */}

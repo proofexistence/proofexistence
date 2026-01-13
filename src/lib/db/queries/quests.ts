@@ -41,14 +41,13 @@ export async function getTodayTheme() {
     return null;
   }
 
-  // Use week-based selection for consistent weekly themes
+  // Use day-based selection for daily theme rotation
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const dayOfYear = Math.floor(
     (now.getTime() - startOfYear.getTime()) / 86400000
   );
-  const weekOfYear = Math.floor(dayOfYear / 7);
-  const selectedTheme = activeThemes[weekOfYear % activeThemes.length];
+  const selectedTheme = activeThemes[dayOfYear % activeThemes.length];
 
   return {
     id: `default-${selectedTheme.id}`,
