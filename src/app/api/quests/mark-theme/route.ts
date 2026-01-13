@@ -28,10 +28,7 @@ export async function POST(req: NextRequest) {
 
     const { sessionId } = await req.json();
     if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Missing sessionId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });
     }
 
     // Check if already completed today
@@ -63,8 +60,7 @@ export async function POST(req: NextRequest) {
     console.error('Mark Theme API Error:', error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : 'Internal Server Error',
+        error: error instanceof Error ? error.message : 'Internal Server Error',
       },
       { status: 500 }
     );

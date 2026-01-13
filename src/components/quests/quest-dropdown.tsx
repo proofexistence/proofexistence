@@ -3,14 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  Target,
-  Flame,
-  Check,
-  Sparkles,
-  Heart,
-  Palette,
-} from 'lucide-react';
+import { Target, Flame, Check, Sparkles, Heart, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QuestData {
@@ -29,13 +22,21 @@ interface QuestData {
       reward: string;
       completed: boolean;
     };
-    dailyTheme: { reward: string; completed: boolean; sessionId: string | null };
+    dailyTheme: {
+      reward: string;
+      completed: boolean;
+      sessionId: string | null;
+    };
   };
   streak: {
     current: number;
     todayClaimed: boolean;
     dailyReward: string;
-    nextMilestone: { day: number; reward: string; badgeId: string | null } | null;
+    nextMilestone: {
+      day: number;
+      reward: string;
+      badgeId: string | null;
+    } | null;
   };
   totalAvailable: string;
 }

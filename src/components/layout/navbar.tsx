@@ -189,7 +189,9 @@ export function Navbar() {
                   </Link>
                 ))}
                 {authenticated && (
-                  <QuestDropdown walletAddress={profile?.walletAddress ?? null} />
+                  <QuestDropdown
+                    walletAddress={profile?.walletAddress ?? null}
+                  />
                 )}
               </div>
             </div>

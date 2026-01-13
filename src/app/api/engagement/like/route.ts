@@ -3,10 +3,7 @@ import { getCurrentUser } from '@/lib/auth/get-user';
 import { db } from '@/db';
 import { likes, sessions } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
-import {
-  incrementLikeCount,
-  createQuestReward,
-} from '@/lib/db/queries/quests';
+import { incrementLikeCount, createQuestReward } from '@/lib/db/queries/quests';
 import { QUEST_CONFIG, QUEST_REWARD_TYPES } from '@/lib/quests/config';
 
 export async function POST(req: NextRequest) {
