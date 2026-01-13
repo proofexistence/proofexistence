@@ -26,6 +26,8 @@ export function StarField({
 }: StarFieldProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
+  // Track pointer down position to distinguish tap from drag (for mobile)
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
 
   // ... (imports remain)
 
@@ -234,8 +236,27 @@ export function StarField({
     }
   });
 
-  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+  // Use pointer events instead of click for mobile compatibility
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    pointerDownPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
+
+    // Check if this was a tap (not a drag)
+    if (pointerDownPos.current) {
+      const dx = Math.abs(e.clientX - pointerDownPos.current.x);
+      const dy = Math.abs(e.clientY - pointerDownPos.current.y);
+      const isDrag = dx > 10 || dy > 10;
+
+      if (isDrag) {
+        pointerDownPos.current = null;
+        return;
+      }
+    }
+    pointerDownPos.current = null;
+
     const instanceId = e.instanceId;
     if (instanceId !== undefined && trails[instanceId]) {
       const trail = trails[instanceId];
@@ -258,7 +279,8 @@ export function StarField({
     <instancedMesh
       ref={meshRef}
       args={[undefined, undefined, trails.length]}
-      onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       frustumCulled={false}
