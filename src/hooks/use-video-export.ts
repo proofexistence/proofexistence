@@ -16,6 +16,8 @@ export interface VideoExportOptions {
   videoBitsPerSecond?: number;
   /** Watermark info to overlay on the video */
   watermark?: WatermarkInfo;
+  /** Max dimension (width or height) in pixels (default: 1920) */
+  maxDimension?: number;
 }
 
 export interface VideoExportState {
@@ -31,7 +33,7 @@ export interface UseVideoExportReturn extends VideoExportState {
     durationMs: number,
     playAnimation: (speed: number) => void,
     pauseAnimation: () => void,
-    seekToStart: () => void,
+    seekToTime: (timeMs: number) => void,
     options?: VideoExportOptions
   ) => Promise<Blob | null>;
   cancelExport: () => void;
@@ -40,6 +42,7 @@ export interface UseVideoExportReturn extends VideoExportState {
 const DEFAULT_OPTIONS: Omit<Required<VideoExportOptions>, 'watermark'> = {
   playbackSpeed: 2,
   videoBitsPerSecond: 2500000, // 2.5 Mbps
+  maxDimension: 1920,
 };
 
 /**
@@ -107,7 +110,7 @@ async function exportWithMediaRecorder(
   videoBitsPerSecond: number,
   playAnimation: (speed: number) => void,
   pauseAnimation: () => void,
-  seekToStart: () => void,
+  seekToTime: (timeMs: number) => void,
   setProgress: (p: number) => void,
   setStatus: (s: string) => void,
   cancelledRef: React.MutableRefObject<boolean>
@@ -170,7 +173,7 @@ async function exportWithMediaRecorder(
     };
 
     // Start from beginning
-    seekToStart();
+    seekToTime(0);
 
     // Small delay to ensure seek is applied
     setTimeout(() => {
@@ -232,11 +235,12 @@ export function useVideoExport(): UseVideoExportReturn {
       durationMs: number,
       playAnimation: (speed: number) => void,
       pauseAnimation: () => void,
-      seekToStart: () => void,
+      seekToTime: (timeMs: number) => void,
       options?: VideoExportOptions
     ): Promise<Blob | null> => {
       const opts = { ...DEFAULT_OPTIONS, ...options };
-      const { playbackSpeed, videoBitsPerSecond, watermark } = opts;
+      const { playbackSpeed, videoBitsPerSecond, watermark, maxDimension } =
+        opts;
 
       // Reset state
       setIsExporting(true);
@@ -283,7 +287,7 @@ export function useVideoExport(): UseVideoExportReturn {
             videoBitsPerSecond,
             playAnimation,
             pauseAnimation,
-            seekToStart,
+            seekToTime,
             setProgress,
             setStatus,
             cancelledRef
@@ -291,11 +295,27 @@ export function useVideoExport(): UseVideoExportReturn {
         }
 
         // WebCodecs path (MP4)
-        // H.264 requires even dimensions
-        const width = Math.floor(canvasElement.width / 2) * 2;
-        const height = Math.floor(canvasElement.height / 2) * 2;
+        // Calculate dimensions with aspect ratio preservation and max limits
+        let width = canvasElement.width;
+        let height = canvasElement.height;
+        const aspect = width / height;
+
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            width = maxDimension;
+            height = Math.round(width / aspect);
+          } else {
+            height = maxDimension;
+            width = Math.round(height * aspect);
+          }
+        }
+
+        // Ensure even dimensions for H.264
+        width = Math.floor(width / 2) * 2;
+        height = Math.floor(height / 2) * 2;
+
         const fps = 30;
-        const recordingDuration = durationMs / playbackSpeed;
+        const recordingDuration = durationMs; // Real duration
         const totalFrames = Math.ceil((recordingDuration / 1000) * fps);
 
         console.log('[VideoExport] Starting MP4 export:', {
@@ -328,7 +348,6 @@ export function useVideoExport(): UseVideoExportReturn {
         });
 
         // Configure encoder for H.264
-        // Use High Profile Level 5.1 to support high resolutions (up to 4K)
         await encoder.configure({
           codec: 'avc1.640033', // H.264 High Profile Level 5.1
           width,
@@ -339,14 +358,10 @@ export function useVideoExport(): UseVideoExportReturn {
 
         setStatus('Recording...');
 
-        // Start from beginning
-        seekToStart();
-        await new Promise((resolve) => requestAnimationFrame(resolve));
+        // Pause animation for controlled seeking
+        pauseAnimation();
 
-        // Start animation playback
-        playAnimation(playbackSpeed);
-
-        // Always create offscreen canvas for watermark drawing
+        // Always create offscreen canvas for resizing and watermark drawing
         const offscreenCanvas = new OffscreenCanvas(width, height);
         const offscreenCtx = offscreenCanvas.getContext('2d');
         if (!offscreenCtx) {
@@ -423,52 +438,36 @@ export function useVideoExport(): UseVideoExportReturn {
           }
         };
 
-        // Capture frames
-        const frameInterval = 1000 / fps;
-        let frameCount = 0;
-        const startTime = Date.now();
+        // Capture frames synchronously (conceptually) by seeking
+        const frameInterval = 1000 / fps; // 33.33ms
 
-        const captureFrame = (): Promise<void> => {
-          return new Promise((resolve) => {
-            if (cancelledRef.current || frameCount >= totalFrames) {
-              resolve();
-              return;
-            }
+        for (let i = 0; i < totalFrames; i++) {
+          if (cancelledRef.current) break;
 
-            // Draw source canvas to offscreen canvas
-            offscreenCtx.drawImage(canvasElement, 0, 0, width, height);
+          const currentTime = i * frameInterval;
+          seekToTime(currentTime);
 
-            // Draw watermarks on top
-            drawWatermarks(offscreenCtx, width);
+          // Wait for a few frames to let React and Three.js update the canvas
+          // We need to wait for the visual update to be reflected on the canvas
+          // 2 frames is generally safe (one for React commit, one for WebGL render)
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          await new Promise((resolve) => requestAnimationFrame(resolve));
 
-            const frame = new VideoFrame(offscreenCanvas, {
-              timestamp: frameCount * frameInterval * 1000, // microseconds
-            });
+          // Draw source canvas to offscreen canvas (resizing it)
+          offscreenCtx.drawImage(canvasElement, 0, 0, width, height);
 
-            encoder.encode(frame, { keyFrame: frameCount % 30 === 0 });
-            frame.close();
+          // Draw watermarks on top
+          drawWatermarks(offscreenCtx, width);
 
-            frameCount++;
-            setProgress(frameCount / totalFrames);
-
-            // Schedule next frame
-            const elapsed = Date.now() - startTime;
-            const expectedTime = frameCount * (frameInterval / playbackSpeed);
-            const delay = Math.max(0, expectedTime - elapsed);
-
-            setTimeout(() => {
-              requestAnimationFrame(() => resolve());
-            }, delay);
+          const frame = new VideoFrame(offscreenCanvas, {
+            timestamp: i * frameInterval * 1000, // microseconds
           });
-        };
 
-        // Capture all frames sequentially
-        while (frameCount < totalFrames && !cancelledRef.current) {
-          await captureFrame();
+          encoder.encode(frame, { keyFrame: i % 30 === 0 });
+          frame.close();
+
+          setProgress(i / totalFrames);
         }
-
-        // Stop animation
-        pauseAnimation();
 
         if (cancelledRef.current) {
           encoder.close();

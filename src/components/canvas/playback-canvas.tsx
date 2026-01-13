@@ -332,10 +332,11 @@ export function PlaybackCanvas({
           playback.play();
         },
         () => playback.pause(),
-        () => playback.seek(0),
+        (t) => playback.seek(t),
         {
-          playbackSpeed: 2, // Export at 2x speed for faster processing
+          playbackSpeed: 2, // Export at 2x speed for faster processing (only affects MediaRecorder path now)
           watermark: watermark,
+          maxDimension: 1080, // Cap at 1080p
         }
       );
 
