@@ -204,5 +204,51 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "todayTheme": "Today's Theme",
+    "tasks": {
+      "dailyCreate": "Create {current}/{target}",
+      "dailyLike": "Like {current}/{target}",
+      "dailyTheme": "Theme Creation"
+    },
+    "streak": {
+      "title": "Streak",
+      "days": "{count} days",
+      "nextMilestone": "Next: Day {day}",
+      "claim": "Claim"
+    },
+    "rewards": {
+      "available": "Available Today",
+      "earned": "Earned"
+    },
+    "viewEvents": "View Events"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "Seven Days",
+      "description": "7-day streak"
+    },
+    "streak-30": {
+      "name": "Monthly Guardian",
+      "description": "30-day streak"
+    },
+    "streak-100": {
+      "name": "Century Legend",
+      "description": "100-day streak"
+    },
+    "theme-first": {
+      "name": "Theme Pioneer",
+      "description": "First theme creation"
+    },
+    "theme-master": {
+      "name": "Theme Master",
+      "description": "30 theme creations"
+    },
+    "social-butterfly": {
+      "name": "Social Butterfly",
+      "description": "100 likes given"
+    }
   }
 }

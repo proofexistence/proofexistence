@@ -204,5 +204,51 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "Quêtes Quotidiennes",
+    "todayTheme": "Thème du Jour",
+    "tasks": {
+      "dailyCreate": "Créer {current}/{target}",
+      "dailyLike": "J'aime {current}/{target}",
+      "dailyTheme": "Création Thématique"
+    },
+    "streak": {
+      "title": "Série",
+      "days": "{count} jours",
+      "nextMilestone": "Suivant: Jour {day}",
+      "claim": "Réclamer"
+    },
+    "rewards": {
+      "available": "Disponible Aujourd'hui",
+      "earned": "Gagné"
+    },
+    "viewEvents": "Voir les Événements"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "Sept Jours",
+      "description": "Série de 7 jours"
+    },
+    "streak-30": {
+      "name": "Gardien Mensuel",
+      "description": "Série de 30 jours"
+    },
+    "streak-100": {
+      "name": "Légende du Siècle",
+      "description": "Série de 100 jours"
+    },
+    "theme-first": {
+      "name": "Pionnier du Thème",
+      "description": "Première création thématique"
+    },
+    "theme-master": {
+      "name": "Maître du Thème",
+      "description": "30 créations thématiques"
+    },
+    "social-butterfly": {
+      "name": "Papillon Social",
+      "description": "100 j'aime donnés"
+    }
   }
 }

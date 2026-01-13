@@ -204,5 +204,51 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "デイリークエスト",
+    "todayTheme": "今日のテーマ",
+    "tasks": {
+      "dailyCreate": "作成 {current}/{target}",
+      "dailyLike": "いいね {current}/{target}",
+      "dailyTheme": "テーマ作成"
+    },
+    "streak": {
+      "title": "連続ログイン",
+      "days": "{count}日",
+      "nextMilestone": "次: {day}日目",
+      "claim": "受け取る"
+    },
+    "rewards": {
+      "available": "本日獲得可能",
+      "earned": "獲得済み"
+    },
+    "viewEvents": "イベントを見る"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "七日の光",
+      "description": "7日連続ログイン"
+    },
+    "streak-30": {
+      "name": "月の守護者",
+      "description": "30日連続ログイン"
+    },
+    "streak-100": {
+      "name": "百日伝説",
+      "description": "100日連続ログイン"
+    },
+    "theme-first": {
+      "name": "テーマパイオニア",
+      "description": "初めてのテーマ作成"
+    },
+    "theme-master": {
+      "name": "テーママスター",
+      "description": "テーマ作成30回達成"
+    },
+    "social-butterfly": {
+      "name": "ソーシャルバタフライ",
+      "description": "いいね100回達成"
+    }
   }
 }

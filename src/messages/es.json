@@ -204,5 +204,51 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "Misiones Diarias",
+    "todayTheme": "Tema de Hoy",
+    "tasks": {
+      "dailyCreate": "Crear {current}/{target}",
+      "dailyLike": "Me gusta {current}/{target}",
+      "dailyTheme": "Creación Temática"
+    },
+    "streak": {
+      "title": "Racha",
+      "days": "{count} días",
+      "nextMilestone": "Siguiente: Día {day}",
+      "claim": "Reclamar"
+    },
+    "rewards": {
+      "available": "Disponible Hoy",
+      "earned": "Ganado"
+    },
+    "viewEvents": "Ver Eventos"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "Siete Días",
+      "description": "Racha de 7 días"
+    },
+    "streak-30": {
+      "name": "Guardián Mensual",
+      "description": "Racha de 30 días"
+    },
+    "streak-100": {
+      "name": "Leyenda del Siglo",
+      "description": "Racha de 100 días"
+    },
+    "theme-first": {
+      "name": "Pionero del Tema",
+      "description": "Primera creación temática"
+    },
+    "theme-master": {
+      "name": "Maestro del Tema",
+      "description": "30 creaciones temáticas"
+    },
+    "social-butterfly": {
+      "name": "Mariposa Social",
+      "description": "100 me gusta dados"
+    }
   }
 }

@@ -204,5 +204,51 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "每日任务",
+    "todayTheme": "今日主题",
+    "tasks": {
+      "dailyCreate": "创作 {current}/{target}",
+      "dailyLike": "点赞 {current}/{target}",
+      "dailyTheme": "主题创作"
+    },
+    "streak": {
+      "title": "连续签到",
+      "days": "{count} 天",
+      "nextMilestone": "下一个: 第 {day} 天",
+      "claim": "领取"
+    },
+    "rewards": {
+      "available": "今日可领",
+      "earned": "已获得"
+    },
+    "viewEvents": "查看活动"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "七日之光",
+      "description": "连续签到 7 天"
+    },
+    "streak-30": {
+      "name": "月之守护者",
+      "description": "连续签到 30 天"
+    },
+    "streak-100": {
+      "name": "百日传说",
+      "description": "连续签到 100 天"
+    },
+    "theme-first": {
+      "name": "主题先锋",
+      "description": "首次完成主题创作"
+    },
+    "theme-master": {
+      "name": "主题大师",
+      "description": "累计 30 个主题创作"
+    },
+    "social-butterfly": {
+      "name": "社交蝴蝶",
+      "description": "累计点赞 100 次"
+    }
   }
 }

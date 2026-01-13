@@ -204,5 +204,51 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "每日任務",
+    "todayTheme": "今日主題",
+    "tasks": {
+      "dailyCreate": "創作 {current}/{target}",
+      "dailyLike": "按讚 {current}/{target}",
+      "dailyTheme": "主題創作"
+    },
+    "streak": {
+      "title": "連續簽到",
+      "days": "{count} 天",
+      "nextMilestone": "下一個: 第 {day} 天",
+      "claim": "領取"
+    },
+    "rewards": {
+      "available": "今日可領",
+      "earned": "已獲得"
+    },
+    "viewEvents": "查看活動"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "七日之光",
+      "description": "連續簽到 7 天"
+    },
+    "streak-30": {
+      "name": "月之守護者",
+      "description": "連續簽到 30 天"
+    },
+    "streak-100": {
+      "name": "百日傳說",
+      "description": "連續簽到 100 天"
+    },
+    "theme-first": {
+      "name": "主題先鋒",
+      "description": "首次完成主題創作"
+    },
+    "theme-master": {
+      "name": "主題大師",
+      "description": "累計 30 個主題創作"
+    },
+    "social-butterfly": {
+      "name": "社交蝴蝶",
+      "description": "累計按讚 100 次"
+    }
   }
 }
