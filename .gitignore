@@ -75,3 +75,6 @@ docs/
 
 # Auto Claude data directory
 .auto-claude/
+
+# Git worktrees
+.worktrees/
