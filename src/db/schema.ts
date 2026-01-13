@@ -338,6 +338,101 @@ export const brandLines = pgTable('brand_lines', {
 });
 
 // ============================================================================
+// DAILY THEMES TABLE
+// Stores daily creation themes (can be from default pool or admin override)
+// ============================================================================
+export const dailyThemes = pgTable(
+  'daily_themes',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    date: varchar('date', { length: 10 }).unique().notNull(), // Format: "YYYY-MM-DD"
+    theme: varchar('theme', { length: 100 }).notNull(),
+    description: varchar('description', { length: 500 }),
+    isDefault: boolean('is_default').default(true).notNull(),
+    createdBy: uuid('created_by').references(() => users.id),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('daily_themes_date_idx').on(table.date)]
+);
+
+// ============================================================================
+// DEFAULT THEMES TABLE
+// Pool of themes for automatic daily rotation
+// ============================================================================
+export const defaultThemes = pgTable('default_themes', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  theme: varchar('theme', { length: 100 }).notNull(),
+  description: varchar('description', { length: 500 }),
+  isActive: boolean('is_active').default(true).notNull(),
+});
+
+// ============================================================================
+// USER DAILY QUESTS TABLE
+// Tracks user's daily quest progress
+// ============================================================================
+export const userDailyQuests = pgTable(
+  'user_daily_quests',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    date: varchar('date', { length: 10 }).notNull(), // Format: "YYYY-MM-DD"
+    createCount: integer('create_count').default(0).notNull(),
+    likeCount: integer('like_count').default(0).notNull(),
+    themeCompleted: boolean('theme_completed').default(false).notNull(),
+    themeSessionId: uuid('theme_session_id').references(() => sessions.id),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('user_daily_quests_user_date_idx').on(table.userId, table.date),
+  ]
+);
+
+// ============================================================================
+// USER STREAKS TABLE
+// Tracks consecutive daily activity
+// ============================================================================
+export const userStreaks = pgTable('user_streaks', {
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .primaryKey(),
+  currentStreak: integer('current_streak').default(0).notNull(),
+  lastActiveDate: varchar('last_active_date', { length: 10 }), // Format: "YYYY-MM-DD"
+  longestStreak: integer('longest_streak').default(0).notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// ============================================================================
+// QUEST REWARDS TABLE
+// Tracks quest bonus rewards (separate from daily TIME26 rewards)
+// ============================================================================
+export const questRewards = pgTable(
+  'quest_rewards',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    date: varchar('date', { length: 10 }).notNull(),
+    rewardType: varchar('reward_type', { length: 50 }).notNull(),
+    // Types: 'daily_create' | 'daily_like' | 'daily_theme' | 'streak_daily' | 'streak_milestone'
+    amount: decimal('amount', { precision: 78, scale: 0 }).notNull(), // in wei
+    status: varchar('status', { length: 20 }).default('PENDING').notNull(),
+    // Status: 'PENDING' | 'APPROVED' | 'SENT'
+    milestoneDay: integer('milestone_day'), // For streak_milestone only (7, 14, 30, 100)
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    sentAt: timestamp('sent_at'),
+  },
+  (table) => [
+    index('quest_rewards_user_id_idx').on(table.userId),
+    index('quest_rewards_status_idx').on(table.status),
+    index('quest_rewards_date_idx').on(table.date),
+  ]
+);
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 export type User = typeof users.$inferSelect;
@@ -363,6 +458,21 @@ export type NewUserDailyReward = typeof userDailyRewards.$inferInsert;
 
 export type BonusReward = typeof bonusRewards.$inferSelect;
 export type NewBonusReward = typeof bonusRewards.$inferInsert;
+
+export type DailyTheme = typeof dailyThemes.$inferSelect;
+export type NewDailyTheme = typeof dailyThemes.$inferInsert;
+
+export type DefaultTheme = typeof defaultThemes.$inferSelect;
+export type NewDefaultTheme = typeof defaultThemes.$inferInsert;
+
+export type UserDailyQuest = typeof userDailyQuests.$inferSelect;
+export type NewUserDailyQuest = typeof userDailyQuests.$inferInsert;
+
+export type UserStreak = typeof userStreaks.$inferSelect;
+export type NewUserStreak = typeof userStreaks.$inferInsert;
+
+export type QuestReward = typeof questRewards.$inferSelect;
+export type NewQuestReward = typeof questRewards.$inferInsert;
 
 // Session status enum for type safety
 export const SESSION_STATUS = {

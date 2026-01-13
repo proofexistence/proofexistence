@@ -8,6 +8,13 @@
       "when": 1768150055913,
       "tag": "0008_neat_gorgon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768301009476,
+      "tag": "0001_parched_rage",
+      "breakpoints": true
     }
   ]
 }
