@@ -1,7 +1,7 @@
 'use client';
 
 import { ElementType } from 'react';
-import { motion, Transition, Variants } from 'motion/react';
+import { motion, Transition, Variants } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 

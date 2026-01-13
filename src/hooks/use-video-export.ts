@@ -63,10 +63,12 @@ function isMediaRecorderSupported(): boolean {
   if (typeof MediaRecorder === 'undefined') return false;
   // Check if video recording is supported (WebM or MP4)
   try {
-    return MediaRecorder.isTypeSupported('video/webm') ||
-           MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ||
-           MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ||
-           MediaRecorder.isTypeSupported('video/mp4');
+    return (
+      MediaRecorder.isTypeSupported('video/webm') ||
+      MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ||
+      MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ||
+      MediaRecorder.isTypeSupported('video/mp4')
+    );
   } catch {
     return false;
   }
@@ -80,7 +82,7 @@ function getSupportedMimeType(): string | null {
     'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm',
-    'video/mp4',  // Safari might support mp4
+    'video/mp4', // Safari might support mp4
   ];
   for (const type of types) {
     try {

@@ -57,7 +57,6 @@
     "keccak256": "^1.0.6",
     "lucide-react": "^0.562.0",
     "merkletreejs": "^0.6.0",
-    "motion": "^12.23.26",
     "mp4-muxer": "^5.2.2",
     "next": "16.0.10",
     "next-intl": "^4.7.0",
@@ -69,7 +68,6 @@
     "remark-gfm": "^4.0.1",
     "rough-notation": "^0.5.1",
     "sharp": "^0.34.5",
-    "swr": "^2.3.8",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",
     "zod": "^4.3.4"

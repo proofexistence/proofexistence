@@ -1,6 +1,6 @@
 'use client';
 
-import useSWR from 'swr';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useWeb3Auth } from '@/lib/web3auth/context';
 
 interface BalanceData {
@@ -26,27 +26,27 @@ interface BalanceData {
 export function useTime26Balance() {
   const { user, isConnected } = useWeb3Auth();
   const walletAddress = user?.walletAddress;
+  const queryClient = useQueryClient();
 
-  const fetcher = async (url: string) => {
+  const fetcher = async () => {
     if (!walletAddress) return null;
-    const res = await fetch(url, {
+    const res = await fetch('/api/user/balance', {
       headers: {
         'X-Wallet-Address': walletAddress,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch balance');
-    return res.json();
+    return res.json() as Promise<BalanceData>;
   };
 
-  const { data, error, isLoading, mutate } = useSWR<BalanceData>(
-    isConnected && walletAddress ? '/api/user/balance' : null,
-    fetcher,
-    {
-      revalidateOnFocus: false, // Don't refetch on window focus
-      revalidateOnReconnect: false, // Don't refetch on reconnect
-      dedupingInterval: 60000, // Dedupe requests within 60s
-    }
-  );
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['time26-balance', walletAddress],
+    queryFn: fetcher,
+    enabled: !!(isConnected && walletAddress),
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on reconnect
+    staleTime: 60000, // Dedupe requests within 60s (SWR dedupingInterval equiv)
+  });
 
   return {
     balance: data?.balance?.formatted ?? '0',
@@ -56,6 +56,9 @@ export function useTime26Balance() {
     recentRewards: data?.recentRewards ?? [],
     isLoading,
     isError: !!error,
-    refresh: mutate,
+    refresh: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['time26-balance', walletAddress],
+      }),
   };
 }

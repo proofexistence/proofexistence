@@ -1,6 +1,6 @@
 'use client';
 
-import useSWR from 'swr';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { useWeb3Auth } from '@/lib/web3auth/context';
 import { ethers } from 'ethers';
@@ -32,26 +32,26 @@ export function useClaimTime26() {
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
   const [claimTxHash, setClaimTxHash] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetcher = async (url: string) => {
+  const fetcher = async () => {
     if (!walletAddress) return null;
-    const res = await fetch(url, {
+    const res = await fetch('/api/user/claim-proof', {
       headers: {
         'X-Wallet-Address': walletAddress,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch claim proof');
-    return res.json();
+    return res.json() as Promise<ClaimProofData>;
   };
 
-  const { data, error, isLoading, mutate } = useSWR<ClaimProofData>(
-    isConnected && walletAddress ? '/api/user/claim-proof' : null,
-    fetcher,
-    {
-      refreshInterval: 300000, // Refresh every 5 minutes
-      revalidateOnFocus: true,
-    }
-  );
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['claim-proof', walletAddress],
+    queryFn: fetcher,
+    enabled: !!(isConnected && walletAddress),
+    refetchInterval: 300000, // Refresh every 5 minutes
+    refetchOnWindowFocus: true,
+  });
 
   const claimRewards = useCallback(async () => {
     if (!data?.claimable || !data?.claimData) {
@@ -89,7 +89,9 @@ export function useClaimTime26() {
       await tx.wait();
 
       // Refresh the data
-      await mutate();
+      await queryClient.invalidateQueries({
+        queryKey: ['claim-proof', walletAddress],
+      });
 
       return true;
     } catch (err) {
@@ -101,7 +103,7 @@ export function useClaimTime26() {
     } finally {
       setIsClaiming(false);
     }
-  }, [data, web3Provider, mutate]);
+  }, [data, web3Provider, queryClient, walletAddress]);
 
   return {
     // Claim status
@@ -124,6 +126,9 @@ export function useClaimTime26() {
     claimTxHash,
 
     // Refresh
-    refresh: mutate,
+    refresh: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['claim-proof', walletAddress],
+      }),
   };
 }
