@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { useWeb3Auth } from '@/lib/web3auth/context';
 
 interface BalanceData {
@@ -29,10 +30,9 @@ export function useTime26Balance() {
   const queryClient = useQueryClient();
 
   const fetcher = async () => {
-    if (!walletAddress) return null;
     const res = await fetch('/api/user/balance', {
       headers: {
-        'X-Wallet-Address': walletAddress,
+        'X-Wallet-Address': walletAddress!,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch balance');
@@ -48,6 +48,14 @@ export function useTime26Balance() {
     staleTime: 60000, // Dedupe requests within 60s (SWR dedupingInterval equiv)
   });
 
+  const refresh = useCallback(
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: ['time26-balance', walletAddress],
+      }),
+    [queryClient, walletAddress]
+  );
+
   return {
     balance: data?.balance?.formatted ?? '0',
     balanceRaw: data?.balance?.raw ?? '0',
@@ -56,9 +64,6 @@ export function useTime26Balance() {
     recentRewards: data?.recentRewards ?? [],
     isLoading,
     isError: !!error,
-    refresh: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['time26-balance', walletAddress],
-      }),
+    refresh,
   };
 }

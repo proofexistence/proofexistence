@@ -35,10 +35,9 @@ export function useClaimTime26() {
   const queryClient = useQueryClient();
 
   const fetcher = async () => {
-    if (!walletAddress) return null;
     const res = await fetch('/api/user/claim-proof', {
       headers: {
-        'X-Wallet-Address': walletAddress,
+        'X-Wallet-Address': walletAddress!,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch claim proof');
@@ -105,6 +104,14 @@ export function useClaimTime26() {
     }
   }, [data, web3Provider, queryClient, walletAddress]);
 
+  const refresh = useCallback(
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: ['claim-proof', walletAddress],
+      }),
+    [queryClient, walletAddress]
+  );
+
   return {
     // Claim status
     claimable: data?.claimable ?? false,
@@ -126,9 +133,6 @@ export function useClaimTime26() {
     claimTxHash,
 
     // Refresh
-    refresh: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['claim-proof', walletAddress],
-      }),
+    refresh,
   };
 }
