@@ -57,21 +57,19 @@ export async function GET() {
       (m) => m.day > currentStreak
     );
 
-    // Calculate total available today
-    let totalAvailable = 0;
-    if (!tasks.dailyCreate.completed) {
-      totalAvailable += parseFloat(tasks.dailyCreate.reward);
+    // Calculate total earned today (completed tasks only)
+    let totalEarned = 0;
+    if (tasks.dailyCreate.completed) {
+      totalEarned += parseFloat(tasks.dailyCreate.reward);
     }
-    if (!tasks.dailyLike.completed) {
-      totalAvailable += parseFloat(tasks.dailyLike.reward);
+    if (tasks.dailyLike.completed) {
+      totalEarned += parseFloat(tasks.dailyLike.reward);
     }
-    if (!tasks.dailyTheme.completed) {
-      totalAvailable += parseFloat(tasks.dailyTheme.reward);
+    if (tasks.dailyTheme.completed) {
+      totalEarned += parseFloat(tasks.dailyTheme.reward);
     }
-    if (!streakClaimed) {
-      totalAvailable += parseFloat(
-        formatEther(QUEST_CONFIG.rewards.streakDaily)
-      );
+    if (streakClaimed) {
+      totalEarned += parseFloat(formatEther(QUEST_CONFIG.rewards.streakDaily));
     }
 
     return NextResponse.json({
@@ -92,7 +90,7 @@ export async function GET() {
             }
           : null,
       },
-      totalAvailable: totalAvailable.toFixed(0),
+      totalEarned: totalEarned.toFixed(0),
     });
   } catch (error) {
     console.error('Quest Today API Error:', error);

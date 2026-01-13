@@ -214,13 +214,13 @@
       "dailyTheme": "テーマ作成"
     },
     "streak": {
-      "title": "連続ログイン",
-      "days": "{count}日",
-      "nextMilestone": "次: {day}日目",
-      "claim": "受け取る"
+      "title": "連続描画",
+      "days": "連続 {count} 日",
+      "nextMilestone": "次のマイルストーン: {day}日目",
+      "claim": "受け取る +{amount}"
     },
     "rewards": {
-      "available": "本日獲得可能",
+      "available": "本日獲得済み",
       "earned": "獲得済み"
     },
     "viewEvents": "イベントを見る"

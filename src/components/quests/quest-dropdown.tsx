@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Target, Flame, Check, Sparkles, Heart, Palette } from 'lucide-react';
+import { Target, Pencil, Check, Sparkles, Heart, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QuestData {
@@ -38,7 +38,7 @@ interface QuestData {
       badgeId: string | null;
     } | null;
   };
-  totalAvailable: string;
+  totalEarned: string;
 }
 
 export function QuestDropdown({
@@ -184,7 +184,7 @@ export function QuestDropdown({
               <div className="p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-orange-400" />
+                    <Pencil className="w-4 h-4 text-purple-400" />
                     <span className="text-sm font-medium text-white">
                       {t('streak.days', { count: data.streak.current })}
                     </span>
@@ -197,7 +197,9 @@ export function QuestDropdown({
                     >
                       {claimStreakMutation.isPending
                         ? '...'
-                        : `+${data.streak.dailyReward}`}
+                        : t('streak.claim', {
+                            amount: data.streak.dailyReward,
+                          })}
                     </button>
                   )}
                   {data.streak.todayClaimed && (
@@ -209,7 +211,7 @@ export function QuestDropdown({
                     {t('streak.nextMilestone', {
                       day: data.streak.nextMilestone.day,
                     })}
-                    {' -> '}
+                    {' → '}
                     <span className="text-amber-400">
                       +{data.streak.nextMilestone.reward}
                     </span>
@@ -217,17 +219,19 @@ export function QuestDropdown({
                 )}
               </div>
 
-              {/* Total Available */}
-              <div className="p-3 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-400">
-                    {t('rewards.available')}
-                  </span>
-                  <span className="text-sm font-bold text-white">
-                    {data.totalAvailable} TIME26
-                  </span>
+              {/* Total Earned - only show if > 0 */}
+              {parseInt(data.totalEarned) > 0 && (
+                <div className="p-3 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-zinc-400">
+                      {t('rewards.available')}
+                    </span>
+                    <span className="text-sm font-bold text-white">
+                      {data.totalEarned} TIME26
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ) : null}
         </div>

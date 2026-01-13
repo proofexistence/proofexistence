@@ -35,36 +35,42 @@ export async function POST(req: NextRequest) {
 
       const isSelfLike = targetSession?.userId === user.id;
 
-      // Upsert like (ignore if exists)
-      await db
+      // Upsert like (ignore if exists) - use returning to check if new
+      const insertResult = await db
         .insert(likes)
         .values({
           userId: user.id,
           sessionId: sessionId,
         })
-        .onConflictDoNothing();
+        .onConflictDoNothing()
+        .returning();
 
-      // Increment session counter
-      await db
-        .update(sessions)
-        .set({ likes: sql`${sessions.likes} + 1` })
-        .where(eq(sessions.id, sessionId));
+      const isNewLike = insertResult.length > 0;
 
-      // Track quest progress (only for non-self likes)
-      if (!isSelfLike) {
-        try {
-          const newCount = await incrementLikeCount(user.id);
+      // Only increment counters and track quest for NEW likes
+      if (isNewLike) {
+        // Increment session counter
+        await db
+          .update(sessions)
+          .set({ likes: sql`${sessions.likes} + 1` })
+          .where(eq(sessions.id, sessionId));
 
-          // Check if daily like task just completed
-          if (newCount === QUEST_CONFIG.targets.dailyLike) {
-            await createQuestReward(
-              user.id,
-              QUEST_REWARD_TYPES.DAILY_LIKE,
-              QUEST_CONFIG.rewards.dailyLike
-            );
+        // Track quest progress (only for non-self likes)
+        if (!isSelfLike) {
+          try {
+            const newCount = await incrementLikeCount(user.id);
+
+            // Check if daily like task just completed
+            if (newCount === QUEST_CONFIG.targets.dailyLike) {
+              await createQuestReward(
+                user.id,
+                QUEST_REWARD_TYPES.DAILY_LIKE,
+                QUEST_CONFIG.rewards.dailyLike
+              );
+            }
+          } catch (questError) {
+            console.error('Quest tracking error:', questError);
           }
-        } catch (questError) {
-          console.error('Quest tracking error:', questError);
         }
       }
     } else if (action === 'unlike') {

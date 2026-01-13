@@ -214,13 +214,13 @@
       "dailyTheme": "Theme Creation"
     },
     "streak": {
-      "title": "Streak",
-      "days": "{count} days",
-      "nextMilestone": "Next: Day {day}",
-      "claim": "Claim"
+      "title": "Drawing Streak",
+      "days": "{count} day streak",
+      "nextMilestone": "Next milestone: Day {day}",
+      "claim": "Claim +{amount}"
     },
     "rewards": {
-      "available": "Available Today",
+      "available": "Earned Today",
       "earned": "Earned"
     },
     "viewEvents": "View Events"

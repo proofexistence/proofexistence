@@ -214,13 +214,13 @@
       "dailyTheme": "Création Thématique"
     },
     "streak": {
-      "title": "Série",
-      "days": "{count} jours",
-      "nextMilestone": "Suivant: Jour {day}",
-      "claim": "Réclamer"
+      "title": "Série de Dessins",
+      "days": "Série de {count} jours",
+      "nextMilestone": "Prochain jalon: Jour {day}",
+      "claim": "Réclamer +{amount}"
     },
     "rewards": {
-      "available": "Disponible Aujourd'hui",
+      "available": "Gagné Aujourd'hui",
       "earned": "Gagné"
     },
     "viewEvents": "Voir les Événements"

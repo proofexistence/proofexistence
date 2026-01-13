@@ -214,13 +214,13 @@
       "dailyTheme": "Creación Temática"
     },
     "streak": {
-      "title": "Racha",
-      "days": "{count} días",
-      "nextMilestone": "Siguiente: Día {day}",
-      "claim": "Reclamar"
+      "title": "Racha de Dibujo",
+      "days": "Racha de {count} días",
+      "nextMilestone": "Siguiente hito: Día {day}",
+      "claim": "Reclamar +{amount}"
     },
     "rewards": {
-      "available": "Disponible Hoy",
+      "available": "Ganado Hoy",
       "earned": "Ganado"
     },
     "viewEvents": "Ver Eventos"
