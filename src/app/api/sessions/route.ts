@@ -3,6 +3,11 @@ import { db } from '@/db';
 import { sessions } from '@/db/schema';
 import { getCurrentUser } from '@/lib/auth/get-user';
 import { eq } from 'drizzle-orm';
+import {
+  incrementCreateCount,
+  createQuestReward,
+} from '@/lib/db/queries/quests';
+import { QUEST_CONFIG, QUEST_REWARD_TYPES } from '@/lib/quests/config';
 
 export async function POST(req: NextRequest) {
   try {
@@ -46,6 +51,23 @@ export async function POST(req: NextRequest) {
         status: 'PENDING',
       })
       .returning();
+
+    // Track quest progress
+    try {
+      const newCount = await incrementCreateCount(userId);
+
+      // Check if daily create task just completed
+      if (newCount === QUEST_CONFIG.targets.dailyCreate) {
+        await createQuestReward(
+          userId,
+          QUEST_REWARD_TYPES.DAILY_CREATE,
+          QUEST_CONFIG.rewards.dailyCreate
+        );
+      }
+    } catch (questError) {
+      // Don't fail session creation if quest tracking fails
+      console.error('Quest tracking error:', questError);
+    }
 
     return NextResponse.json({ success: true, session: newSession });
   } catch (error) {
