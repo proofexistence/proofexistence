@@ -220,5 +220,79 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "Misiones Diarias",
+    "todayTheme": "Tema de Hoy",
+    "tasks": {
+      "dailyCreate": "Crear {current}/{target}",
+      "dailyLike": "Me gusta {current}/{target}",
+      "dailyTheme": "Creación Temática"
+    },
+    "streak": {
+      "title": "Racha de Dibujo",
+      "days": "Racha de {count} días",
+      "nextMilestone": "Siguiente hito: Día {day}",
+      "claim": "Reclamar +{amount}"
+    },
+    "rewards": {
+      "available": "Ganado Hoy",
+      "earned": "Ganado"
+    },
+    "viewEvents": "Ver Eventos"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "Siete Días",
+      "description": "Racha de 7 días"
+    },
+    "streak-30": {
+      "name": "Guardián Mensual",
+      "description": "Racha de 30 días"
+    },
+    "streak-100": {
+      "name": "Leyenda del Siglo",
+      "description": "Racha de 100 días"
+    },
+    "theme-first": {
+      "name": "Pionero del Tema",
+      "description": "Primera creación temática"
+    },
+    "theme-master": {
+      "name": "Maestro del Tema",
+      "description": "30 creaciones temáticas"
+    },
+    "social-butterfly": {
+      "name": "Mariposa Social",
+      "description": "100 me gusta dados"
+    }
+  },
+  "timeCapsule": {
+    "title": "Cápsula del Tiempo",
+    "create": "Crear Cápsula del Tiempo",
+    "unlock": "Fecha de Apertura",
+    "message": "Mensaje Secreto",
+    "messagePlaceholder": "Escribe un mensaje para tu yo futuro...",
+    "unlockIn": "Se abre en {days} días",
+    "canOpen": "¡Lista para abrir!",
+    "open": "Abrir Cápsula",
+    "opened": "Abierta el {date}",
+    "locked": "Bloqueada hasta {date}",
+    "empty": "No hay cápsulas del tiempo",
+    "createFirst": "Crea tu primera cápsula del tiempo guardando un dibujo para el futuro.",
+    "success": "¡Cápsula del tiempo creada!",
+    "successMessage": "Tu creación se revelará el {date}"
+  },
+  "events": {
+    "title": "Eventos",
+    "active": "Eventos Activos",
+    "upcoming": "Próximamente",
+    "past": "Eventos Pasados",
+    "noActive": "No hay eventos activos",
+    "join": "Unirse al Evento",
+    "joined": "Unido",
+    "participants": "{count} participantes",
+    "rewardBonus": "Recompensas {multiplier}x",
+    "endsIn": "Termina en {days} días"
   }
 }

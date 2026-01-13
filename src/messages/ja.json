@@ -220,5 +220,79 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "デイリークエスト",
+    "todayTheme": "今日のテーマ",
+    "tasks": {
+      "dailyCreate": "作成 {current}/{target}",
+      "dailyLike": "いいね {current}/{target}",
+      "dailyTheme": "テーマ作成"
+    },
+    "streak": {
+      "title": "連続描画",
+      "days": "連続 {count} 日",
+      "nextMilestone": "次のマイルストーン: {day}日目",
+      "claim": "受け取る +{amount}"
+    },
+    "rewards": {
+      "available": "本日獲得済み",
+      "earned": "獲得済み"
+    },
+    "viewEvents": "イベントを見る"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "七日の光",
+      "description": "7日連続ログイン"
+    },
+    "streak-30": {
+      "name": "月の守護者",
+      "description": "30日連続ログイン"
+    },
+    "streak-100": {
+      "name": "百日伝説",
+      "description": "100日連続ログイン"
+    },
+    "theme-first": {
+      "name": "テーマパイオニア",
+      "description": "初めてのテーマ作成"
+    },
+    "theme-master": {
+      "name": "テーママスター",
+      "description": "テーマ作成30回達成"
+    },
+    "social-butterfly": {
+      "name": "ソーシャルバタフライ",
+      "description": "いいね100回達成"
+    }
+  },
+  "timeCapsule": {
+    "title": "タイムカプセル",
+    "create": "タイムカプセルを作成",
+    "unlock": "開封日",
+    "message": "秘密のメッセージ",
+    "messagePlaceholder": "未来の自分へメッセージを書いてください...",
+    "unlockIn": "あと {days} 日で開封",
+    "canOpen": "開封できます！",
+    "open": "カプセルを開く",
+    "opened": "{date} に開封済み",
+    "locked": "{date} まで封印",
+    "empty": "タイムカプセルはありません",
+    "createFirst": "作品を封印して、未来の自分へ届けましょう。",
+    "success": "タイムカプセルが作成されました！",
+    "successMessage": "あなたの作品は {date} に公開されます"
+  },
+  "events": {
+    "title": "イベント",
+    "active": "開催中のイベント",
+    "upcoming": "近日開催",
+    "past": "過去のイベント",
+    "noActive": "開催中のイベントはありません",
+    "join": "参加する",
+    "joined": "参加中",
+    "participants": "{count} 人参加",
+    "rewardBonus": "報酬 {multiplier}x",
+    "endsIn": "残り {days} 日"
   }
 }

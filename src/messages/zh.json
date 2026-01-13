@@ -220,5 +220,79 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "每日任務",
+    "todayTheme": "今日主題",
+    "tasks": {
+      "dailyCreate": "創作 {current}/{target}",
+      "dailyLike": "按讚 {current}/{target}",
+      "dailyTheme": "主題創作"
+    },
+    "streak": {
+      "title": "連續繪畫",
+      "days": "連續 {count} 天",
+      "nextMilestone": "下一個里程碑: 第 {day} 天",
+      "claim": "領取 +{amount}"
+    },
+    "rewards": {
+      "available": "今日已獲得",
+      "earned": "已獲得"
+    },
+    "viewEvents": "查看活動"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "七日之光",
+      "description": "連續簽到 7 天"
+    },
+    "streak-30": {
+      "name": "月之守護者",
+      "description": "連續簽到 30 天"
+    },
+    "streak-100": {
+      "name": "百日傳說",
+      "description": "連續簽到 100 天"
+    },
+    "theme-first": {
+      "name": "主題先鋒",
+      "description": "首次完成主題創作"
+    },
+    "theme-master": {
+      "name": "主題大師",
+      "description": "累計 30 個主題創作"
+    },
+    "social-butterfly": {
+      "name": "社交蝴蝶",
+      "description": "累計按讚 100 次"
+    }
+  },
+  "timeCapsule": {
+    "title": "時空膠囊",
+    "create": "創建時空膠囊",
+    "unlock": "解鎖日期",
+    "message": "秘密訊息",
+    "messagePlaceholder": "寫一封信給未來的自己...",
+    "unlockIn": "{days} 天後解鎖",
+    "canOpen": "可以開啟了！",
+    "open": "開啟膠囊",
+    "opened": "已於 {date} 開啟",
+    "locked": "封存至 {date}",
+    "empty": "尚未創建時空膠囊",
+    "createFirst": "將你的創作封存，留給未來的自己。",
+    "success": "時空膠囊已創建！",
+    "successMessage": "你的創作將於 {date} 揭曉"
+  },
+  "events": {
+    "title": "活動",
+    "active": "進行中的活動",
+    "upcoming": "即將到來",
+    "past": "過往活動",
+    "noActive": "目前沒有進行中的活動",
+    "join": "加入活動",
+    "joined": "已加入",
+    "participants": "{count} 人參與",
+    "rewardBonus": "{multiplier}x 獎勵加成",
+    "endsIn": "剩餘 {days} 天"
   }
 }

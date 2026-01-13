@@ -220,5 +220,79 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "todayTheme": "Today's Theme",
+    "tasks": {
+      "dailyCreate": "Create {current}/{target}",
+      "dailyLike": "Like {current}/{target}",
+      "dailyTheme": "Theme Creation"
+    },
+    "streak": {
+      "title": "Drawing Streak",
+      "days": "{count} day streak",
+      "nextMilestone": "Next milestone: Day {day}",
+      "claim": "Claim +{amount}"
+    },
+    "rewards": {
+      "available": "Earned Today",
+      "earned": "Earned"
+    },
+    "viewEvents": "View Events"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "Seven Days",
+      "description": "7-day streak"
+    },
+    "streak-30": {
+      "name": "Monthly Guardian",
+      "description": "30-day streak"
+    },
+    "streak-100": {
+      "name": "Century Legend",
+      "description": "100-day streak"
+    },
+    "theme-first": {
+      "name": "Theme Pioneer",
+      "description": "First theme creation"
+    },
+    "theme-master": {
+      "name": "Theme Master",
+      "description": "30 theme creations"
+    },
+    "social-butterfly": {
+      "name": "Social Butterfly",
+      "description": "100 likes given"
+    }
+  },
+  "timeCapsule": {
+    "title": "Time Capsule",
+    "create": "Create Time Capsule",
+    "unlock": "Unlock Date",
+    "message": "Secret Message",
+    "messagePlaceholder": "Write a message to your future self...",
+    "unlockIn": "Unlocks in {days} days",
+    "canOpen": "Ready to open!",
+    "open": "Open Capsule",
+    "opened": "Opened {date}",
+    "locked": "Locked until {date}",
+    "empty": "No time capsules yet",
+    "createFirst": "Create your first time capsule by saving a drawing for the future.",
+    "success": "Time capsule created!",
+    "successMessage": "Your creation will be revealed on {date}"
+  },
+  "events": {
+    "title": "Events",
+    "active": "Active Events",
+    "upcoming": "Upcoming Events",
+    "past": "Past Events",
+    "noActive": "No active events",
+    "join": "Join Event",
+    "joined": "Joined",
+    "participants": "{count} participants",
+    "rewardBonus": "{multiplier}x rewards",
+    "endsIn": "Ends in {days} days"
   }
 }

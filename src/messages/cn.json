@@ -220,5 +220,79 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "每日任务",
+    "todayTheme": "今日主题",
+    "tasks": {
+      "dailyCreate": "创作 {current}/{target}",
+      "dailyLike": "点赞 {current}/{target}",
+      "dailyTheme": "主题创作"
+    },
+    "streak": {
+      "title": "连续绘画",
+      "days": "连续 {count} 天",
+      "nextMilestone": "下一个里程碑: 第 {day} 天",
+      "claim": "领取 +{amount}"
+    },
+    "rewards": {
+      "available": "今日已获得",
+      "earned": "已获得"
+    },
+    "viewEvents": "查看活动"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "七日之光",
+      "description": "连续签到 7 天"
+    },
+    "streak-30": {
+      "name": "月之守护者",
+      "description": "连续签到 30 天"
+    },
+    "streak-100": {
+      "name": "百日传说",
+      "description": "连续签到 100 天"
+    },
+    "theme-first": {
+      "name": "主题先锋",
+      "description": "首次完成主题创作"
+    },
+    "theme-master": {
+      "name": "主题大师",
+      "description": "累计 30 个主题创作"
+    },
+    "social-butterfly": {
+      "name": "社交蝴蝶",
+      "description": "累计点赞 100 次"
+    }
+  },
+  "timeCapsule": {
+    "title": "时空胶囊",
+    "create": "创建时空胶囊",
+    "unlock": "解锁日期",
+    "message": "秘密消息",
+    "messagePlaceholder": "写一封信给未来的自己...",
+    "unlockIn": "{days} 天后解锁",
+    "canOpen": "可以开启了！",
+    "open": "开启胶囊",
+    "opened": "已于 {date} 开启",
+    "locked": "封存至 {date}",
+    "empty": "尚未创建时空胶囊",
+    "createFirst": "将你的创作封存，留给未来的自己。",
+    "success": "时空胶囊已创建！",
+    "successMessage": "你的创作将于 {date} 揭晓"
+  },
+  "events": {
+    "title": "活动",
+    "active": "进行中的活动",
+    "upcoming": "即将到来",
+    "past": "过往活动",
+    "noActive": "目前没有进行中的活动",
+    "join": "加入活动",
+    "joined": "已加入",
+    "participants": "{count} 人参与",
+    "rewardBonus": "{multiplier}x 奖励加成",
+    "endsIn": "剩余 {days} 天"
   }
 }

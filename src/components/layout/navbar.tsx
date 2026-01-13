@@ -37,6 +37,7 @@ import { WalletDropdown, ExportKeyDialog } from '@/components/wallet';
 import { useNetworkInfo } from '@/hooks/use-network-info';
 import { useWalletBalances } from '@/hooks/use-wallet-balances';
 import { LearnDropdown } from './learn-dropdown';
+import { QuestDropdown } from '@/components/quests/quest-dropdown';
 import { ethers } from 'ethers';
 
 export function Navbar() {
@@ -187,6 +188,11 @@ export function Navbar() {
                     {link.name}
                   </Link>
                 ))}
+                {authenticated && (
+                  <QuestDropdown
+                    walletAddress={profile?.walletAddress ?? null}
+                  />
+                )}
               </div>
             </div>
 

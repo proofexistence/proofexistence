@@ -220,5 +220,79 @@
     "es": "Español",
     "ja": "日本語",
     "fr": "Français"
+  },
+  "quests": {
+    "title": "Quêtes Quotidiennes",
+    "todayTheme": "Thème du Jour",
+    "tasks": {
+      "dailyCreate": "Créer {current}/{target}",
+      "dailyLike": "J'aime {current}/{target}",
+      "dailyTheme": "Création Thématique"
+    },
+    "streak": {
+      "title": "Série de Dessins",
+      "days": "Série de {count} jours",
+      "nextMilestone": "Prochain jalon: Jour {day}",
+      "claim": "Réclamer +{amount}"
+    },
+    "rewards": {
+      "available": "Gagné Aujourd'hui",
+      "earned": "Gagné"
+    },
+    "viewEvents": "Voir les Événements"
+  },
+  "badges": {
+    "streak-7": {
+      "name": "Sept Jours",
+      "description": "Série de 7 jours"
+    },
+    "streak-30": {
+      "name": "Gardien Mensuel",
+      "description": "Série de 30 jours"
+    },
+    "streak-100": {
+      "name": "Légende du Siècle",
+      "description": "Série de 100 jours"
+    },
+    "theme-first": {
+      "name": "Pionnier du Thème",
+      "description": "Première création thématique"
+    },
+    "theme-master": {
+      "name": "Maître du Thème",
+      "description": "30 créations thématiques"
+    },
+    "social-butterfly": {
+      "name": "Papillon Social",
+      "description": "100 j'aime donnés"
+    }
+  },
+  "timeCapsule": {
+    "title": "Capsule Temporelle",
+    "create": "Créer une Capsule",
+    "unlock": "Date d'Ouverture",
+    "message": "Message Secret",
+    "messagePlaceholder": "Écrivez un message à votre futur vous...",
+    "unlockIn": "S'ouvre dans {days} jours",
+    "canOpen": "Prête à ouvrir !",
+    "open": "Ouvrir la Capsule",
+    "opened": "Ouverte le {date}",
+    "locked": "Verrouillée jusqu'au {date}",
+    "empty": "Pas de capsules temporelles",
+    "createFirst": "Créez votre première capsule temporelle en sauvegardant un dessin pour le futur.",
+    "success": "Capsule temporelle créée !",
+    "successMessage": "Votre création sera révélée le {date}"
+  },
+  "events": {
+    "title": "Événements",
+    "active": "Événements Actifs",
+    "upcoming": "À Venir",
+    "past": "Événements Passés",
+    "noActive": "Pas d'événements actifs",
+    "join": "Rejoindre",
+    "joined": "Rejoint",
+    "participants": "{count} participants",
+    "rewardBonus": "Récompenses {multiplier}x",
+    "endsIn": "Se termine dans {days} jours"
   }
 }

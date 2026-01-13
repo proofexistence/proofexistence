@@ -18,6 +18,7 @@ import {
   dailyRewards,
   userDailyRewards,
   time26Transactions,
+  questRewards,
 } from '@/db/schema';
 import { eq, and, gte, lte, gt, inArray, sql } from 'drizzle-orm';
 import { generateMerkleTree } from '@/lib/merkle';
@@ -569,6 +570,112 @@ async function runBurnAndMerkle(): Promise<{
 }
 
 // ============================================================
+// Task 4: Process Quest Rewards
+// ============================================================
+async function runQuestRewards(): Promise<{
+  success: boolean;
+  processedCount: number;
+  usersUpdated: number;
+  totalAmount: string;
+  error?: string;
+}> {
+  // console.log('[Daily Cron] Running quest rewards task...');
+
+  try {
+    // Auto-approve all PENDING quest rewards and process them
+    const pendingRewards = await db
+      .select({
+        userId: questRewards.userId,
+        totalAmount: sql<string>`SUM(${questRewards.amount}::numeric)`,
+        rewardIds: sql<string[]>`array_agg(${questRewards.id})`,
+      })
+      .from(questRewards)
+      .where(eq(questRewards.status, 'PENDING'))
+      .groupBy(questRewards.userId);
+
+    if (pendingRewards.length === 0) {
+      return {
+        success: true,
+        processedCount: 0,
+        usersUpdated: 0,
+        totalAmount: '0',
+      };
+    }
+
+    let processedCount = 0;
+    let totalAmount = BigInt(0);
+    const now = new Date();
+
+    for (const userRewards of pendingRewards) {
+      const rewardAmount = BigInt(userRewards.totalAmount);
+      totalAmount += rewardAmount;
+
+      // Get current balance for transaction log
+      const [currentUser] = await db
+        .select({ time26Balance: users.time26Balance })
+        .from(users)
+        .where(eq(users.id, userRewards.userId))
+        .limit(1);
+
+      const balanceBefore = BigInt(currentUser?.time26Balance || '0');
+      const balanceAfter = balanceBefore + rewardAmount;
+
+      // Add to user's TIME26 balance
+      await db
+        .update(users)
+        .set({
+          time26Balance: sql`${users.time26Balance}::numeric + ${userRewards.totalAmount}::numeric`,
+        })
+        .where(eq(users.id, userRewards.userId));
+
+      // Mark rewards as SENT (skip APPROVED state for auto-processing)
+      await db
+        .update(questRewards)
+        .set({
+          status: 'SENT',
+          sentAt: now,
+        })
+        .where(inArray(questRewards.id, userRewards.rewardIds));
+
+      // Log transaction
+      await db.insert(time26Transactions).values({
+        userId: userRewards.userId,
+        type: 'quest_reward',
+        amount: userRewards.totalAmount,
+        direction: 'credit',
+        balanceBefore: balanceBefore.toString(),
+        balanceAfter: balanceAfter.toString(),
+        referenceId: now.toISOString().split('T')[0],
+        referenceType: 'quest_reward',
+        description: `Quest rewards: ${userRewards.rewardIds.length} tasks completed`,
+        metadata: {
+          rewardIds: userRewards.rewardIds,
+          rewardCount: userRewards.rewardIds.length,
+        },
+      });
+
+      processedCount += userRewards.rewardIds.length;
+    }
+
+    return {
+      success: true,
+      processedCount,
+      usersUpdated: pendingRewards.length,
+      totalAmount: totalAmount.toString(),
+    };
+  } catch (error) {
+    console.error('[Daily Cron] Quest rewards error:', error);
+    return {
+      success: false,
+      processedCount: 0,
+      usersUpdated: 0,
+      totalAmount: '0',
+      error: String(error),
+    };
+  }
+}
+
+// ============================================================
 // Main Handler
 // ============================================================
 export async function GET(req: NextRequest) {
@@ -606,7 +713,10 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Task 3: Burn and update merkle root (only if all rewards succeeded)
+  // Task 3: Process quest rewards
+  const questRewardsResult = await runQuestRewards();
+
+  // Task 4: Burn and update merkle root (only if all rewards succeeded)
   const allRewardsSucceeded = rewardsResults.every(
     (r) => r.success || r.skipped
   );
@@ -617,12 +727,15 @@ export async function GET(req: NextRequest) {
     skipped: true,
   };
 
-  if (allRewardsSucceeded) {
+  if (allRewardsSucceeded && questRewardsResult.success) {
     burnMerkleResult = await runBurnAndMerkle();
   }
 
   const success =
-    settleResult.success && allRewardsSucceeded && burnMerkleResult.success;
+    settleResult.success &&
+    allRewardsSucceeded &&
+    questRewardsResult.success &&
+    burnMerkleResult.success;
 
   return NextResponse.json({
     success,
@@ -631,6 +744,7 @@ export async function GET(req: NextRequest) {
       processedDays: missingDays,
       results: rewardsResults,
     },
+    questRewards: questRewardsResult,
     burnMerkle: burnMerkleResult,
   });
 }
