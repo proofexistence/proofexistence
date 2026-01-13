@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useRef, useEffect, useCallback } from 'react';
 import { useFrame, ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CosmosTrail } from './types';
@@ -23,11 +23,25 @@ export function StarField({
   onSelect,
   isFocused,
   onLayoutComputed,
-}: StarFieldProps) {
+  meshRefCallback,
+}: StarFieldProps & {
+  meshRefCallback?: (mesh: THREE.InstancedMesh | null) => void;
+}) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   // Track pointer down position to distinguish tap from drag (for mobile)
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  // Callback ref to properly notify parent when mesh is mounted
+  const setMeshRef = useCallback(
+    (mesh: THREE.InstancedMesh | null) => {
+      meshRef.current = mesh;
+      if (meshRefCallback) {
+        meshRefCallback(mesh);
+      }
+    },
+    [meshRefCallback]
+  );
 
   // ... (imports remain)
 
@@ -277,7 +291,7 @@ export function StarField({
 
   return (
     <instancedMesh
-      ref={meshRef}
+      ref={setMeshRef}
       args={[undefined, undefined, trails.length]}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}

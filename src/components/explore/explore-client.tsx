@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Search, Filter, Loader2 } from 'lucide-react';
 import { useExplore } from '@/hooks/use-explore';
+import { useTranslations } from 'next-intl';
 
 interface Proof {
   id: string;
@@ -38,6 +39,8 @@ export function ExploreClient({
   initialProofs,
   initialTotal,
 }: ExploreClientProps) {
+  const t = useTranslations('explore');
+
   // Filters
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -95,8 +98,8 @@ export function ExploreClient({
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <PageHeader
-            title="Global Gallery"
-            description="Witness the immutable traces of existence created by people around the world. Each proof is cryptographically verified and permanently stored."
+            title={t('title')}
+            description={t('description')}
             className="mb-0"
           />
 
@@ -106,7 +109,7 @@ export function ExploreClient({
                 {total.toLocaleString()}
               </span>
               <span className="text-xs text-zinc-500 uppercase tracking-wider">
-                Total Proofs
+                {t('totalProofs')}
               </span>
             </div>
           </div>
@@ -119,7 +122,7 @@ export function ExploreClient({
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
             <Input
               type="text"
-              placeholder="Search by title, message, or creator..."
+              placeholder={t('searchPlaceholder')}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-zinc-500 h-12"
@@ -130,43 +133,43 @@ export function ExploreClient({
           <div className="flex flex-wrap gap-3">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-zinc-400" />
-              <span className="text-sm text-zinc-400">Filters:</span>
+              <span className="text-sm text-zinc-400">{t('filters')}</span>
             </div>
 
             {/* Status Filter */}
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger className="w-[140px] bg-white/5 border-white/10 text-white">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('allStatus')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="MINTED">Minted</SelectItem>
-                <SelectItem value="SETTLED">Settled</SelectItem>
+                <SelectItem value="all">{t('allStatus')}</SelectItem>
+                <SelectItem value="MINTED">{t('minted')}</SelectItem>
+                <SelectItem value="SETTLED">{t('settled')}</SelectItem>
               </SelectContent>
             </Select>
 
             {/* Timeframe Filter */}
             <Select value={timeframe} onValueChange={setTimeframe}>
               <SelectTrigger className="w-[140px] bg-white/5 border-white/10 text-white">
-                <SelectValue placeholder="Timeframe" />
+                <SelectValue placeholder={t('allTime')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="24h">Last 24 Hours</SelectItem>
-                <SelectItem value="7d">Last 7 Days</SelectItem>
-                <SelectItem value="30d">Last 30 Days</SelectItem>
+                <SelectItem value="all">{t('allTime')}</SelectItem>
+                <SelectItem value="24h">{t('last24h')}</SelectItem>
+                <SelectItem value="7d">{t('last7d')}</SelectItem>
+                <SelectItem value="30d">{t('last30d')}</SelectItem>
               </SelectContent>
             </Select>
 
             {/* Sort By */}
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[140px] bg-white/5 border-white/10 text-white">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder={t('mostRecent')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="recent">Most Recent</SelectItem>
-                <SelectItem value="popular">Most Viewed</SelectItem>
-                <SelectItem value="trending">Trending</SelectItem>
+                <SelectItem value="recent">{t('mostRecent')}</SelectItem>
+                <SelectItem value="popular">{t('mostViewed')}</SelectItem>
+                <SelectItem value="trending">{t('trending')}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -187,7 +190,7 @@ export function ExploreClient({
                 }}
                 className="text-zinc-400 hover:text-white"
               >
-                Clear Filters
+                {t('clearFilters')}
               </Button>
             )}
           </div>
@@ -214,18 +217,14 @@ export function ExploreClient({
             {/* No More Results */}
             {!hasNextPage && proofs.length > 0 && (
               <div className="text-center py-8">
-                <p className="text-white/40 text-sm">
-                  You&apos;ve reached the end
-                </p>
+                <p className="text-white/40 text-sm">{t('reachedEnd')}</p>
               </div>
             )}
 
             {/* No Results */}
             {proofs.length === 0 && !isLoading && (
               <div className="text-center py-20">
-                <p className="text-white/40">
-                  No proofs found. Try adjusting your filters.
-                </p>
+                <p className="text-white/40">{t('noResults')}</p>
               </div>
             )}
           </>

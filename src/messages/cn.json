@@ -158,8 +158,24 @@
     "syncingStorage": "同步存储中..."
   },
   "explore": {
-    "title": "探索",
-    "description": "发现来自世界各地的最新验证证明。"
+    "title": "全球画廊",
+    "description": "见证来自世界各地人们创造的不可篡改的存在痕迹。每个证明都经过加密验证并永久存储。",
+    "totalProofs": "证明总数",
+    "searchPlaceholder": "按标题、留言或创作者搜索...",
+    "filters": "筛选：",
+    "allStatus": "所有状态",
+    "minted": "已铸造",
+    "settled": "已结算",
+    "allTime": "所有时间",
+    "last24h": "过去 24 小时",
+    "last7d": "过去 7 天",
+    "last30d": "过去 30 天",
+    "mostRecent": "最新",
+    "mostViewed": "最多观看",
+    "trending": "热门",
+    "clearFilters": "清除筛选",
+    "reachedEnd": "已经到底了",
+    "noResults": "找不到证明。请尝试调整筛选条件。"
   },
   "referral": {
     "title": "邀请好友",

@@ -158,8 +158,24 @@
     "syncingStorage": "Synchronisation du Stockage..."
   },
   "explore": {
-    "title": "Explorer",
-    "description": "Découvrez les dernières preuves vérifiées du monde entier."
+    "title": "Galerie Mondiale",
+    "description": "Témoin des traces immuables d'existence créées par des personnes du monde entier. Chaque preuve est vérifiée cryptographiquement et stockée de façon permanente.",
+    "totalProofs": "Total des Preuves",
+    "searchPlaceholder": "Rechercher par titre, message ou créateur...",
+    "filters": "Filtres :",
+    "allStatus": "Tous les Statuts",
+    "minted": "Frappé",
+    "settled": "Confirmé",
+    "allTime": "Tout le Temps",
+    "last24h": "Dernières 24 Heures",
+    "last7d": "7 Derniers Jours",
+    "last30d": "30 Derniers Jours",
+    "mostRecent": "Plus Récent",
+    "mostViewed": "Plus Vu",
+    "trending": "Tendance",
+    "clearFilters": "Effacer les Filtres",
+    "reachedEnd": "Vous avez atteint la fin",
+    "noResults": "Aucune preuve trouvée. Essayez d'ajuster vos filtres."
   },
   "referral": {
     "title": "Inviter des Amis",

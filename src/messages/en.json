@@ -158,8 +158,24 @@
     "syncingStorage": "Syncing Storage..."
   },
   "explore": {
-    "title": "Explore",
-    "description": "Discover the latest verified proofs from around the world."
+    "title": "Global Gallery",
+    "description": "Witness the immutable traces of existence created by people around the world. Each proof is cryptographically verified and permanently stored.",
+    "totalProofs": "Total Proofs",
+    "searchPlaceholder": "Search by title, message, or creator...",
+    "filters": "Filters:",
+    "allStatus": "All Status",
+    "minted": "Minted",
+    "settled": "Settled",
+    "allTime": "All Time",
+    "last24h": "Last 24 Hours",
+    "last7d": "Last 7 Days",
+    "last30d": "Last 30 Days",
+    "mostRecent": "Most Recent",
+    "mostViewed": "Most Viewed",
+    "trending": "Trending",
+    "clearFilters": "Clear Filters",
+    "reachedEnd": "You've reached the end",
+    "noResults": "No proofs found. Try adjusting your filters."
   },
   "referral": {
     "title": "Invite Friends",

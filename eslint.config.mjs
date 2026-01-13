@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     'contracts/**',
     // Vendor files
     'public/gif.worker.js',
+    // Worktrees
+    '.worktrees/**',
   ]),
   prettierConfig,
 ]);

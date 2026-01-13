@@ -158,8 +158,24 @@
     "syncingStorage": "ストレージ同期中..."
   },
   "explore": {
-    "title": "探索",
-    "description": "世界中から最新の検証済み証明を発見しよう。"
+    "title": "グローバルギャラリー",
+    "description": "世界中の人々が作り出した不変の存在の痕跡を目撃しよう。各証明は暗号的に検証され、永久に保存されます。",
+    "totalProofs": "証明の総数",
+    "searchPlaceholder": "タイトル、メッセージ、作成者で検索...",
+    "filters": "フィルター：",
+    "allStatus": "すべてのステータス",
+    "minted": "鋳造済み",
+    "settled": "確定済み",
+    "allTime": "全期間",
+    "last24h": "過去24時間",
+    "last7d": "過去7日間",
+    "last30d": "過去30日間",
+    "mostRecent": "最新",
+    "mostViewed": "最も閲覧された",
+    "trending": "トレンド",
+    "clearFilters": "フィルターをクリア",
+    "reachedEnd": "最後まで表示しました",
+    "noResults": "証明が見つかりません。フィルターを調整してみてください。"
   },
   "referral": {
     "title": "友達を招待",

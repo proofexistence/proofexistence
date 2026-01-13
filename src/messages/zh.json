@@ -158,8 +158,24 @@
     "syncingStorage": "同步存儲中..."
   },
   "explore": {
-    "title": "探索",
-    "description": "發現來自世界各地的最新驗證證明。"
+    "title": "全球畫廊",
+    "description": "見證來自世界各地人們創造的不可篡改的存在痕跡。每個證明都經過加密驗證並永久存儲。",
+    "totalProofs": "證明總數",
+    "searchPlaceholder": "按標題、留言或創作者搜尋...",
+    "filters": "篩選：",
+    "allStatus": "所有狀態",
+    "minted": "已鑄造",
+    "settled": "已結算",
+    "allTime": "所有時間",
+    "last24h": "過去 24 小時",
+    "last7d": "過去 7 天",
+    "last30d": "過去 30 天",
+    "mostRecent": "最新",
+    "mostViewed": "最多觀看",
+    "trending": "熱門",
+    "clearFilters": "清除篩選",
+    "reachedEnd": "已經到底了",
+    "noResults": "找不到證明。請嘗試調整篩選條件。"
   },
   "referral": {
     "title": "邀請好友",

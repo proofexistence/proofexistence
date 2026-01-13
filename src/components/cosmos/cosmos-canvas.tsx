@@ -3,7 +3,7 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { Text } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { BrandConstellation } from './brand-constellation';
@@ -17,6 +17,88 @@ import { StarField } from './star-field';
 import { CosmosTrail } from './types';
 import { getStarPosition } from './utils';
 import { splitIntoStrokes } from '@/components/canvas/light-trail';
+
+// Mobile tap handler - performs raycasting on touch events to detect star taps
+// This bypasses OrbitControls which intercepts touch events before they reach the mesh
+function MobileTapHandler({
+  starMesh,
+  trails,
+  onSelect,
+}: {
+  starMesh: THREE.InstancedMesh | null;
+  trails: CosmosTrail[];
+  onSelect: (trail: CosmosTrail, position: THREE.Vector3) => void;
+}) {
+  const { camera, gl } = useThree();
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  const touchStart = useRef<{ x: number; y: number; time: number } | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (!starMesh) return;
+
+    const canvas = gl.domElement;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        touchStart.current = {
+          x: touch.clientX,
+          y: touch.clientY,
+          time: Date.now(),
+        };
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!touchStart.current || e.changedTouches.length !== 1) {
+        touchStart.current = null;
+        return;
+      }
+
+      const touch = e.changedTouches[0];
+      const dx = Math.abs(touch.clientX - touchStart.current.x);
+      const dy = Math.abs(touch.clientY - touchStart.current.y);
+      const dt = Date.now() - touchStart.current.time;
+
+      // Only process as tap if it was quick (<300ms) and didn't move much (<15px)
+      if (dt < 300 && dx < 15 && dy < 15) {
+        // Convert touch position to normalized device coordinates
+        const rect = canvas.getBoundingClientRect();
+        const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+        const intersects = raycaster.intersectObject(starMesh, false);
+
+        if (intersects.length > 0 && intersects[0].instanceId !== undefined) {
+          const instanceId = intersects[0].instanceId;
+          if (trails[instanceId]) {
+            const trail = trails[instanceId];
+            const matrix = new THREE.Matrix4();
+            starMesh.getMatrixAt(instanceId, matrix);
+            const position = new THREE.Vector3().setFromMatrixPosition(matrix);
+            position.applyMatrix4(starMesh.matrixWorld);
+            onSelect(trail, position);
+          }
+        }
+      }
+
+      touchStart.current = null;
+    };
+
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [starMesh, trails, onSelect, camera, gl, raycaster]);
+
+  return null;
+}
 
 // Helper to track 3D position to 2D screen coordinates
 function ScreenPositionTracker({
@@ -68,6 +150,7 @@ export function CosmosCanvas({
   >(new Map());
   const [mounted, setMounted] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [starMesh, setStarMesh] = useState<THREE.InstancedMesh | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -154,6 +237,13 @@ export function CosmosCanvas({
           <ambientLight intensity={0.2} />
           <pointLight position={[0, 0, 0]} intensity={2} color="purple" />
 
+          {/* Mobile tap handler for star selection */}
+          <MobileTapHandler
+            starMesh={starMesh}
+            trails={validTrails}
+            onSelect={selectStar}
+          />
+
           {/* Pass computed time props down */}
           <StarField
             trails={validTrails}
@@ -162,6 +252,7 @@ export function CosmosCanvas({
             onSelect={selectStar}
             isFocused={!!selectedTrail}
             onLayoutComputed={setStarPositions}
+            meshRefCallback={setStarMesh}
           />
 
           <TimeMarkers minTime={minTime} maxTime={maxTime} />

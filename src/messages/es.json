@@ -158,8 +158,24 @@
     "syncingStorage": "Sincronizando Almacenamiento..."
   },
   "explore": {
-    "title": "Explorar",
-    "description": "Descubre las últimas pruebas verificadas de todo el mundo."
+    "title": "Galería Global",
+    "description": "Presencia las huellas inmutables de existencia creadas por personas de todo el mundo. Cada prueba está verificada criptográficamente y almacenada permanentemente.",
+    "totalProofs": "Total de Pruebas",
+    "searchPlaceholder": "Buscar por título, mensaje o creador...",
+    "filters": "Filtros:",
+    "allStatus": "Todos los Estados",
+    "minted": "Acuñado",
+    "settled": "Confirmado",
+    "allTime": "Todo el Tiempo",
+    "last24h": "Últimas 24 Horas",
+    "last7d": "Últimos 7 Días",
+    "last30d": "Últimos 30 Días",
+    "mostRecent": "Más Reciente",
+    "mostViewed": "Más Visto",
+    "trending": "Tendencia",
+    "clearFilters": "Limpiar Filtros",
+    "reachedEnd": "Has llegado al final",
+    "noResults": "No se encontraron pruebas. Intenta ajustar tus filtros."
   },
   "referral": {
     "title": "Invitar Amigos",
