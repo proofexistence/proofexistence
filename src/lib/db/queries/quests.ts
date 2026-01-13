@@ -41,11 +41,14 @@ export async function getTodayTheme() {
     return null;
   }
 
-  // Use date-based seed for consistent daily selection
+  // Use week-based selection for consistent weekly themes
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
   const dayOfYear = Math.floor(
-    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+    (now.getTime() - startOfYear.getTime()) / 86400000
   );
-  const selectedTheme = activeThemes[dayOfYear % activeThemes.length];
+  const weekOfYear = Math.floor(dayOfYear / 7);
+  const selectedTheme = activeThemes[weekOfYear % activeThemes.length];
 
   return {
     id: `default-${selectedTheme.id}`,
