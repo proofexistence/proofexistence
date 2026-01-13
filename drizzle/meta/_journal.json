@@ -15,6 +15,13 @@
       "when": 1768301009476,
       "tag": "0001_parched_rage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768330885862,
+      "tag": "0002_sharp_corsair",
+      "breakpoints": true
     }
   ]
 }

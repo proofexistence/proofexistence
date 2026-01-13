@@ -250,5 +250,33 @@
       "name": "Papillon Social",
       "description": "100 j'aime donnés"
     }
+  },
+  "timeCapsule": {
+    "title": "Capsule Temporelle",
+    "create": "Créer une Capsule",
+    "unlock": "Date d'Ouverture",
+    "message": "Message Secret",
+    "messagePlaceholder": "Écrivez un message à votre futur vous...",
+    "unlockIn": "S'ouvre dans {days} jours",
+    "canOpen": "Prête à ouvrir !",
+    "open": "Ouvrir la Capsule",
+    "opened": "Ouverte le {date}",
+    "locked": "Verrouillée jusqu'au {date}",
+    "empty": "Pas de capsules temporelles",
+    "createFirst": "Créez votre première capsule temporelle en sauvegardant un dessin pour le futur.",
+    "success": "Capsule temporelle créée !",
+    "successMessage": "Votre création sera révélée le {date}"
+  },
+  "events": {
+    "title": "Événements",
+    "active": "Événements Actifs",
+    "upcoming": "À Venir",
+    "past": "Événements Passés",
+    "noActive": "Pas d'événements actifs",
+    "join": "Rejoindre",
+    "joined": "Rejoint",
+    "participants": "{count} participants",
+    "rewardBonus": "Récompenses {multiplier}x",
+    "endsIn": "Se termine dans {days} jours"
   }
 }

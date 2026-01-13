@@ -250,5 +250,33 @@
       "name": "Mariposa Social",
       "description": "100 me gusta dados"
     }
+  },
+  "timeCapsule": {
+    "title": "Cápsula del Tiempo",
+    "create": "Crear Cápsula del Tiempo",
+    "unlock": "Fecha de Apertura",
+    "message": "Mensaje Secreto",
+    "messagePlaceholder": "Escribe un mensaje para tu yo futuro...",
+    "unlockIn": "Se abre en {days} días",
+    "canOpen": "¡Lista para abrir!",
+    "open": "Abrir Cápsula",
+    "opened": "Abierta el {date}",
+    "locked": "Bloqueada hasta {date}",
+    "empty": "No hay cápsulas del tiempo",
+    "createFirst": "Crea tu primera cápsula del tiempo guardando un dibujo para el futuro.",
+    "success": "¡Cápsula del tiempo creada!",
+    "successMessage": "Tu creación se revelará el {date}"
+  },
+  "events": {
+    "title": "Eventos",
+    "active": "Eventos Activos",
+    "upcoming": "Próximamente",
+    "past": "Eventos Pasados",
+    "noActive": "No hay eventos activos",
+    "join": "Unirse al Evento",
+    "joined": "Unido",
+    "participants": "{count} participantes",
+    "rewardBonus": "Recompensas {multiplier}x",
+    "endsIn": "Termina en {days} días"
   }
 }

@@ -433,6 +433,89 @@ export const questRewards = pgTable(
 );
 
 // ============================================================================
+// EVENTS TABLE
+// Stores special events and campaigns
+// ============================================================================
+export const events = pgTable(
+  'events',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: varchar('name', { length: 100 }).notNull(),
+    description: varchar('description', { length: 500 }),
+    theme: varchar('theme', { length: 100 }), // Optional theme for the event
+    startDate: timestamp('start_date').notNull(),
+    endDate: timestamp('end_date').notNull(),
+    rewardMultiplier: decimal('reward_multiplier', { precision: 5, scale: 2 })
+      .default('1.00')
+      .notNull(), // e.g., 1.5x rewards
+    isActive: boolean('is_active').default(true).notNull(),
+    imageUrl: varchar('image_url', { length: 500 }),
+    metadata: jsonb('metadata'), // Additional event-specific data
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('events_start_date_idx').on(table.startDate),
+    index('events_end_date_idx').on(table.endDate),
+    index('events_is_active_idx').on(table.isActive),
+  ]
+);
+
+// ============================================================================
+// TIME CAPSULES TABLE
+// Time-locked sessions that reveal after a certain date
+// ============================================================================
+export const timeCapsules = pgTable(
+  'time_capsules',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    sessionId: uuid('session_id')
+      .references(() => sessions.id)
+      .notNull(),
+    unlockDate: timestamp('unlock_date').notNull(),
+    message: varchar('message', { length: 500 }), // Message revealed when opened
+    isOpened: boolean('is_opened').default(false).notNull(),
+    openedAt: timestamp('opened_at'),
+    notifyOnUnlock: boolean('notify_on_unlock').default(true).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('time_capsules_user_id_idx').on(table.userId),
+    index('time_capsules_unlock_date_idx').on(table.unlockDate),
+    index('time_capsules_is_opened_idx').on(table.isOpened),
+  ]
+);
+
+// ============================================================================
+// EVENT PARTICIPANTS TABLE
+// Tracks user participation in events
+// ============================================================================
+export const eventParticipants = pgTable(
+  'event_participants',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    eventId: uuid('event_id')
+      .references(() => events.id)
+      .notNull(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    sessionsCount: integer('sessions_count').default(0).notNull(),
+    totalDuration: integer('total_duration').default(0).notNull(), // Total drawing seconds
+    rewardsEarned: decimal('rewards_earned', { precision: 78, scale: 0 })
+      .default('0')
+      .notNull(),
+    joinedAt: timestamp('joined_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('event_participants_event_id_idx').on(table.eventId),
+    index('event_participants_user_id_idx').on(table.userId),
+  ]
+);
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 export type User = typeof users.$inferSelect;
@@ -473,6 +556,15 @@ export type NewUserStreak = typeof userStreaks.$inferInsert;
 
 export type QuestReward = typeof questRewards.$inferSelect;
 export type NewQuestReward = typeof questRewards.$inferInsert;
+
+export type Event = typeof events.$inferSelect;
+export type NewEvent = typeof events.$inferInsert;
+
+export type TimeCapsule = typeof timeCapsules.$inferSelect;
+export type NewTimeCapsule = typeof timeCapsules.$inferInsert;
+
+export type EventParticipant = typeof eventParticipants.$inferSelect;
+export type NewEventParticipant = typeof eventParticipants.$inferInsert;
 
 // Session status enum for type safety
 export const SESSION_STATUS = {

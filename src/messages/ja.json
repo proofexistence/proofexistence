@@ -250,5 +250,33 @@
       "name": "ソーシャルバタフライ",
       "description": "いいね100回達成"
     }
+  },
+  "timeCapsule": {
+    "title": "タイムカプセル",
+    "create": "タイムカプセルを作成",
+    "unlock": "開封日",
+    "message": "秘密のメッセージ",
+    "messagePlaceholder": "未来の自分へメッセージを書いてください...",
+    "unlockIn": "あと {days} 日で開封",
+    "canOpen": "開封できます！",
+    "open": "カプセルを開く",
+    "opened": "{date} に開封済み",
+    "locked": "{date} まで封印",
+    "empty": "タイムカプセルはありません",
+    "createFirst": "作品を封印して、未来の自分へ届けましょう。",
+    "success": "タイムカプセルが作成されました！",
+    "successMessage": "あなたの作品は {date} に公開されます"
+  },
+  "events": {
+    "title": "イベント",
+    "active": "開催中のイベント",
+    "upcoming": "近日開催",
+    "past": "過去のイベント",
+    "noActive": "開催中のイベントはありません",
+    "join": "参加する",
+    "joined": "参加中",
+    "participants": "{count} 人参加",
+    "rewardBonus": "報酬 {multiplier}x",
+    "endsIn": "残り {days} 日"
   }
 }
