@@ -135,18 +135,6 @@ export function QuestDropdown({
             <div className="p-4 text-center text-zinc-500">Loading...</div>
           ) : data ? (
             <div className="divide-y divide-white/10">
-              {/* Theme */}
-              {data.theme && (
-                <div className="p-3">
-                  <div className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">
-                    {t('todayTheme')}
-                  </div>
-                  <div className="text-sm font-medium text-white">
-                    {data.theme.name}
-                  </div>
-                </div>
-              )}
-
               {/* Tasks */}
               <div className="p-3 space-y-2">
                 {/* Daily Create */}
@@ -171,10 +159,9 @@ export function QuestDropdown({
                   completed={data.tasks.dailyLike.completed}
                 />
 
-                {/* Daily Theme */}
-                <TaskItem
-                  icon={<Palette className="w-4 h-4" />}
-                  label={t('tasks.dailyTheme')}
+                {/* Daily Theme - with theme info */}
+                <ThemeTaskItem
+                  theme={data.theme}
                   reward={data.tasks.dailyTheme.reward}
                   completed={data.tasks.dailyTheme.completed}
                 />
@@ -279,6 +266,98 @@ function TaskItem({
       >
         +{reward}
       </span>
+    </div>
+  );
+}
+
+function ThemeTaskItem({
+  theme,
+  reward,
+  completed,
+}: {
+  theme: { name: string; description: string } | null;
+  reward: string;
+  completed: boolean;
+}) {
+  const t = useTranslations('quests');
+
+  if (!theme) {
+    return (
+      <TaskItem
+        icon={<Palette className="w-4 h-4" />}
+        label={t('tasks.dailyTheme')}
+        reward={reward}
+        completed={completed}
+      />
+    );
+  }
+
+  // Try to get translation, fallback to original value
+  const themeKey = theme.name.toLowerCase().replace(/\s+/g, '_');
+  const nameKey = `themes.${themeKey}`;
+  const descKey = `themes.${themeKey}_desc`;
+
+  // Use raw() to check if translation exists, fallback to original
+  let translatedName: string;
+  let translatedDesc: string | null;
+
+  try {
+    const rawName = t.raw(nameKey);
+    translatedName = typeof rawName === 'string' ? rawName : theme.name;
+  } catch {
+    translatedName = theme.name;
+  }
+
+  try {
+    const rawDesc = t.raw(descKey);
+    translatedDesc = typeof rawDesc === 'string' ? rawDesc : theme.description;
+  } catch {
+    translatedDesc = theme.description;
+  }
+
+  return (
+    <div
+      className={cn(
+        'p-2 rounded-lg',
+        completed ? 'bg-green-500/10' : 'bg-gradient-to-r from-purple-500/10 to-blue-500/10'
+      )}
+    >
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <span className={completed ? 'text-green-400' : 'text-purple-400'}>
+            {completed ? <Check className="w-4 h-4" /> : <Palette className="w-4 h-4" />}
+          </span>
+          <span className="text-[10px] text-zinc-500 uppercase tracking-wider">
+            {t('todayTheme')}
+          </span>
+        </div>
+        <span
+          className={cn(
+            'text-xs font-mono',
+            completed ? 'text-green-400' : 'text-amber-400'
+          )}
+        >
+          +{reward}
+        </span>
+      </div>
+      <div className="ml-6">
+        <span
+          className={cn(
+            'text-sm font-medium',
+            completed ? 'text-green-300 line-through' : 'text-white'
+          )}
+        >
+          {translatedName}
+        </span>
+        {translatedDesc && (
+          <p className={cn(
+            'text-xs mt-0.5',
+            completed ? 'text-green-400/60' : 'text-zinc-500'
+          )}>
+            {translatedDesc}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

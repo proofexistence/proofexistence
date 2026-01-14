@@ -76,12 +76,17 @@ interface ProofViewerProps {
   };
   nftImage?: string | null;
   isSyncing?: boolean;
+  themeInfo?: {
+    isMarkedAsTheme: boolean;
+    themeName: string | null;
+  };
 }
 
 export function ProofViewer({
   session,
   nftImage,
   isSyncing = false,
+  themeInfo,
 }: ProofViewerProps) {
   const router = useRouter();
   const canvasRef = useRef<ReplayCanvasRef>(null);
@@ -384,6 +389,12 @@ export function ProofViewer({
             >
               {session.status as string}
             </div>
+            {themeInfo?.isMarkedAsTheme && (
+              <div className="px-3 py-1 rounded-full text-[10px] font-bold border backdrop-blur-md bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-200 border-purple-500/50 shrink-0 flex items-center gap-1">
+                <span>🎨</span>
+                <span>{themeInfo.themeName || 'Theme'}</span>
+              </div>
+            )}
           </div>
 
           {/* Title - below navbar on mobile, truncate if too long */}

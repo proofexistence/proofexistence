@@ -3,14 +3,9 @@ import { getCurrentUser } from '@/lib/auth/get-user';
 import { checkRateLimit } from '@/lib/ratelimit';
 import {
   markThemeCompleted,
-  getUserDailyQuest,
   createQuestReward,
 } from '@/lib/db/queries/quests';
-import {
-  QUEST_CONFIG,
-  QUEST_REWARD_TYPES,
-  getTodayDateString,
-} from '@/lib/quests/config';
+import { QUEST_CONFIG, QUEST_REWARD_TYPES } from '@/lib/quests/config';
 import { formatEther } from 'ethers';
 
 export async function POST(req: NextRequest) {
@@ -31,17 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });
     }
 
-    // Check if already completed today
-    const today = getTodayDateString();
-    const quest = await getUserDailyQuest(user.id, today);
-    if (quest?.themeCompleted) {
-      return NextResponse.json(
-        { error: 'Theme quest already completed today' },
-        { status: 400 }
-      );
-    }
-
-    // Mark as completed
+    // Mark as completed (allows changing to different session)
     await markThemeCompleted(user.id, sessionId);
 
     // Create reward record

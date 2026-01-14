@@ -592,6 +592,7 @@ interface SubmissionModalProps {
     username: string;
     title: string;
     description: string;
+    markAsTheme?: boolean;
   }) => void;
   onSelectInstant: (data: {
     message: string;
@@ -599,6 +600,7 @@ interface SubmissionModalProps {
     title: string;
     description: string;
     paymentMethod?: PaymentMethod;
+    markAsTheme?: boolean;
   }) => void;
   isSubmitting: boolean;
   profileName?: string;
@@ -614,6 +616,9 @@ interface SubmissionModalProps {
   gaslessTotalCost?: string;
   gaslessLoading?: boolean;
   unclaimedBalance?: string;
+  // Theme marking
+  themeName?: string | null;
+  themeCompleted?: boolean;
 }
 
 export function SubmissionModal({
@@ -634,6 +639,8 @@ export function SubmissionModal({
   gaslessTotalCost = '0',
   gaslessLoading = false,
   unclaimedBalance = '0',
+  themeName,
+  themeCompleted = false,
 }: SubmissionModalProps) {
   const t = useTranslations('canvas');
   // Logic: Default to Name -> Username -> Empty (Anonymous)
@@ -645,13 +652,16 @@ export function SubmissionModal({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('NATIVE');
   const [isSavingDisplayName, setIsSavingDisplayName] = useState(false);
   const [displayNameSaved, setDisplayNameSaved] = useState(false);
+  const [markAsTheme, setMarkAsTheme] = useState(false);
 
   // Sync username with profile name when modal opens
   useEffect(() => {
     if (isOpen) {
       setUsername(profileName || profileUsername || '');
+      // Default to marking as theme if theme exists and not already completed
+      setMarkAsTheme(!!themeName && !themeCompleted);
     }
-  }, [isOpen, profileName, profileUsername]);
+  }, [isOpen, profileName, profileUsername, themeName, themeCompleted]);
 
   // Handle set as display name
   const handleSetAsDisplayName = async () => {
@@ -845,6 +855,60 @@ export function SubmissionModal({
             </div>
           </div>
 
+          {/* Theme Marking Option */}
+          {themeName && (
+            <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl border border-purple-500/20 mb-4">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={markAsTheme}
+                    onChange={(e) => setMarkAsTheme(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div
+                    className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${
+                      markAsTheme
+                        ? 'bg-purple-500 border-purple-500'
+                        : 'border-purple-400/50 group-hover:border-purple-400'
+                    }`}
+                  >
+                    {markAsTheme && (
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="3"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-white">
+                      {t('modal.markAsTheme')}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                      {themeName}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">
+                    {themeCompleted
+                      ? t('modal.themeAlreadyMarked')
+                      : t('modal.themeReward')}
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
+
           {/* Payment Method Selector (Full Width) */}
           <div className="mb-4">
             <label className="block text-xs font-medium text-zinc-500 mb-2 ml-1">
@@ -936,6 +1000,7 @@ export function SubmissionModal({
                   title,
                   description,
                   paymentMethod,
+                  markAsTheme,
                 })
               }
               disabled={isSubmitting}
@@ -1017,7 +1082,7 @@ export function SubmissionModal({
             {/* Option 2: Standard Proof (Secondary) */}
             <button
               onClick={() =>
-                onSelectStandard({ message, username, title, description })
+                onSelectStandard({ message, username, title, description, markAsTheme })
               }
               disabled={isSubmitting}
               className="group relative flex items-center gap-4 p-5 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"

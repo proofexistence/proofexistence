@@ -47,6 +47,8 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useProfile } from '@/hooks/use-profile';
+import { useQuery } from '@tanstack/react-query';
+import { useMarkTheme } from '@/hooks/use-mark-theme';
 
 // Helper for RPC provider with fallbacks
 const getPublicProvider = () => {
@@ -618,6 +620,33 @@ export function POECanvas() {
   const { isConnected, user: web3User, login } = useWeb3Auth();
   const authenticated = isConnected;
 
+  // Quest/Theme data - fetch when submission modal is open
+  const { data: questData } = useQuery<{
+    theme: { name: string } | null;
+    tasks: {
+      dailyTheme: {
+        completed: boolean;
+        sessionId: string | null;
+      };
+    };
+  }>({
+    queryKey: ['quests', 'today'],
+    queryFn: async () => {
+      const headers: Record<string, string> = {};
+      if (web3User?.walletAddress) {
+        headers['X-Wallet-Address'] = web3User.walletAddress;
+      }
+      const res = await fetch('/api/quests/today', { headers });
+      if (!res.ok) throw new Error('Failed to fetch quests');
+      return res.json();
+    },
+    enabled: showSubmissionModal && !!web3User?.walletAddress,
+    staleTime: 1000 * 60,
+  });
+
+  // Mark theme hook
+  const { markThemeAsync } = useMarkTheme();
+
   // Trigger capture when mode is active
   useEffect(() => {
     // Removed dependency on currentSessionId - we capture before creating session now
@@ -751,6 +780,7 @@ export function POECanvas() {
         title: string;
         description: string;
         paymentMethod?: PaymentMethod;
+        markAsTheme?: boolean;
       }
     ) => {
       // NOTE: We now create the session HERE, instead of before opening the modal.
@@ -805,7 +835,6 @@ export function POECanvas() {
           }
 
           setLoadingStatus('Submitting proof...');
-          setLoadingStatus('Submitting proof...');
           await submitStandard.mutateAsync({
             sessionId: sessionId,
             message: data.message,
@@ -813,6 +842,15 @@ export function POECanvas() {
             description: data.description,
             color: trailColor,
           });
+
+          // Mark as today's theme if requested
+          if (data.markAsTheme && sessionId) {
+            try {
+              await markThemeAsync(sessionId);
+            } catch (themeErr) {
+              console.warn('Failed to mark theme (non-critical):', themeErr);
+            }
+          }
 
           // Close submission modal explicitly before success dialog
           setShowSubmissionModal(false);
@@ -1135,6 +1173,15 @@ export function POECanvas() {
             console.error('Failed to save txHash to DB:', saveErr);
           }
 
+          // Mark as today's theme if requested
+          if (data.markAsTheme && sessionId) {
+            try {
+              await markThemeAsync(sessionId);
+            } catch (themeErr) {
+              console.warn('Failed to mark theme (non-critical):', themeErr);
+            }
+          }
+
           // Show Success Dialog
           setShowSubmissionModal(false); // Close submission modal FIRST
           setShowSuccessShareMenu(false);
@@ -1257,6 +1304,7 @@ export function POECanvas() {
       router,
       screenshotData,
       trailColor,
+      markThemeAsync,
     ]
   );
 
@@ -1482,6 +1530,8 @@ export function POECanvas() {
           onSetAsDisplayName={async (name: string) => {
             await updateProfile({ name });
           }}
+          themeName={questData?.theme?.name}
+          themeCompleted={questData?.tasks.dailyTheme.completed}
         />
 
         <ClearConfirmModal

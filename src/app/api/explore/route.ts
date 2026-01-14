@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { sessions, users } from '@/db/schema';
-import { desc, inArray, eq, and, or, like, gte, sql } from 'drizzle-orm';
+import { sessions, users, userDailyQuests } from '@/db/schema';
+import { desc, inArray, eq, and, or, like, gte, sql, isNotNull } from 'drizzle-orm';
+import { getTodayDateString } from '@/lib/quests/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,25 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status'); // 'MINTED', 'SETTLED', or 'all'
     const sortBy = searchParams.get('sortBy') || 'recent'; // 'recent', 'popular', 'trending'
     const timeframe = searchParams.get('timeframe'); // '24h', '7d', '30d', 'all'
+    const themeOnly = searchParams.get('themeOnly') === 'true'; // Filter for today's theme works
+
+    // If themeOnly, get today's theme session IDs
+    let themeSessionIds: string[] = [];
+    if (themeOnly) {
+      const today = getTodayDateString();
+      const themeRecords = await db
+        .select({ themeSessionId: userDailyQuests.themeSessionId })
+        .from(userDailyQuests)
+        .where(
+          and(
+            eq(userDailyQuests.date, today),
+            isNotNull(userDailyQuests.themeSessionId)
+          )
+        );
+      themeSessionIds = themeRecords
+        .map((r) => r.themeSessionId)
+        .filter((id): id is string => id !== null);
+    }
 
     // Build where conditions
     const conditions = [];
@@ -70,6 +90,24 @@ export async function GET(req: NextRequest) {
           like(users.username, searchPattern)
         )
       );
+    }
+
+    // Theme filter - only show today's theme works
+    if (themeOnly) {
+      if (themeSessionIds.length > 0) {
+        conditions.push(inArray(sessions.id, themeSessionIds));
+      } else {
+        // No theme works today, return empty
+        return NextResponse.json({
+          proofs: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            hasMore: false,
+          },
+        });
+      }
     }
 
     // Determine sort order

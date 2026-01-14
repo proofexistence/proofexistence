@@ -111,6 +111,7 @@ export function WalletDropdown() {
                     walletAddress={walletAddress}
                     displayName={displayName}
                     username={username}
+                    onNavigate={() => setIsOpen(false)}
                   />
 
                   {/* Balances Section */}

@@ -15,6 +15,7 @@ import {
 import { Search, Filter, Loader2 } from 'lucide-react';
 import { useExplore } from '@/hooks/use-explore';
 import { useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
 
 interface Proof {
   id: string;
@@ -47,6 +48,22 @@ export function ExploreClient({
   const [status, setStatus] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [timeframe, setTimeframe] = useState('all');
+  const [themeOnly, setThemeOnly] = useState(false);
+
+  // Fetch today's theme info (public endpoint)
+  const { data: themeData } = useQuery<{
+    theme: { name: string; description: string } | null;
+  }>({
+    queryKey: ['theme', 'today'],
+    queryFn: async () => {
+      const res = await fetch('/api/quests/today');
+      if (!res.ok) throw new Error('Failed to fetch theme');
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  const todayTheme = themeData?.theme;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useExplore({
@@ -54,6 +71,7 @@ export function ExploreClient({
       status,
       sortBy,
       timeframe,
+      themeOnly,
     });
 
   const proofs = data?.pages.flatMap((page) => page.proofs) || initialProofs;
@@ -114,6 +132,37 @@ export function ExploreClient({
             </div>
           </div>
         </div>
+
+        {/* Today's Theme Banner */}
+        {todayTheme && (
+          <div className="mb-8 p-4 rounded-xl bg-white/[0.03] border border-white/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-lg">
+                  🎨
+                </div>
+                <div>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest">
+                    {t('todayTheme')}
+                  </span>
+                  <h3 className="text-base font-medium text-white">
+                    {todayTheme.name}
+                  </h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setThemeOnly(!themeOnly)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  themeOnly
+                    ? 'bg-white/10 text-white border border-white/20'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {themeOnly ? t('showingThemeWorks') : t('viewThemeWorks')}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Search and Filters */}
         <div className="mb-8 space-y-4">
@@ -177,7 +226,8 @@ export function ExploreClient({
             {(search ||
               status !== 'all' ||
               sortBy !== 'recent' ||
-              timeframe !== 'all') && (
+              timeframe !== 'all' ||
+              themeOnly) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -187,6 +237,7 @@ export function ExploreClient({
                   setStatus('all');
                   setSortBy('recent');
                   setTimeframe('all');
+                  setThemeOnly(false);
                 }}
                 className="text-zinc-400 hover:text-white"
               >

@@ -3,17 +3,20 @@
 import { Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 import { useNetworkInfo } from '@/hooks/use-network-info';
+import { Link } from '@/i18n/navigation';
 
 interface WalletHeaderProps {
   walletAddress: string;
   displayName?: string | null;
   username?: string | null;
+  onNavigate?: () => void;
 }
 
 export function WalletHeader({
   walletAddress,
   displayName,
   username,
+  onNavigate,
 }: WalletHeaderProps) {
   const network = useNetworkInfo();
   const [copied, setCopied] = useState(false);
@@ -51,7 +54,11 @@ export function WalletHeader({
 
       {/* User Info - Display Name & Username */}
       {(displayName || username) && (
-        <div className="mb-2">
+        <Link
+          href={username ? `/u/${username}` : `/u/${walletAddress}`}
+          onClick={onNavigate}
+          className="block mb-2 hover:opacity-80 transition-opacity cursor-pointer"
+        >
           {displayName && (
             <div className="text-sm font-semibold text-white truncate">
               {displayName}
@@ -60,7 +67,7 @@ export function WalletHeader({
           {username && (
             <div className="text-xs text-zinc-400 truncate">@{username}</div>
           )}
-        </div>
+        </Link>
       )}
 
       {/* Wallet Address */}

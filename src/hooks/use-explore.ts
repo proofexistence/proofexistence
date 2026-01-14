@@ -29,6 +29,7 @@ interface ExploreFilters {
   status?: string;
   sortBy?: string;
   timeframe?: string;
+  themeOnly?: boolean;
 }
 
 export function useExplore(filters: ExploreFilters) {
@@ -42,6 +43,7 @@ export function useExplore(filters: ExploreFilters) {
         ...(filters.status !== 'all' && { status: filters.status }),
         ...(filters.sortBy && { sortBy: filters.sortBy }),
         ...(filters.timeframe !== 'all' && { timeframe: filters.timeframe }),
+        ...(filters.themeOnly && { themeOnly: 'true' }),
       });
 
       const res = await fetch(`/api/explore?${params}`);

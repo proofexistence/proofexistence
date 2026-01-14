@@ -9,8 +9,10 @@ interface PageProps {
 
 async function getSession(id: string) {
   const { db } = await import('@/db');
-  const { sessions, users } = await import('@/db/schema');
-  const { eq } = await import('drizzle-orm');
+  const { sessions, users, userDailyQuests } = await import('@/db/schema');
+  const { eq, and } = await import('drizzle-orm');
+  const { getTodayDateString } = await import('@/lib/quests/config');
+  const { getTodayTheme } = await import('@/lib/db/queries/quests');
 
   const session = await db.query.sessions.findFirst({
     where: eq(sessions.id, id),
@@ -47,7 +49,29 @@ async function getSession(id: string) {
     },
   });
 
-  return { ...session, user };
+  // Check if this session is marked as today's theme by its owner
+  const today = getTodayDateString();
+  const [ownerQuest] = await db
+    .select({ themeSessionId: userDailyQuests.themeSessionId })
+    .from(userDailyQuests)
+    .where(
+      and(
+        eq(userDailyQuests.userId, session.userId),
+        eq(userDailyQuests.date, today)
+      )
+    )
+    .limit(1);
+
+  const isMarkedAsTheme = ownerQuest?.themeSessionId === session.id;
+
+  // Get today's theme name if marked
+  let themeName: string | null = null;
+  if (isMarkedAsTheme) {
+    const theme = await getTodayTheme();
+    themeName = theme?.theme || null;
+  }
+
+  return { ...session, user, themeInfo: { isMarkedAsTheme, themeName } };
 }
 
 export async function generateMetadata({
@@ -184,6 +208,7 @@ export default async function ProofPage({ params }: PageProps) {
       session={{ ...session, color: session.color || undefined }}
       nftImage={nftImage}
       isSyncing={isSyncing}
+      themeInfo={session.themeInfo}
     />
   );
 }

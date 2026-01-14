@@ -12,6 +12,7 @@ import {
   Eye,
   EyeOff,
   Link2,
+  Palette,
 } from 'lucide-react';
 import { NFTThumbnail } from './nft-thumbnail';
 import { useState, useRef, useEffect } from 'react';
@@ -19,6 +20,7 @@ import { useProfile } from '@/hooks/use-profile';
 import { useSavedProofs } from '@/hooks/use-saved-proofs';
 import { useLikes } from '@/hooks/use-likes';
 import { useVisibility } from '@/hooks/use-visibility';
+import { useMarkTheme } from '@/hooks/use-mark-theme';
 import { useWeb3Auth } from '@/lib/web3auth';
 
 interface ProofCardProps {
@@ -36,6 +38,9 @@ interface ProofCardProps {
   previewUrl?: string | null;
   hidden?: number;
   onVisibilityChange?: () => void;
+  themeSessionId?: string | null;
+  themeName?: string | null;
+  onThemeChange?: () => void;
 }
 
 export function ProofCard({
@@ -53,6 +58,9 @@ export function ProofCard({
   isOwner,
   hidden = 0,
   onVisibilityChange,
+  themeSessionId,
+  themeName,
+  onThemeChange,
 }: ProofCardProps) {
   const router = useRouter();
   const shortId = id.slice(0, 8);
@@ -72,9 +80,8 @@ export function ProofCard({
     }
   };
 
-  // Local state for interactions (optimistic UI)
+  // Local state for like count (optimistic UI)
   const [likeCount, setLikeCount] = useState(likes);
-  const [isLiked, setIsLiked] = useState(false); // separate API call needed to check if user liked? For now default false.
 
   // React Query Hook for Saved State
   const { savedIds, toggleSave } = useSavedProofs();
@@ -106,8 +113,39 @@ export function ProofCard({
   const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
 
   // React Query Hook for Likes
-  const { toggleLike } = useLikes();
+  const { likedIds, toggleLike } = useLikes();
+  const isLiked = likedIds.has(id);
   const { toggleVisibility } = useVisibility();
+
+  // Theme marking
+  const { markThemeAsync, isPending: isMarkingTheme } = useMarkTheme();
+  const isThisSessionMarkedAsTheme = themeSessionId === id;
+
+  // Check if this proof was created today (for theme marking eligibility)
+  const isCreatedToday = (() => {
+    const today = new Date();
+    const proofDate = new Date(createdAt);
+    return (
+      today.getFullYear() === proofDate.getFullYear() &&
+      today.getMonth() === proofDate.getMonth() &&
+      today.getDate() === proofDate.getDate()
+    );
+  })();
+
+  // Can mark as theme only if: owner, has theme name, and created today
+  const canMarkAsTheme = isOwner && themeName && isCreatedToday;
+
+  const handleMarkTheme = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isOwner || !isAuthenticated) return;
+    try {
+      await markThemeAsync(id);
+      onThemeChange?.();
+    } catch (error) {
+      console.error('Failed to mark theme:', error);
+    }
+  };
 
   const handleToggleVisibility = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -136,18 +174,17 @@ export function ProofCard({
       return;
     }
 
-    // Optimistic Update
-    const newIsLiked = !isLiked;
-    setIsLiked(newIsLiked);
-    setLikeCount((prev) => (newIsLiked ? prev + 1 : prev - 1));
+    // Optimistic Update for like count
+    const currentIsLiked = isLiked;
+    setLikeCount((prev) => (currentIsLiked ? prev - 1 : prev + 1));
 
+    // toggleLike handles optimistic update for likedIds internally
     toggleLike(
-      { sessionId: id, isLiked },
+      { sessionId: id, isLiked: currentIsLiked },
       {
         onError: () => {
-          // Revert on error
-          setIsLiked(!newIsLiked);
-          setLikeCount((prev) => (newIsLiked ? prev - 1 : prev + 1));
+          // Revert like count on error
+          setLikeCount((prev) => (currentIsLiked ? prev + 1 : prev - 1));
         },
       }
     );
@@ -267,6 +304,40 @@ export function ProofCard({
           : 'border-white/5 hover:border-purple-500/50'
       }`}
     >
+      {/* Theme Mark Button - Top Right (only for today's creations) */}
+      {canMarkAsTheme && (
+        <button
+          onClick={handleMarkTheme}
+          disabled={isMarkingTheme}
+          className={`absolute top-2 right-2 z-10 p-1.5 rounded-full backdrop-blur-md border transition-all hover:scale-110 active:scale-95 ${
+            isThisSessionMarkedAsTheme
+              ? 'bg-green-500/30 text-green-300 border-green-500/50'
+              : 'bg-black/50 text-purple-300 border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-500/50'
+          } disabled:opacity-50`}
+          title={
+            isThisSessionMarkedAsTheme
+              ? `Today's Theme: ${themeName || 'Theme'}`
+              : 'Mark as Today Theme'
+          }
+        >
+          {isMarkingTheme ? (
+            <div className="w-4 h-4 border-2 border-purple-300 border-t-transparent rounded-full animate-spin" />
+          ) : isThisSessionMarkedAsTheme ? (
+            <Check size={16} />
+          ) : (
+            <Palette size={16} />
+          )}
+        </button>
+      )}
+
+      {/* Theme Badge - Show when marked */}
+      {isThisSessionMarkedAsTheme && (
+        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-200 border border-purple-500/30 backdrop-blur-md flex items-center gap-1">
+          <span>🎨</span>
+          <span className="truncate max-w-[80px]">{themeName || 'Theme'}</span>
+        </div>
+      )}
+
       {/* Main Content Area (Image + Info) */}
       <Link
         href={`/proof/${id}`}

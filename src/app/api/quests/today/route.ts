@@ -12,15 +12,26 @@ import { formatEther } from 'ethers';
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const today = getTodayDateString();
 
-    // Fetch all data in parallel
-    const [theme, quest, streak, streakClaimed] = await Promise.all([
-      getTodayTheme(),
+    // Always fetch theme (public info)
+    const theme = await getTodayTheme();
+
+    // If not logged in, return only theme info (public access)
+    if (!user) {
+      return NextResponse.json({
+        date: today,
+        theme: theme
+          ? { name: theme.theme, description: theme.description }
+          : null,
+        tasks: null,
+        streak: null,
+        totalEarned: '0',
+      });
+    }
+
+    // Fetch user-specific data in parallel
+    const [quest, streak, streakClaimed] = await Promise.all([
       getUserDailyQuest(user.id, today),
       getUserStreak(user.id),
       hasClaimedStreakToday(user.id),

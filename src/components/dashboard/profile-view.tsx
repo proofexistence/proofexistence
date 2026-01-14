@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GalleryGrid } from '@/components/gallery/gallery-grid';
 import { BadgeDisplay } from '@/components/dashboard/badge-display';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -89,11 +90,39 @@ export function ProfileView({
     }));
 
   const { user: currentUser } = useWeb3Auth();
+  const queryClient = useQueryClient();
 
   // Check if the current logged-in user is the owner of this profile
   const isOwner =
     currentUser?.walletAddress?.toLowerCase() ===
     user.walletAddress.toLowerCase();
+
+  // Fetch quest data for theme marking (only for owner)
+  const { data: questData } = useQuery<{
+    theme: { name: string } | null;
+    tasks: {
+      dailyTheme: {
+        sessionId: string | null;
+      };
+    };
+  }>({
+    queryKey: ['quests', 'today'],
+    queryFn: async () => {
+      const headers: Record<string, string> = {};
+      if (currentUser?.walletAddress) {
+        headers['X-Wallet-Address'] = currentUser.walletAddress;
+      }
+      const res = await fetch('/api/quests/today', { headers });
+      if (!res.ok) throw new Error('Failed to fetch quests');
+      return res.json();
+    },
+    enabled: isOwner,
+    staleTime: 1000 * 60,
+  });
+
+  const handleThemeChange = () => {
+    queryClient.invalidateQueries({ queryKey: ['quests', 'today'] });
+  };
 
   // Use avatarUrl from database
   const profileImageUrl = user.avatarUrl;
@@ -184,6 +213,9 @@ export function ProfileView({
                 proofs={formatProofs(createdProofs)}
                 isOwner={isOwner}
                 onVisibilityChange={onVisibilityChange}
+                themeSessionId={questData?.tasks.dailyTheme.sessionId}
+                themeName={questData?.theme?.name}
+                onThemeChange={handleThemeChange}
               />
               {hasMoreProofs && (
                 <div className="flex justify-center mt-8">

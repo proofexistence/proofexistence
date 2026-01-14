@@ -162,8 +162,9 @@ export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
         <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link
             href="/cosmos"
-            className="group px-8 py-3 bg-cyan-500/20 hover:bg-cyan-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-cyan-400/30 hover:border-cyan-400/50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden justify-center"
+            className="group px-8 py-3.5 bg-cyan-500/10 hover:bg-cyan-500/20 backdrop-blur-2xl text-white rounded-full font-bold border border-white/20 hover:border-white/40 shadow-[0_8px_32px_rgba(12,201,242,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_8px_32px_rgba(12,201,242,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden justify-center"
           >
+            <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
             <span className="relative z-10">{t('exploreCosmos')}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -181,16 +182,17 @@ export function AnimatedHero({ sessions = [] }: AnimatedHeroProps) {
               <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
               <path d="M2 12h20" />
             </svg>
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
           </Link>
 
           <Link
             href="/canvas"
-            className="group px-8 py-3 bg-purple-500/20 hover:bg-purple-500/30 backdrop-blur-xl text-white rounded-full font-bold border border-purple-400/30 hover:border-purple-400/50 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden justify-center"
+            className="group px-8 py-3.5 bg-purple-500/10 hover:bg-purple-500/20 backdrop-blur-2xl text-white rounded-full font-bold border border-white/20 hover:border-white/40 shadow-[0_8px_32px_rgba(126,68,219,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_8px_32px_rgba(126,68,219,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 relative z-10 overflow-hidden justify-center"
           >
+            <span className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
             <Pencil className="relative z-10 w-4 h-4" />
             <span className="relative z-10">{tNav('drawToProof')}</span>
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
           </Link>
         </div>
       </div>

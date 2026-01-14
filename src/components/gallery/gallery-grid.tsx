@@ -17,12 +17,18 @@ interface GalleryGridProps {
   }[];
   isOwner?: boolean;
   onVisibilityChange?: () => void;
+  themeSessionId?: string | null;
+  themeName?: string | null;
+  onThemeChange?: () => void;
 }
 
 export function GalleryGrid({
   proofs,
   isOwner,
   onVisibilityChange,
+  themeSessionId,
+  themeName,
+  onThemeChange,
 }: GalleryGridProps) {
   if (!proofs || proofs.length === 0) {
     return (
@@ -52,6 +58,9 @@ export function GalleryGrid({
           isOwner={isOwner}
           hidden={proof.hidden}
           onVisibilityChange={onVisibilityChange}
+          themeSessionId={themeSessionId}
+          themeName={themeName}
+          onThemeChange={onThemeChange}
         />
       ))}
     </div>

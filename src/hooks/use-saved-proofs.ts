@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useWeb3Auth } from '@/lib/web3auth';
 
@@ -33,7 +34,11 @@ export function useSavedProofs() {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const savedIds = new Set(data?.savedSessionIds || []);
+  // Memoize Set creation to avoid creating new Set on every render
+  const savedIds = useMemo(
+    () => new Set(data?.savedSessionIds || []),
+    [data?.savedSessionIds]
+  );
 
   const { mutate: toggleSave } = useMutation({
     mutationFn: async ({
@@ -82,7 +87,7 @@ export function useSavedProofs() {
 
       return { previousData };
     },
-    onError: (err, newTodo, context) => {
+    onError: (_err, _variables, context) => {
       queryClient.setQueryData(['saved-proofs'], context?.previousData);
     },
     onSettled: () => {
