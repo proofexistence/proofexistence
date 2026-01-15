@@ -44,7 +44,7 @@ import { LearnDropdown } from './learn-dropdown';
 import { QuestDropdown } from '@/components/quests/quest-dropdown';
 import { useTodayQuest } from '@/hooks/use-today-quest';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ethers } from 'ethers';
+import { useClaimTime26 } from '@/hooks/useClaimTime26';
 
 export function Navbar() {
   const { profile, isLoading, isAuthenticated } = useProfile();
@@ -56,10 +56,6 @@ export function Navbar() {
     isLoading: balancesLoading,
     refresh: refreshBalances,
   } = useWalletBalances();
-  // Use profile.time26Balance instead of separate API call
-  const pendingBalance = profile?.time26Balance
-    ? parseFloat(ethers.formatEther(profile.time26Balance)).toFixed(1)
-    : '0';
   const t = useTranslations('nav');
 
   const handleSignOut = () => logout();
@@ -94,6 +90,14 @@ export function Navbar() {
   const tQuests = useTranslations('quests');
   const { data: questData } = useTodayQuest();
   const queryClient = useQueryClient();
+  const {
+    claimable,
+    claimableFormatted,
+    alreadyClaimedFormatted,
+    isClaiming,
+    claimRewards,
+    claimError,
+  } = useClaimTime26();
 
   // Claim streak mutation for mobile
   const claimStreakMutation = useMutation({
@@ -558,15 +562,40 @@ export function Navbar() {
                             </div>
                           )}
 
-                          {/* Total Earned */}
-                          <div className="flex items-center justify-between px-3 py-2 mt-1 border-t border-white/5">
-                            <span className="text-xs text-zinc-500">
-                              {tQuests('rewards.earned')}
-                            </span>
-                            <span className="text-sm font-mono text-amber-400">
-                              {questData.totalEarned} T26
-                            </span>
-                          </div>
+                          {/* TIME26 Rewards - with claim button */}
+                          {(parseFloat(claimableFormatted) > 0 || parseFloat(alreadyClaimedFormatted) > 0) && (
+                            <div className="mt-2 px-3 py-2 border-t border-white/5">
+                              <div className="flex items-center justify-between">
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] text-zinc-500 mb-0.5">
+                                    {tQuests('rewards.available')}
+                                  </span>
+                                  <span className="text-sm font-mono text-amber-400">
+                                    {claimableFormatted} T26
+                                  </span>
+                                </div>
+                                {claimable ? (
+                                  <button
+                                    onClick={claimRewards}
+                                    disabled={isClaiming}
+                                    className="px-2.5 py-1 text-[10px] font-semibold bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 text-white rounded-lg transition-colors flex items-center gap-1"
+                                  >
+                                    {isClaiming ? '...' : 'Claim'}
+                                  </button>
+                                ) : parseFloat(alreadyClaimedFormatted) > 0 ? (
+                                  <span className="px-2 py-1 text-[10px] font-semibold bg-green-500/20 text-green-400 rounded-lg flex items-center gap-1">
+                                    <Check className="w-3 h-3" />
+                                    Claimed
+                                  </span>
+                                ) : null}
+                              </div>
+                              {claimError && (
+                                <div className="text-[10px] text-red-400 mt-1 truncate">
+                                  {claimError}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </motion.div>
                     )}
@@ -697,20 +726,41 @@ export function Navbar() {
                       </div>
                     </div>
 
-                    {/* Pending Rewards */}
-                    {pendingBalance && pendingBalance !== '0' && (
+                    {/* TIME26 Rewards - with claim button */}
+                    {(parseFloat(claimableFormatted) > 0 || parseFloat(alreadyClaimedFormatted) > 0) && (
                       <div className="px-4 py-3 border-b border-white/10">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                            <span className="text-xs text-zinc-400">
-                              {t('pendingRewards')}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                              TIME26 Rewards
                             </span>
                           </div>
-                          <span className="text-sm font-mono font-semibold text-green-400">
-                            +{pendingBalance} T26
-                          </span>
                         </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-mono font-semibold text-amber-400">
+                            {claimableFormatted} T26
+                          </span>
+                          {claimable ? (
+                            <button
+                              onClick={claimRewards}
+                              disabled={isClaiming}
+                              className="px-2.5 py-1 text-[10px] font-semibold bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 text-white rounded-lg transition-colors"
+                            >
+                              {isClaiming ? '...' : 'Claim'}
+                            </button>
+                          ) : parseFloat(alreadyClaimedFormatted) > 0 ? (
+                            <span className="px-2 py-1 text-[10px] font-semibold bg-green-500/20 text-green-400 rounded-lg flex items-center gap-1">
+                              <Check className="w-3 h-3" />
+                              Claimed
+                            </span>
+                          ) : null}
+                        </div>
+                        {claimError && (
+                          <div className="text-[10px] text-red-400 mt-1 truncate">
+                            {claimError}
+                          </div>
+                        )}
                       </div>
                     )}
 
