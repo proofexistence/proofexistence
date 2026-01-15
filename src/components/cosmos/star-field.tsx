@@ -228,6 +228,9 @@ export function StarField({
 
     meshRef.current.instanceMatrix.needsUpdate = true;
     meshRef.current.instanceColor!.needsUpdate = true;
+
+    // Compute bounding sphere for raycasting to work properly on mobile
+    meshRef.current.computeBoundingSphere();
   }, [trails, layout, dummy]);
 
   useFrame((state, delta) => {
