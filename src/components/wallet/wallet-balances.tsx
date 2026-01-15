@@ -1,7 +1,8 @@
 'use client';
 
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ExternalLink } from 'lucide-react';
 import { useWalletBalances } from '@/hooks/use-wallet-balances';
+import { TIME26_ADDRESS, isTestnet } from '@/lib/contracts';
 
 export function WalletBalances() {
   const { pol, time26, isLoading, error, refresh } = useWalletBalances();
@@ -48,6 +49,17 @@ export function WalletBalances() {
                 <span className="text-[8px] font-bold text-white">T</span>
               </div>
               <span className="text-xs text-zinc-400">TIME26</span>
+              {!isTestnet && (
+                <a
+                  href={`https://app.uniswap.org/swap?outputCurrency=${TIME26_ADDRESS}&chain=polygon`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-400 hover:text-amber-300"
+                  title="Get TIME26 on Uniswap"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
             </div>
             <span className="text-sm font-mono font-semibold text-white">
               {isLoading ? '-' : time26.formatted}

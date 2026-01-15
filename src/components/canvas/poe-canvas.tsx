@@ -1513,7 +1513,7 @@ export function POECanvas() {
             await updateProfile({ name });
           }}
           themeName={questData?.theme?.name}
-          themeCompleted={questData?.tasks.dailyTheme.completed}
+          themeCompleted={questData?.tasks?.dailyTheme?.completed}
         />
 
         <ClearConfirmModal

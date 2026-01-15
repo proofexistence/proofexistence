@@ -50,7 +50,6 @@ import {
   formatTime26,
   type DrawingPeriod,
 } from '@/lib/rewards/calculate';
-import { desc } from 'drizzle-orm';
 
 // Force dynamic to avoid caching
 export const dynamic = 'force-dynamic';
