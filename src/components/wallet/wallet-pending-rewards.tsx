@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Gift, Loader2, Check, CheckCircle } from 'lucide-react';
+import { Gift, Loader2, Check } from 'lucide-react';
 import { useTime26Balance } from '@/hooks/useTime26Balance';
 import { useClaimTime26 } from '@/hooks/useClaimTime26';
 
@@ -10,7 +10,6 @@ export function WalletPendingRewards() {
   const {
     claimable,
     claimableFormatted,
-    alreadyClaimedFormatted,
     isClaiming,
     claimRewards,
     claimError,
@@ -28,7 +27,11 @@ export function WalletPendingRewards() {
 
   // Parse claimable amount
   const claimableAmount = parseFloat(claimableFormatted) || 0;
-  const alreadyClaimed = parseFloat(alreadyClaimedFormatted) || 0;
+
+  // Only show if there's something to claim or just claimed successfully
+  if (!claimable && !claimSuccess && claimableAmount <= 0) {
+    return null;
+  }
 
   return (
     <div className="px-4 py-3 border-b border-white/10">
@@ -52,7 +55,12 @@ export function WalletPendingRewards() {
             <span className="text-sm font-mono font-semibold text-amber-400">
               {claimableAmount.toFixed(2)} T26
             </span>
-            {claimable ? (
+            {claimSuccess ? (
+              <span className="px-2.5 py-1 text-[10px] font-semibold bg-green-500/20 text-green-400 rounded-lg flex items-center gap-1">
+                <Check className="w-3 h-3" />
+                Claimed!
+              </span>
+            ) : claimable ? (
               <button
                 onClick={handleClaim}
                 disabled={isClaiming}
@@ -63,20 +71,10 @@ export function WalletPendingRewards() {
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Claiming...
                   </>
-                ) : claimSuccess ? (
-                  <>
-                    <Check className="w-3 h-3" />
-                    Claimed!
-                  </>
                 ) : (
                   'Claim'
                 )}
               </button>
-            ) : alreadyClaimed > 0 ? (
-              <span className="px-2.5 py-1 text-[10px] font-semibold bg-green-500/20 text-green-400 rounded-lg flex items-center gap-1">
-                <CheckCircle className="w-3 h-3" />
-                Claimed
-              </span>
             ) : null}
           </div>
 
@@ -87,13 +85,12 @@ export function WalletPendingRewards() {
             </div>
           )}
 
-          {/* Stats - show claimed amount */}
-          <div className="flex items-center gap-3 text-[10px] text-zinc-500">
-            {alreadyClaimed > 0 && (
-              <span>Claimed: {alreadyClaimed.toFixed(2)} T26</span>
-            )}
-            {stats && <span>{stats.daysActive} days active</span>}
-          </div>
+          {/* Stats */}
+          {stats && (
+            <div className="text-[10px] text-zinc-500">
+              {stats.daysActive} days active
+            </div>
+          )}
         </div>
       )}
     </div>
