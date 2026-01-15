@@ -13,12 +13,19 @@
 
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { users, dailyRewards, userDailyRewards } from '@/db/schema';
-import { gt, desc, sql, eq } from 'drizzle-orm';
+import {
+  users,
+  dailyRewards,
+  userDailyRewards,
+  sessions,
+  rewardsMerkleSnapshots,
+} from '@/db/schema';
+import { gt, desc, sql, eq, count } from 'drizzle-orm';
 import { ethers } from 'ethers';
 import { PROOF_RECORDER_ADDRESS, TIME26_ADDRESS } from '@/lib/contracts';
 import { createPolygonProvider } from '@/lib/provider';
 import { getCurrentUser } from '@/lib/auth/get-user';
+import { getYesterdayDayId } from '@/lib/rewards/calculate';
 
 export const dynamic = 'force-dynamic';
 
@@ -246,7 +253,54 @@ export async function GET() {
     }));
 
     // ============================================================
-    // 5. Summary Calculations
+    // 5. Unprocessed Days & Snapshot Status
+    // ============================================================
+    const yesterday = getYesterdayDayId();
+
+    // Get all unique session dates
+    const sessionDates = await db
+      .select({
+        date: sql<string>`DATE(${sessions.startTime})`.as('date'),
+        sessionCount: count(),
+      })
+      .from(sessions)
+      .groupBy(sql`DATE(${sessions.startTime})`)
+      .orderBy(sql`DATE(${sessions.startTime})`);
+
+    // Find unprocessed days
+    const processedDaySet = new Set(dailyRewardsData.map((d) => d.dayId));
+    const unprocessedDays = sessionDates
+      .filter((s) => s.date < yesterday && !processedDaySet.has(s.date))
+      .map((s) => ({ date: s.date, sessionCount: Number(s.sessionCount) }));
+
+    // Get latest snapshot
+    let latestSnapshot = null;
+    let snapshotMatchesOnChain = false;
+    try {
+      const snapshots = await db
+        .select({
+          merkleRoot: rewardsMerkleSnapshots.merkleRoot,
+          userCount: rewardsMerkleSnapshots.userCount,
+          txHash: rewardsMerkleSnapshots.txHash,
+          createdAt: rewardsMerkleSnapshots.createdAt,
+        })
+        .from(rewardsMerkleSnapshots)
+        .orderBy(desc(rewardsMerkleSnapshots.createdAt))
+        .limit(1);
+
+      if (snapshots.length > 0) {
+        latestSnapshot = snapshots[0];
+        snapshotMatchesOnChain = latestSnapshot.merkleRoot === merkleRoot;
+      }
+    } catch {
+      // Table might not exist yet
+    }
+
+    // Check if on-chain root is zero
+    const onChainRootIsZero = merkleRoot === '0x' + '0'.repeat(64);
+
+    // ============================================================
+    // 6. Summary Calculations
     // ============================================================
     const contractBalanceBigInt = BigInt(contractBalance.toString());
 
@@ -349,6 +403,29 @@ export async function GET() {
       users: userDetails,
       dailyRewards: dailyRewardsFormatted,
       recentUserRewards: recentUserRewardsFormatted,
+      // Verification data
+      verification: {
+        unprocessedDays,
+        hasUnprocessedDays: unprocessedDays.length > 0,
+        totalUnprocessedSessions: unprocessedDays.reduce(
+          (sum, d) => sum + d.sessionCount,
+          0
+        ),
+        snapshot: {
+          latest: latestSnapshot
+            ? {
+                merkleRoot: latestSnapshot.merkleRoot,
+                userCount: latestSnapshot.userCount,
+                txHash: latestSnapshot.txHash,
+                createdAt: latestSnapshot.createdAt?.toISOString(),
+              }
+            : null,
+          onChainRoot: merkleRoot,
+          onChainRootIsZero,
+          matchesOnChain: snapshotMatchesOnChain,
+          needsSync: !snapshotMatchesOnChain && !onChainRootIsZero,
+        },
+      },
     });
   } catch (error) {
     console.error('[Admin Rewards Status] Error:', error);

@@ -17,7 +17,11 @@ import {
   Clock,
   Server,
   Database,
+  Play,
+  XCircle,
+  FileCheck,
 } from 'lucide-react';
+import { useState } from 'react';
 
 // Local interface removed, using type from hook if needed or inferred.
 
@@ -78,11 +82,63 @@ export function AdminRewardsClient() {
     refetch,
   } = useRewardsStatus();
 
+  const [isRunningCron, setIsRunningCron] = useState(false);
+  const [cronResult, setCronResult] = useState<{
+    success: boolean;
+    message: string;
+    details?: Record<string, unknown>;
+  } | null>(null);
+
   const loading = rewardsLoading;
   const error = rewardsError ? (rewardsError as Error).message : null;
   const unauthorized = error === 'Access Denied';
 
   const fetchData = () => refetch();
+
+  const runCron = async () => {
+    if (!user?.walletAddress) return;
+
+    setIsRunningCron(true);
+    setCronResult(null);
+
+    try {
+      const res = await fetch('/api/cron/daily', {
+        method: 'GET',
+        headers: {
+          'X-Wallet-Address': user.walletAddress,
+        },
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        const processedDays = result.rewards?.processedDays?.length || 0;
+        const remainingDays = data?.verification?.unprocessedDays
+          ? data.verification.unprocessedDays.length - processedDays
+          : 0;
+        setCronResult({
+          success: true,
+          message: `處理完成！本次處理 ${processedDays} 天${remainingDays > 0 ? `，還剩 ${remainingDays} 天待處理` : ''}。burnMerkle: ${result.burnMerkle?.success ? '✓' : '✗'}`,
+          details: result,
+        });
+        // Refresh data after cron
+        setTimeout(() => refetch(), 2000);
+      } else {
+        setCronResult({
+          success: false,
+          message: `Cron failed: ${result.burnMerkle?.error || result.error || 'Unknown error'}`,
+          details: result,
+        });
+      }
+    } catch (err) {
+      setCronResult({
+        success: false,
+        message: `Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      });
+    } finally {
+      setIsRunningCron(false);
+    }
+  };
 
   if (authLoading || (loading && !data)) {
     return (
@@ -245,6 +301,174 @@ export function AdminRewardsClient() {
             </div>
           </div>
         </div>
+
+        {/* Verification Status */}
+        {data.verification && (
+          <div className="space-y-4">
+            {/* Unprocessed Days Warning */}
+            {data.verification.hasUnprocessedDays && (
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-6 h-6 text-amber-400" />
+                    <div>
+                      <div className="font-bold text-amber-400">
+                        {data.verification.unprocessedDays.length} 天未處理獎勵
+                      </div>
+                      <div className="text-sm text-zinc-400">
+                        共 {data.verification.totalUnprocessedSessions} 個
+                        sessions 待處理
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={runCron}
+                    disabled={isRunningCron}
+                    className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 text-black font-bold rounded-lg"
+                  >
+                    {isRunningCron ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        處理中...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4" />
+                        運行 Cron
+                      </>
+                    )}
+                  </button>
+                </div>
+                {/* List unprocessed days */}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {data.verification.unprocessedDays.slice(0, 10).map((d) => (
+                    <span
+                      key={d.date}
+                      className="px-2 py-1 bg-amber-500/20 rounded text-xs font-mono"
+                    >
+                      {d.date} ({d.sessionCount})
+                    </span>
+                  ))}
+                  {data.verification.unprocessedDays.length > 10 && (
+                    <span className="px-2 py-1 text-xs text-zinc-500">
+                      +{data.verification.unprocessedDays.length - 10} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Snapshot Status */}
+            <div
+              className={`rounded-xl border p-4 ${
+                data.verification.snapshot.matchesOnChain
+                  ? 'bg-green-500/10 border-green-500/20'
+                  : data.verification.snapshot.onChainRootIsZero
+                    ? 'bg-zinc-800/50 border-zinc-700'
+                    : 'bg-red-500/10 border-red-500/20'
+              }`}
+            >
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  {data.verification.snapshot.matchesOnChain ? (
+                    <FileCheck className="w-6 h-6 text-green-400" />
+                  ) : data.verification.snapshot.onChainRootIsZero ? (
+                    <XCircle className="w-6 h-6 text-zinc-500" />
+                  ) : (
+                    <AlertTriangle className="w-6 h-6 text-red-400" />
+                  )}
+                  <div>
+                    <div
+                      className={`font-bold ${
+                        data.verification.snapshot.matchesOnChain
+                          ? 'text-green-400'
+                          : data.verification.snapshot.onChainRootIsZero
+                            ? 'text-zinc-400'
+                            : 'text-red-400'
+                      }`}
+                    >
+                      {data.verification.snapshot.matchesOnChain
+                        ? 'Merkle Snapshot 同步 ✓'
+                        : data.verification.snapshot.onChainRootIsZero
+                          ? 'On-chain Root 尚未設定'
+                          : 'Merkle Snapshot 不同步!'}
+                    </div>
+                    <div className="text-sm text-zinc-400">
+                      {data.verification.snapshot.latest ? (
+                        <>
+                          Snapshot: {data.verification.snapshot.latest.userCount}{' '}
+                          users @{' '}
+                          {data.verification.snapshot.latest.createdAt
+                            ? new Date(
+                                data.verification.snapshot.latest.createdAt
+                              ).toLocaleString()
+                            : 'N/A'}
+                        </>
+                      ) : (
+                        '無 Snapshot 記錄'
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {!data.verification.snapshot.matchesOnChain &&
+                  !data.verification.hasUnprocessedDays && (
+                    <button
+                      onClick={runCron}
+                      disabled={isRunningCron}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 text-white font-bold rounded-lg"
+                    >
+                      {isRunningCron ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          同步中...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4" />
+                          同步 Merkle Root
+                        </>
+                      )}
+                    </button>
+                  )}
+              </div>
+            </div>
+
+            {/* Cron Result */}
+            {cronResult && (
+              <div
+                className={`rounded-xl border p-4 ${
+                  cronResult.success
+                    ? 'bg-green-500/10 border-green-500/20'
+                    : 'bg-red-500/10 border-red-500/20'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  {cronResult.success ? (
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-red-400" />
+                  )}
+                  <span
+                    className={`font-bold ${cronResult.success ? 'text-green-400' : 'text-red-400'}`}
+                  >
+                    {cronResult.success ? 'Cron 成功' : 'Cron 失敗'}
+                  </span>
+                </div>
+                <p className="text-sm text-zinc-400">{cronResult.message}</p>
+                {cronResult.details && (
+                  <details className="mt-2">
+                    <summary className="text-xs text-zinc-500 cursor-pointer hover:text-zinc-400">
+                      查看詳情
+                    </summary>
+                    <pre className="mt-2 text-xs bg-black/30 p-2 rounded overflow-auto max-h-48">
+                      {JSON.stringify(cronResult.details, null, 2)}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Main Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">

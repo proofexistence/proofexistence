@@ -83,6 +83,23 @@ export interface RewardsStatus {
     bonusRewardFormatted: string;
     totalRewardFormatted: string;
   }>;
+  verification: {
+    unprocessedDays: Array<{ date: string; sessionCount: number }>;
+    hasUnprocessedDays: boolean;
+    totalUnprocessedSessions: number;
+    snapshot: {
+      latest: {
+        merkleRoot: string;
+        userCount: number;
+        txHash: string | null;
+        createdAt: string | null;
+      } | null;
+      onChainRoot: string;
+      onChainRootIsZero: boolean;
+      matchesOnChain: boolean;
+      needsSync: boolean;
+    };
+  };
 }
 
 export function useRewardsStatus() {

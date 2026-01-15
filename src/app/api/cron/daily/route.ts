@@ -61,44 +61,39 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Get all days that need rewards processing
- * Returns days from (last processed + 1) to yesterday, in chronological order
+ * Finds days that have sessions but no rewards record yet
+ * Limited to MAX_DAYS_PER_RUN to avoid timeout
  */
 async function getMissingDays(): Promise<string[]> {
   const yesterday = getYesterdayDayId();
+  const MAX_DAYS_PER_RUN = 30;
 
-  // Find the most recent processed day
-  const lastProcessed = await db
-    .select({ dayId: dailyRewards.dayId })
-    .from(dailyRewards)
-    .orderBy(desc(dailyRewards.dayId))
-    .limit(1);
+  // Get all unique session dates (before yesterday)
+  const sessionDates = await db
+    .select({
+      date: sql<string>`DATE(${sessions.startTime})`.as('date'),
+    })
+    .from(sessions)
+    .where(sql`DATE(${sessions.startTime}) < ${yesterday}`)
+    .groupBy(sql`DATE(${sessions.startTime})`)
+    .orderBy(sql`DATE(${sessions.startTime})`);
 
-  // If no rewards have been processed yet, start from yesterday only
-  if (lastProcessed.length === 0) {
-    return [yesterday];
-  }
-
-  const lastDayId = lastProcessed[0].dayId;
-
-  // If last processed is yesterday or later, nothing to do
-  if (lastDayId >= yesterday) {
+  if (sessionDates.length === 0) {
     return [];
   }
 
-  // Calculate all missing days between lastDayId and yesterday
-  const missingDays: string[] = [];
-  const lastDate = new Date(lastDayId + 'T00:00:00Z');
-  const yesterdayDate = new Date(yesterday + 'T00:00:00Z');
+  // Get all processed days
+  const processedDays = await db
+    .select({ dayId: dailyRewards.dayId })
+    .from(dailyRewards);
 
-  // Start from day after last processed
-  const currentDate = new Date(lastDate);
-  currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+  const processedSet = new Set(processedDays.map((d) => d.dayId));
 
-  while (currentDate <= yesterdayDate) {
-    const dayId = currentDate.toISOString().split('T')[0];
-    missingDays.push(dayId);
-    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-  }
+  // Find days with sessions but no rewards record
+  const missingDays = sessionDates
+    .map((s) => s.date)
+    .filter((date) => !processedSet.has(date))
+    .slice(0, MAX_DAYS_PER_RUN);
 
   return missingDays;
 }
@@ -549,23 +544,31 @@ async function runBurnAndMerkle(): Promise<{
     await waitForTransaction(provider, tx.hash, 1, 60000);
 
     // Save the merkle snapshot so claim-proof API can use it
-    await db
-      .insert(rewardsMerkleSnapshots)
-      .values({
-        merkleRoot: root,
-        entries: entries,
-        userCount: entries.length,
-        txHash: tx.hash,
-      })
-      .onConflictDoUpdate({
-        target: rewardsMerkleSnapshots.merkleRoot,
-        set: {
+    // Use select + insert/update pattern for better compatibility
+    const existingSnapshot = await db
+      .select({ id: rewardsMerkleSnapshots.id })
+      .from(rewardsMerkleSnapshots)
+      .where(eq(rewardsMerkleSnapshots.merkleRoot, root))
+      .limit(1);
+
+    if (existingSnapshot.length > 0) {
+      await db
+        .update(rewardsMerkleSnapshots)
+        .set({
           entries: entries,
           userCount: entries.length,
           txHash: tx.hash,
           createdAt: new Date(),
-        },
+        })
+        .where(eq(rewardsMerkleSnapshots.merkleRoot, root));
+    } else {
+      await db.insert(rewardsMerkleSnapshots).values({
+        merkleRoot: root,
+        entries: entries,
+        userCount: entries.length,
+        txHash: tx.hash,
       });
+    }
 
     // console.log(`[Daily Cron] Updated rewards merkle root: ${root}, tx: ${tx.hash}`);
 
@@ -701,9 +704,25 @@ async function runQuestRewards(): Promise<{
 export async function GET(req: NextRequest) {
   // console.log('[Daily Cron] Starting combined daily tasks...');
 
-  // Security Check
+  // Security Check - Allow CRON_SECRET or Admin users
   const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const isCronAuth = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
+  let isAdminAuth = false;
+  if (!isCronAuth) {
+    // Check if request is from an admin user
+    const walletAddress = req.headers.get('x-wallet-address');
+    if (walletAddress) {
+      const adminUser = await db
+        .select({ isAdmin: users.isAdmin })
+        .from(users)
+        .where(eq(users.walletAddress, walletAddress))
+        .limit(1);
+      isAdminAuth = adminUser[0]?.isAdmin === true;
+    }
+  }
+
+  if (!isCronAuth && !isAdminAuth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
