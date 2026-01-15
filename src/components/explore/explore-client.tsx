@@ -29,6 +29,7 @@ interface Proof {
   userName?: string | null;
   walletAddress?: string | null;
   previewUrl?: string | null;
+  isThemeMarked?: boolean;
 }
 
 interface ExploreClientProps {
@@ -254,7 +255,7 @@ export function ExploreClient({
           </div>
         ) : (
           <>
-            <GalleryGrid proofs={proofs} />
+            <GalleryGrid proofs={proofs} themeName={todayTheme?.name} />
 
             {/* Infinite Scroll Trigger */}
             {hasNextPage && (

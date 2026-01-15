@@ -75,7 +75,8 @@
     "instructions": {
       "clickAndHold": "点击并按住绘画",
       "drawForMinimum": "至少绘画{seconds}秒才能创建证明",
-      "theme": "主题: {name} • Ctrl+B 切换",
+      "todayTheme": "今日创作主题: {name}",
+      "backgroundHint": "Ctrl+B 切换背景",
       "recording": "录制中 • 松开暂停",
       "readyToSubmit": "准备提交！",
       "useButtons": "使用上方按钮提交或重新开始"
@@ -180,6 +181,7 @@
     "reachedEnd": "已经到底了",
     "noResults": "找不到证明。请尝试调整筛选条件。",
     "todayTheme": "今日主题",
+    "addTheme": "+ 今日主题",
     "viewThemeWorks": "查看主题作品",
     "showingThemeWorks": "显示主题作品中"
   },
@@ -239,7 +241,7 @@
       "title": "连续绘画",
       "days": "连续 {count} 天",
       "nextMilestone": "下一个里程碑: 第 {day} 天",
-      "claim": "领取 +{amount}"
+      "claim": "签到 +{amount}"
     },
     "rewards": {
       "available": "今日已获得",

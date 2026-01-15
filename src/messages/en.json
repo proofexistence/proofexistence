@@ -75,7 +75,8 @@
     "instructions": {
       "clickAndHold": "Click & hold to draw",
       "drawForMinimum": "Draw for at least {seconds}s to create a proof",
-      "theme": "Theme: {name} • Ctrl+B to cycle",
+      "todayTheme": "Today's Theme: {name}",
+      "backgroundHint": "Ctrl+B to change background",
       "recording": "Recording • Release to pause",
       "readyToSubmit": "Ready to submit!",
       "useButtons": "Use buttons above to submit or restart"
@@ -180,6 +181,7 @@
     "reachedEnd": "You've reached the end",
     "noResults": "No proofs found. Try adjusting your filters.",
     "todayTheme": "Today's Theme",
+    "addTheme": "+ Today's Theme",
     "viewThemeWorks": "View Theme Works",
     "showingThemeWorks": "Showing Theme Works"
   },
@@ -239,7 +241,7 @@
       "title": "Drawing Streak",
       "days": "{count} day streak",
       "nextMilestone": "Next milestone: Day {day}",
-      "claim": "Claim +{amount}"
+      "claim": "Check in +{amount}"
     },
     "rewards": {
       "available": "Earned Today",

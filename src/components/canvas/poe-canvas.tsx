@@ -47,8 +47,8 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useProfile } from '@/hooks/use-profile';
-import { useQuery } from '@tanstack/react-query';
 import { useMarkTheme } from '@/hooks/use-mark-theme';
+import { useTodayTheme, useTodayQuest } from '@/hooks/use-today-quest';
 
 // Helper for RPC provider with fallbacks
 const getPublicProvider = () => {
@@ -620,29 +620,11 @@ export function POECanvas() {
   const { isConnected, user: web3User, login } = useWeb3Auth();
   const authenticated = isConnected;
 
-  // Quest/Theme data - fetch when submission modal is open
-  const { data: questData } = useQuery<{
-    theme: { name: string } | null;
-    tasks: {
-      dailyTheme: {
-        completed: boolean;
-        sessionId: string | null;
-      };
-    };
-  }>({
-    queryKey: ['quests', 'today'],
-    queryFn: async () => {
-      const headers: Record<string, string> = {};
-      if (web3User?.walletAddress) {
-        headers['X-Wallet-Address'] = web3User.walletAddress;
-      }
-      const res = await fetch('/api/quests/today', { headers });
-      if (!res.ok) throw new Error('Failed to fetch quests');
-      return res.json();
-    },
-    enabled: showSubmissionModal && !!web3User?.walletAddress,
-    staleTime: 1000 * 60,
-  });
+  // Today's theme - fetch immediately for canvas display (public info)
+  const { data: todayTheme } = useTodayTheme();
+
+  // Full quest data with user tasks - used for submission modal
+  const { data: questData } = useTodayQuest();
 
   // Mark theme hook
   const { markThemeAsync } = useMarkTheme();
@@ -1503,7 +1485,7 @@ export function POECanvas() {
           isPaused={isPaused}
           onClear={() => setShowClearConfirm(true)}
           onSubmit={handleComplete}
-          themeName={currentTheme.name}
+          themeName={todayTheme?.theme?.name}
         />
 
         <SubmissionModal

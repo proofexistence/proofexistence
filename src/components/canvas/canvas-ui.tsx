@@ -397,6 +397,20 @@ export function Instructions({
   themeName,
 }: InstructionsProps) {
   const t = useTranslations('canvas');
+  const tQuests = useTranslations('quests');
+
+  // Translate theme name using quests translations
+  const getTranslatedThemeName = (name: string): string => {
+    const themeKey = name.toLowerCase().replace(/\s+/g, '_');
+    try {
+      const rawName = tQuests.raw(`themes.${themeKey}`);
+      return typeof rawName === 'string' ? rawName : name;
+    } catch {
+      return name;
+    }
+  };
+
+  const translatedThemeName = themeName ? getTranslatedThemeName(themeName) : null;
   // Position changes based on state
   // Paused state uses pointer-events-none on container so clicks pass through to canvas
   const getPositionClass = () => {
@@ -422,9 +436,14 @@ export function Instructions({
               seconds: MIN_SESSION_DURATION,
             })}
           </p>
-          <div className="pt-3 border-t border-white/5">
-            <p className="text-white/30 text-[10px] font-mono">
-              {t('instructions.theme', { name: themeName || 'Default' })}
+          <div className="pt-3 border-t border-white/5 space-y-1">
+            {translatedThemeName && (
+              <p className="text-purple-300/60 text-[10px] font-medium">
+                {t('instructions.todayTheme', { name: translatedThemeName })}
+              </p>
+            )}
+            <p className="text-white/20 text-[10px] font-mono">
+              {t('instructions.backgroundHint')}
             </p>
           </div>
         </div>
@@ -658,10 +677,10 @@ export function SubmissionModal({
   useEffect(() => {
     if (isOpen) {
       setUsername(profileName || profileUsername || '');
-      // Default to marking as theme if theme exists and not already completed
-      setMarkAsTheme(!!themeName && !themeCompleted);
+      // Reset markAsTheme to false (user must opt-in)
+      setMarkAsTheme(false);
     }
-  }, [isOpen, profileName, profileUsername, themeName, themeCompleted]);
+  }, [isOpen, profileName, profileUsername]);
 
   // Handle set as display name
   const handleSetAsDisplayName = async () => {

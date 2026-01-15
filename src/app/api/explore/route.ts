@@ -24,23 +24,21 @@ export async function GET(req: NextRequest) {
     const timeframe = searchParams.get('timeframe'); // '24h', '7d', '30d', 'all'
     const themeOnly = searchParams.get('themeOnly') === 'true'; // Filter for today's theme works
 
-    // If themeOnly, get today's theme session IDs
-    let themeSessionIds: string[] = [];
-    if (themeOnly) {
-      const today = getTodayDateString();
-      const themeRecords = await db
-        .select({ themeSessionId: userDailyQuests.themeSessionId })
-        .from(userDailyQuests)
-        .where(
-          and(
-            eq(userDailyQuests.date, today),
-            isNotNull(userDailyQuests.themeSessionId)
-          )
-        );
-      themeSessionIds = themeRecords
-        .map((r) => r.themeSessionId)
-        .filter((id): id is string => id !== null);
-    }
+    // Get today's theme session IDs (for filtering and badge display)
+    const today = getTodayDateString();
+    const themeRecords = await db
+      .select({ themeSessionId: userDailyQuests.themeSessionId })
+      .from(userDailyQuests)
+      .where(
+        and(
+          eq(userDailyQuests.date, today),
+          isNotNull(userDailyQuests.themeSessionId)
+        )
+      );
+    const themeSessionIds = themeRecords
+      .map((r) => r.themeSessionId)
+      .filter((id): id is string => id !== null);
+    const themeSessionIdSet = new Set(themeSessionIds);
 
     // Build where conditions
     const conditions = [];
@@ -166,6 +164,7 @@ export async function GET(req: NextRequest) {
       proofs: proofs.map((proof) => ({
         ...proof,
         createdAt: proof.createdAt.toISOString(),
+        isThemeMarked: themeSessionIdSet.has(proof.id),
       })),
       pagination: {
         page,

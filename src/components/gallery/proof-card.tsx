@@ -22,6 +22,7 @@ import { useLikes } from '@/hooks/use-likes';
 import { useVisibility } from '@/hooks/use-visibility';
 import { useMarkTheme } from '@/hooks/use-mark-theme';
 import { useWeb3Auth } from '@/lib/web3auth';
+import { useTranslations } from 'next-intl';
 
 interface ProofCardProps {
   id: string;
@@ -41,6 +42,7 @@ interface ProofCardProps {
   themeSessionId?: string | null;
   themeName?: string | null;
   onThemeChange?: () => void;
+  isThemeMarked?: boolean;
 }
 
 export function ProofCard({
@@ -61,8 +63,10 @@ export function ProofCard({
   themeSessionId,
   themeName,
   onThemeChange,
+  isThemeMarked = false,
 }: ProofCardProps) {
   const router = useRouter();
+  const t = useTranslations('explore');
   const shortId = id.slice(0, 8);
   const dateStr = new Date(createdAt).toLocaleDateString();
   const displayName =
@@ -118,8 +122,19 @@ export function ProofCard({
   const { toggleVisibility } = useVisibility();
 
   // Theme marking
-  const { markThemeAsync, isPending: isMarkingTheme } = useMarkTheme();
-  const isThisSessionMarkedAsTheme = themeSessionId === id;
+  const { markThemeAsync, unmarkThemeAsync, isPending: isMarkingTheme } = useMarkTheme();
+
+  // Local optimistic state for theme marking
+  const [optimisticIsMarked, setOptimisticIsMarked] = useState<boolean | null>(null);
+
+  // Show as marked if: explicitly marked via prop OR themeSessionId matches this proof
+  const initialIsMarked = isThemeMarked || themeSessionId === id;
+  const isThisSessionMarkedAsTheme = optimisticIsMarked ?? initialIsMarked;
+
+  // Reset optimistic state when props update (after refetch)
+  useEffect(() => {
+    setOptimisticIsMarked(null);
+  }, [isThemeMarked, themeSessionId, id]);
 
   // Check if this proof was created today (for theme marking eligibility)
   const isCreatedToday = (() => {
@@ -139,11 +154,24 @@ export function ProofCard({
     e.preventDefault();
     e.stopPropagation();
     if (!isOwner || !isAuthenticated) return;
+
+    const wasMarked = isThisSessionMarkedAsTheme;
+    // Optimistic update - immediately show new state
+    setOptimisticIsMarked(!wasMarked);
+
     try {
-      await markThemeAsync(id);
+      if (wasMarked) {
+        // Unmark if already marked
+        await unmarkThemeAsync();
+      } else {
+        // Mark as theme
+        await markThemeAsync(id);
+      }
       onThemeChange?.();
     } catch (error) {
-      console.error('Failed to mark theme:', error);
+      // Revert on error
+      setOptimisticIsMarked(wasMarked);
+      console.error('Failed to toggle theme:', error);
     }
   };
 
@@ -304,39 +332,41 @@ export function ProofCard({
           : 'border-white/5 hover:border-purple-500/50'
       }`}
     >
-      {/* Theme Mark Button - Top Right (only for today's creations) */}
-      {canMarkAsTheme && (
+      {/* Theme Badge/Button - Top Left */}
+      {/* Show clickable badge for owner's today's creations, or static badge for marked items */}
+      {canMarkAsTheme ? (
+        // Owner can toggle theme marking
         <button
           onClick={handleMarkTheme}
           disabled={isMarkingTheme}
-          className={`absolute top-2 right-2 z-10 p-1.5 rounded-full backdrop-blur-md border transition-all hover:scale-110 active:scale-95 ${
+          className={`absolute top-2 left-2 z-10 px-2 py-1 rounded-full text-[10px] font-bold backdrop-blur-md border transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 ${
             isThisSessionMarkedAsTheme
-              ? 'bg-green-500/30 text-green-300 border-green-500/50'
-              : 'bg-black/50 text-purple-300 border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-500/50'
+              ? 'bg-gradient-to-r from-purple-500/40 to-pink-500/40 text-white border-purple-400/50 shadow-lg shadow-purple-500/20'
+              : 'bg-black/60 text-purple-300 border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-400/50'
           } disabled:opacity-50`}
-          title={
-            isThisSessionMarkedAsTheme
-              ? `Today's Theme: ${themeName || 'Theme'}`
-              : 'Mark as Today Theme'
-          }
         >
           {isMarkingTheme ? (
-            <div className="w-4 h-4 border-2 border-purple-300 border-t-transparent rounded-full animate-spin" />
+            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
           ) : isThisSessionMarkedAsTheme ? (
-            <Check size={16} />
+            <>
+              <span>🎨</span>
+              <span className="truncate max-w-[60px]">{themeName}</span>
+              <span className="text-white/60 hover:text-white">×</span>
+            </>
           ) : (
-            <Palette size={16} />
+            <>
+              <Palette size={12} />
+              <span>{t('addTheme')}</span>
+            </>
           )}
         </button>
-      )}
-
-      {/* Theme Badge - Show when marked */}
-      {isThisSessionMarkedAsTheme && (
-        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-200 border border-purple-500/30 backdrop-blur-md flex items-center gap-1">
+      ) : isThisSessionMarkedAsTheme ? (
+        // Non-owner sees static badge
+        <div className="absolute top-2 left-2 z-10 px-2 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-200 border border-purple-500/30 backdrop-blur-md flex items-center gap-1">
           <span>🎨</span>
           <span className="truncate max-w-[80px]">{themeName || 'Theme'}</span>
         </div>
-      )}
+      ) : null}
 
       {/* Main Content Area (Image + Info) */}
       <Link

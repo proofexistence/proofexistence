@@ -75,7 +75,8 @@
     "instructions": {
       "clickAndHold": "クリック＆ホールドで描画",
       "drawForMinimum": "証明を作成するには{seconds}秒以上描画してください",
-      "theme": "テーマ: {name} • Ctrl+Bで切り替え",
+      "todayTheme": "本日のテーマ: {name}",
+      "backgroundHint": "Ctrl+B で背景を切り替え",
       "recording": "録画中 • 離すと一時停止",
       "readyToSubmit": "提出準備完了！",
       "useButtons": "上のボタンを使って提出またはやり直し"
@@ -180,6 +181,7 @@
     "reachedEnd": "最後まで表示しました",
     "noResults": "証明が見つかりません。フィルターを調整してみてください。",
     "todayTheme": "今日のテーマ",
+    "addTheme": "+ 今日のテーマ",
     "viewThemeWorks": "テーマ作品を見る",
     "showingThemeWorks": "テーマ作品を表示中"
   },
@@ -239,7 +241,7 @@
       "title": "連続描画",
       "days": "連続 {count} 日",
       "nextMilestone": "次のマイルストーン: {day}日目",
-      "claim": "受け取る +{amount}"
+      "claim": "チェックイン +{amount}"
     },
     "rewards": {
       "available": "本日獲得済み",

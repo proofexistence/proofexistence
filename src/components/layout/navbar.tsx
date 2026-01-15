@@ -26,6 +26,10 @@ import {
   MessageCircle,
   FileText,
   ChevronRight,
+  Target,
+  Pencil,
+  Heart,
+  Palette,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -38,6 +42,8 @@ import { useNetworkInfo } from '@/hooks/use-network-info';
 import { useWalletBalances } from '@/hooks/use-wallet-balances';
 import { LearnDropdown } from './learn-dropdown';
 import { QuestDropdown } from '@/components/quests/quest-dropdown';
+import { useTodayQuest } from '@/hooks/use-today-quest';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ethers } from 'ethers';
 
 export function Navbar() {
@@ -83,7 +89,33 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileLearnOpen, setIsMobileLearnOpen] = useState(false);
+  const [isMobileQuestOpen, setIsMobileQuestOpen] = useState(false);
   const [launched, setLaunched] = useState(false);
+  const tQuests = useTranslations('quests');
+  const { data: questData } = useTodayQuest();
+  const queryClient = useQueryClient();
+
+  // Claim streak mutation for mobile
+  const claimStreakMutation = useMutation({
+    mutationFn: async () => {
+      const headers: Record<string, string> = {};
+      if (profile?.walletAddress) {
+        headers['X-Wallet-Address'] = profile.walletAddress;
+      }
+      const res = await fetch('/api/quests/claim-streak', {
+        method: 'POST',
+        headers,
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to claim streak');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quests', 'today'] });
+    },
+  });
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -400,6 +432,147 @@ export function Navbar() {
                   )}
                 </AnimatePresence>
               </div>
+
+              {/* Today Quest Section - Only for authenticated users */}
+              {authenticated && questData && (
+                <div className="mt-2">
+                  <button
+                    onClick={() => setIsMobileQuestOpen(!isMobileQuestOpen)}
+                    className="w-full flex items-center justify-between gap-4 p-4 rounded-2xl text-lg font-medium text-zinc-300 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white transition-all"
+                  >
+                    <div className="flex items-center gap-4">
+                      <Target className="w-5 h-5 text-purple-400" />
+                      <span>{tQuests('title')}</span>
+                    </div>
+                    <ChevronRight
+                      className={`w-5 h-5 text-zinc-400 transition-transform duration-200 ${
+                        isMobileQuestOpen ? 'rotate-90' : ''
+                      }`}
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {isMobileQuestOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pl-4 mt-2 space-y-1">
+                          {/* Today's Theme */}
+                          {questData.theme && (
+                            <div className="px-3 py-2">
+                              <div className="flex items-center gap-2 text-purple-300">
+                                <Palette className="w-4 h-4" />
+                                <span className="text-sm">
+                                  {tQuests('todayTheme')}: <span className="text-white font-medium">{questData.theme.name}</span>
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Tasks - Plain text style */}
+                          {questData.tasks && (
+                            <div className="space-y-1">
+                              {/* Daily Create */}
+                              <div className="flex items-center justify-between px-3 py-2">
+                                <div className="flex items-center gap-3 text-zinc-400">
+                                  <Pencil className="w-4 h-4" />
+                                  <span className="text-sm">
+                                    {tQuests('tasks.dailyCreate', {
+                                      current: questData.tasks.dailyCreate.current ?? 0,
+                                      target: questData.tasks.dailyCreate.target ?? 1,
+                                    })}
+                                  </span>
+                                </div>
+                                {questData.tasks.dailyCreate.completed ? (
+                                  <Check className="w-4 h-4 text-green-400" />
+                                ) : (
+                                  <span className="text-xs text-zinc-500">
+                                    +{questData.tasks.dailyCreate.reward}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Daily Like */}
+                              <div className="flex items-center justify-between px-3 py-2">
+                                <div className="flex items-center gap-3 text-zinc-400">
+                                  <Heart className="w-4 h-4" />
+                                  <span className="text-sm">
+                                    {tQuests('tasks.dailyLike', {
+                                      current: questData.tasks.dailyLike.current ?? 0,
+                                      target: questData.tasks.dailyLike.target ?? 3,
+                                    })}
+                                  </span>
+                                </div>
+                                {questData.tasks.dailyLike.completed ? (
+                                  <Check className="w-4 h-4 text-green-400" />
+                                ) : (
+                                  <span className="text-xs text-zinc-500">
+                                    +{questData.tasks.dailyLike.reward}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Daily Theme */}
+                              <div className="flex items-center justify-between px-3 py-2">
+                                <div className="flex items-center gap-3 text-zinc-400">
+                                  <Palette className="w-4 h-4" />
+                                  <span className="text-sm">
+                                    {tQuests('tasks.dailyTheme')}
+                                  </span>
+                                </div>
+                                {questData.tasks.dailyTheme.completed ? (
+                                  <Check className="w-4 h-4 text-green-400" />
+                                ) : (
+                                  <span className="text-xs text-zinc-500">
+                                    +{questData.tasks.dailyTheme.reward}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Streak - With clickable check-in button */}
+                          {questData.streak && (
+                            <div className="flex items-center justify-between px-3 py-2">
+                              <div className="flex items-center gap-3 text-zinc-400">
+                                <Sparkles className="w-4 h-4 text-purple-400" />
+                                <span className="text-sm">
+                                  {tQuests('streak.days', { count: questData.streak.current })}
+                                </span>
+                              </div>
+                              {questData.streak.todayClaimed ? (
+                                <Check className="w-4 h-4 text-green-400" />
+                              ) : (
+                                <button
+                                  onClick={() => claimStreakMutation.mutate()}
+                                  disabled={claimStreakMutation.isPending}
+                                  className="px-2 py-1 text-xs font-medium bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-50"
+                                >
+                                  {claimStreakMutation.isPending ? '...' : tQuests('streak.claim', { amount: questData.streak.dailyReward })}
+                                </button>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Total Earned */}
+                          <div className="flex items-center justify-between px-3 py-2 mt-1 border-t border-white/5">
+                            <span className="text-xs text-zinc-500">
+                              {tQuests('rewards.earned')}
+                            </span>
+                            <span className="text-sm font-mono text-amber-400">
+                              {questData.totalEarned} T26
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
 
             {/* Divider */}

@@ -75,7 +75,8 @@
     "instructions": {
       "clickAndHold": "點擊並按住繪畫",
       "drawForMinimum": "至少繪畫{seconds}秒才能創建證明",
-      "theme": "主題: {name} • Ctrl+B 切換",
+      "todayTheme": "今日創作主題: {name}",
+      "backgroundHint": "Ctrl+B 切換背景",
       "recording": "錄制中 • 松開暫停",
       "readyToSubmit": "準備提交！",
       "useButtons": "使用上方按鈕提交或重新開始"
@@ -180,6 +181,7 @@
     "reachedEnd": "已經到底了",
     "noResults": "找不到證明。請嘗試調整篩選條件。",
     "todayTheme": "今日主題",
+    "addTheme": "+ 今日主題",
     "viewThemeWorks": "查看主題作品",
     "showingThemeWorks": "顯示主題作品中"
   },
@@ -239,7 +241,7 @@
       "title": "連續繪畫",
       "days": "連續 {count} 天",
       "nextMilestone": "下一個里程碑: 第 {day} 天",
-      "claim": "領取 +{amount}"
+      "claim": "簽到 +{amount}"
     },
     "rewards": {
       "available": "今日已獲得",

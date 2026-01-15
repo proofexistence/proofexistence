@@ -75,7 +75,8 @@
     "instructions": {
       "clickAndHold": "Cliquez et maintenez pour dessiner",
       "drawForMinimum": "Dessinez pendant au moins {seconds}s pour créer une preuve",
-      "theme": "Thème : {name} • Ctrl+B pour changer",
+      "todayTheme": "Thème du Jour : {name}",
+      "backgroundHint": "Ctrl+B pour changer le fond",
       "recording": "Enregistrement • Relâchez pour pause",
       "readyToSubmit": "Prêt à soumettre !",
       "useButtons": "Utilisez les boutons ci-dessus pour soumettre ou recommencer"
@@ -180,6 +181,7 @@
     "reachedEnd": "Vous avez atteint la fin",
     "noResults": "Aucune preuve trouvée. Essayez d'ajuster vos filtres.",
     "todayTheme": "Thème du Jour",
+    "addTheme": "+ Thème du Jour",
     "viewThemeWorks": "Voir les Œuvres du Thème",
     "showingThemeWorks": "Affichage des Œuvres du Thème"
   },
@@ -239,7 +241,7 @@
       "title": "Série de Dessins",
       "days": "Série de {count} jours",
       "nextMilestone": "Prochain jalon: Jour {day}",
-      "claim": "Réclamer +{amount}"
+      "claim": "Pointer +{amount}"
     },
     "rewards": {
       "available": "Gagné Aujourd'hui",

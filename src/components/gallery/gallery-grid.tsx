@@ -14,6 +14,7 @@ interface GalleryGridProps {
     walletAddress?: string | null;
     previewUrl?: string | null;
     hidden?: number;
+    isThemeMarked?: boolean;
   }[];
   isOwner?: boolean;
   onVisibilityChange?: () => void;
@@ -61,6 +62,7 @@ export function GalleryGrid({
           themeSessionId={themeSessionId}
           themeName={themeName}
           onThemeChange={onThemeChange}
+          isThemeMarked={proof.isThemeMarked}
         />
       ))}
     </div>

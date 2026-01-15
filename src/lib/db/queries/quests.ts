@@ -154,6 +154,26 @@ export async function markThemeCompleted(userId: string, sessionId: string) {
   return true;
 }
 
+export async function unmarkTheme(userId: string) {
+  const quest = await getOrCreateUserDailyQuest(userId);
+
+  // Only unmark if there was a theme session
+  if (!quest.themeSessionId) {
+    return false;
+  }
+
+  await db
+    .update(userDailyQuests)
+    .set({
+      themeCompleted: false,
+      themeSessionId: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(userDailyQuests.id, quest.id));
+
+  return true;
+}
+
 // ============================================================================
 // USER STREAK QUERIES
 // ============================================================================

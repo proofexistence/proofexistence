@@ -75,7 +75,8 @@
     "instructions": {
       "clickAndHold": "Haz clic y mantén para dibujar",
       "drawForMinimum": "Dibuja al menos {seconds}s para crear una prueba",
-      "theme": "Tema: {name} • Ctrl+B para cambiar",
+      "todayTheme": "Tema de Hoy: {name}",
+      "backgroundHint": "Ctrl+B para cambiar fondo",
       "recording": "Grabando • Suelta para pausar",
       "readyToSubmit": "¡Listo para enviar!",
       "useButtons": "Usa los botones arriba para enviar o reiniciar"
@@ -180,6 +181,7 @@
     "reachedEnd": "Has llegado al final",
     "noResults": "No se encontraron pruebas. Intenta ajustar tus filtros.",
     "todayTheme": "Tema del Día",
+    "addTheme": "+ Tema de Hoy",
     "viewThemeWorks": "Ver Obras del Tema",
     "showingThemeWorks": "Mostrando Obras del Tema"
   },
@@ -239,7 +241,7 @@
       "title": "Racha de Dibujo",
       "days": "Racha de {count} días",
       "nextMilestone": "Siguiente hito: Día {day}",
-      "claim": "Reclamar +{amount}"
+      "claim": "Registrar +{amount}"
     },
     "rewards": {
       "available": "Ganado Hoy",
