@@ -5,17 +5,19 @@
  *
  * The proof allows users to claim their off-chain balance to their wallet
  * by calling ProofRecorder.claimRewards(cumulativeAmount, proof)
+ *
+ * IMPORTANT: Uses stored Merkle snapshot from when the root was set on-chain,
+ * not current DB balances. This ensures the proof matches the on-chain root.
  */
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/get-user';
 import { db } from '@/db';
-import { users } from '@/db/schema';
-import { gt } from 'drizzle-orm';
+import { rewardsMerkleSnapshots } from '@/db/schema';
+import { eq, desc } from 'drizzle-orm';
 import {
   generateRewardsMerkleTree,
   getRewardProof,
-  getRewardsRoot,
   type UserRewardEntry,
 } from '@/lib/merkle/rewards';
 import { PROOF_RECORDER_ADDRESS } from '@/lib/contracts';
@@ -25,62 +27,6 @@ import { createPolygonProvider } from '@/lib/provider';
 
 export const dynamic = 'force-dynamic';
 
-// Cache the merkle tree for 5 minutes to avoid regenerating on every request
-let cachedTree: {
-  tree: ReturnType<typeof generateRewardsMerkleTree>;
-  entries: Map<string, UserRewardEntry>;
-  root: string;
-  timestamp: number;
-} | null = null;
-
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-async function getOrGenerateMerkleTree() {
-  const now = Date.now();
-
-  // Return cached tree if still valid
-  if (cachedTree && now - cachedTree.timestamp < CACHE_TTL) {
-    return cachedTree;
-  }
-
-  // Fetch all users with positive balance
-  const usersWithBalance = await db
-    .select({
-      walletAddress: users.walletAddress,
-      time26Balance: users.time26Balance,
-    })
-    .from(users)
-    .where(gt(users.time26Balance, '0'));
-
-  if (usersWithBalance.length === 0) {
-    return null;
-  }
-
-  // Create entries for merkle tree
-  const entries: UserRewardEntry[] = usersWithBalance.map((u) => ({
-    walletAddress: u.walletAddress.toLowerCase(), // Normalize to lowercase
-    cumulativeAmount: u.time26Balance,
-  }));
-
-  // Create lookup map
-  const entriesMap = new Map<string, UserRewardEntry>();
-  entries.forEach((e) => entriesMap.set(e.walletAddress.toLowerCase(), e));
-
-  // Generate tree
-  const tree = generateRewardsMerkleTree(entries);
-  const root = getRewardsRoot(tree);
-
-  // Cache it
-  cachedTree = {
-    tree,
-    entries: entriesMap,
-    root,
-    timestamp: now,
-  };
-
-  return cachedTree;
-}
-
 export async function GET() {
   try {
     const user = await getCurrentUser();
@@ -88,32 +34,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get the merkle tree
-    const treeData = await getOrGenerateMerkleTree();
-    if (!treeData) {
-      return NextResponse.json({
-        claimable: false,
-        reason: 'No users with rewards',
-        balance: '0',
-      });
-    }
-
-    // Find user's entry
-    const userAddress = user.walletAddress.toLowerCase();
-    const userEntry = treeData.entries.get(userAddress);
-
-    if (!userEntry) {
-      return NextResponse.json({
-        claimable: false,
-        reason: 'No balance to claim',
-        balance: '0',
-      });
-    }
-
-    // Get proof
-    const proof = getRewardProof(treeData.tree, userEntry);
-
-    // Check on-chain claimed amount
+    // 1. Fetch on-chain data first
     let alreadyClaimed = '0';
     let onChainRoot = '0x' + '0'.repeat(64);
     try {
@@ -131,20 +52,66 @@ export async function GET() {
       onChainRoot = await proofRecorder.rewardsMerkleRoot();
     } catch (err) {
       console.warn('[ClaimProof] Error fetching on-chain data:', err);
+      return NextResponse.json({
+        claimable: false,
+        reason: 'Failed to fetch on-chain data',
+        claimableFormatted: '0',
+      });
     }
 
-    // Calculate claimable
+    // 2. Find the snapshot matching the on-chain root
+    const snapshot = await db
+      .select()
+      .from(rewardsMerkleSnapshots)
+      .where(eq(rewardsMerkleSnapshots.merkleRoot, onChainRoot))
+      .limit(1);
+
+    if (snapshot.length === 0) {
+      // No matching snapshot - might be first time or root was set externally
+      // Try to find the latest snapshot as fallback info
+      const latestSnapshot = await db
+        .select()
+        .from(rewardsMerkleSnapshots)
+        .orderBy(desc(rewardsMerkleSnapshots.createdAt))
+        .limit(1);
+
+      return NextResponse.json({
+        claimable: false,
+        reason: 'No matching merkle snapshot found. Rewards sync pending.',
+        onChainRoot,
+        latestSnapshotRoot: latestSnapshot[0]?.merkleRoot || null,
+        claimableFormatted: '0',
+      });
+    }
+
+    // 3. Find user's entry in the snapshot
+    const userAddress = user.walletAddress.toLowerCase();
+    const entries = snapshot[0].entries as UserRewardEntry[];
+    const userEntry = entries.find(
+      (e) => e.walletAddress.toLowerCase() === userAddress
+    );
+
+    if (!userEntry) {
+      return NextResponse.json({
+        claimable: false,
+        reason: 'No balance in current merkle tree',
+        claimableFormatted: '0',
+        onChainRoot,
+      });
+    }
+
+    // 4. Regenerate tree from snapshot entries to get proof
+    const tree = generateRewardsMerkleTree(entries);
+    const proof = getRewardProof(tree, userEntry);
+
+    // 5. Calculate claimable amount
     const cumulativeAmount = BigInt(userEntry.cumulativeAmount);
     const claimed = BigInt(alreadyClaimed);
     const claimableAmount =
       cumulativeAmount > claimed ? cumulativeAmount - claimed : BigInt(0);
 
-    // Check if merkle root matches on-chain
-    const rootMatches =
-      treeData.root.toLowerCase() === onChainRoot.toLowerCase();
-
     return NextResponse.json({
-      claimable: claimableAmount > 0 && rootMatches,
+      claimable: claimableAmount > 0,
       cumulativeAmount: userEntry.cumulativeAmount,
       cumulativeFormatted: formatTime26(userEntry.cumulativeAmount),
       alreadyClaimed,
@@ -152,9 +119,9 @@ export async function GET() {
       claimableAmount: claimableAmount.toString(),
       claimableFormatted: formatTime26(claimableAmount.toString()),
       proof,
-      merkleRoot: treeData.root,
+      merkleRoot: onChainRoot,
       onChainRoot,
-      rootMatches,
+      rootMatches: true, // Always true now since we use the on-chain root's snapshot
       contractAddress: PROOF_RECORDER_ADDRESS,
       // Data needed to call claimRewards(cumulativeAmount, proof)
       claimData: {

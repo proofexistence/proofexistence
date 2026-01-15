@@ -196,6 +196,23 @@ export const dailySnapshots = pgTable('daily_snapshots', {
 });
 
 // ============================================================================
+// REWARDS MERKLE SNAPSHOTS TABLE
+// Stores Merkle tree data when rewards root is updated on-chain
+// This allows claim-proof API to use the exact data that matches on-chain root
+// ============================================================================
+export const rewardsMerkleSnapshots = pgTable('rewards_merkle_snapshots', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  merkleRoot: varchar('merkle_root', { length: 66 }).notNull().unique(),
+  // Store entries as JSON: [{walletAddress, cumulativeAmount}, ...]
+  entries: jsonb('entries').notNull().$type<
+    Array<{ walletAddress: string; cumulativeAmount: string }>
+  >(),
+  userCount: integer('user_count').notNull(),
+  txHash: varchar('tx_hash', { length: 66 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// ============================================================================
 // DAILY REWARDS TABLE
 // Stores TIME26 reward settlement records per day
 // ============================================================================
@@ -532,6 +549,10 @@ export type UserBadge = typeof userBadges.$inferSelect;
 
 export type DailySnapshot = typeof dailySnapshots.$inferSelect;
 export type NewDailySnapshot = typeof dailySnapshots.$inferInsert;
+
+export type RewardsMerkleSnapshot = typeof rewardsMerkleSnapshots.$inferSelect;
+export type NewRewardsMerkleSnapshot =
+  typeof rewardsMerkleSnapshots.$inferInsert;
 
 export type DailyReward = typeof dailyRewards.$inferSelect;
 export type NewDailyReward = typeof dailyRewards.$inferInsert;

@@ -19,6 +19,7 @@ import {
   userDailyRewards,
   time26Transactions,
   questRewards,
+  rewardsMerkleSnapshots,
 } from '@/db/schema';
 import { eq, and, gte, lte, gt, inArray, sql } from 'drizzle-orm';
 import { generateMerkleTree } from '@/lib/merkle';
@@ -546,6 +547,25 @@ async function runBurnAndMerkle(): Promise<{
       gasLimit: 100000,
     });
     await waitForTransaction(provider, tx.hash, 1, 60000);
+
+    // Save the merkle snapshot so claim-proof API can use it
+    await db
+      .insert(rewardsMerkleSnapshots)
+      .values({
+        merkleRoot: root,
+        entries: entries,
+        userCount: entries.length,
+        txHash: tx.hash,
+      })
+      .onConflictDoUpdate({
+        target: rewardsMerkleSnapshots.merkleRoot,
+        set: {
+          entries: entries,
+          userCount: entries.length,
+          txHash: tx.hash,
+          createdAt: new Date(),
+        },
+      });
 
     // console.log(`[Daily Cron] Updated rewards merkle root: ${root}, tx: ${tx.hash}`);
 
