@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Pencil, Clock, Sparkles, ArrowRight, X } from 'lucide-react';
 
-const STORAGE_KEY = 'poe-canvas-onboarded';
-
 interface CanvasOnboardingModalProps {
   onComplete?: () => void;
 }
@@ -18,18 +16,13 @@ export function CanvasOnboardingModal({
   const t = useTranslations('onboarding');
 
   useEffect(() => {
-    // Check if user has seen onboarding before
-    const onboarded = localStorage.getItem(STORAGE_KEY);
-    if (!onboarded) {
-      // Small delay for smoother transition
-      const timer = setTimeout(() => setShow(true), 500);
-      return () => clearTimeout(timer);
-    }
+    // Always show onboarding - some users skip without reading
+    const timer = setTimeout(() => setShow(true), 500);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
     setShow(false);
-    localStorage.setItem(STORAGE_KEY, 'true');
     onComplete?.();
   };
 
