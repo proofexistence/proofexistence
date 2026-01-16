@@ -99,7 +99,7 @@ export function DrawToProofHint() {
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <span className="text-sm font-medium text-white tracking-wide">
+            <span className="text-sm font-medium text-white tracking-wide whitespace-nowrap">
               Start Here
             </span>
           </motion.div>
