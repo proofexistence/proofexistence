@@ -7,6 +7,7 @@
     "whitepaper": "Whitepaper",
     "explore": "Explore",
     "cosmos": "Cosmos",
+    "badges": "Badges",
     "learn": "Learn",
     "gettingStarted": "Getting Started",
     "tutorials": "Tutorials",
@@ -22,7 +23,13 @@
     "logOut": "Log Out",
     "balances": "Balances",
     "pendingRewards": "Pending Rewards",
-    "referral": "Referral"
+    "referral": "Referral",
+    "admin": "Admin",
+    "rewardsStatus": "Rewards Status",
+    "questThemes": "Quest Themes",
+    "questRewards": "Quest Rewards",
+    "questStats": "Quest Stats",
+    "badgeManagement": "Badge Management"
   },
   "footer": {
     "title": "Proof of Existence",
@@ -408,5 +415,81 @@
     "participants": "{count} participants",
     "rewardBonus": "{multiplier}x rewards",
     "endsIn": "Ends in {days} days"
+  },
+  "onboarding": {
+    "title": "Welcome to the Canvas",
+    "subtitle": "Three steps to leave your eternal mark",
+    "step1": {
+      "title": "Draw your light trail",
+      "description": "Hold mouse or touch screen to draw, release to pause"
+    },
+    "step2": {
+      "title": "Draw for at least 10 seconds",
+      "description": "Click 'Done' button when finished"
+    },
+    "step3": {
+      "title": "Choose your proof type",
+      "description": "Free standard proof or paid instant mint"
+    },
+    "freeNote": "Standard proof is completely free, no payment required",
+    "startButton": "Start Creating"
+  },
+  "badges": {
+    "early-adopter-top-100": {
+      "name": "Early Adopter",
+      "description": "One of the first 100 pioneers to join Proof of Existence"
+    },
+    "marathon-artist": {
+      "name": "Marathon Artist",
+      "description": "Longest single creation session"
+    },
+    "prolific-creator": {
+      "name": "Prolific Creator",
+      "description": "Most active user with highest creation count"
+    },
+    "streak-master": {
+      "name": "Streak Master",
+      "description": "Longest consecutive creation streak"
+    },
+    "most-liked": {
+      "name": "Most Liked",
+      "description": "Most community likes received"
+    },
+    "collection-star": {
+      "name": "Collection Star",
+      "description": "Most bookmarked artwork"
+    },
+    "generous-giver": {
+      "name": "Generous Giver",
+      "description": "Most TIME26 tokens donated"
+    },
+    "reward-collector": {
+      "name": "Reward Collector",
+      "description": "Most TIME26 rewards accumulated"
+    },
+    "referral-ambassador": {
+      "name": "Referral Ambassador",
+      "description": "Successfully referred the most new users"
+    },
+    "distance-explorer": {
+      "name": "Distance Explorer",
+      "description": "Longest light trail distance drawn"
+    },
+    "speed-demon": {
+      "name": "Speed Demon",
+      "description": "Fastest drawing speed creator"
+    }
+  },
+  "badgesPage": {
+    "title": "Achievement Badges",
+    "description": "Discover all achievement badges available in Proof of Existence. Unlock these unique honors by participating in the community, creating light trails, and reaching milestones.",
+    "howToEarn": {
+      "title": "How to Earn Badges",
+      "description": "Badges recognize your contributions and achievements in the Proof of Existence community. Each badge represents a unique accomplishment:",
+      "tip1": "Early Adopter badge is automatically awarded to the first 100 registered users",
+      "tip2": "Creation badges are earned through your drawing activity, duration, and consistency",
+      "tip3": "Community badges come from likes and saves on your work by other users",
+      "tip4": "TIME26 badges are earned through token donations and collections"
+    }
   }
 }

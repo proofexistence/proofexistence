@@ -7,6 +7,7 @@
     "whitepaper": "白皮書",
     "explore": "探索",
     "cosmos": "宇宙",
+    "badges": "徽章",
     "learn": "學習",
     "gettingStarted": "入門指南",
     "tutorials": "教學",
@@ -22,7 +23,13 @@
     "logOut": "登出",
     "balances": "餘額",
     "pendingRewards": "待領獎勵",
-    "referral": "推薦"
+    "referral": "推薦",
+    "admin": "管理員",
+    "rewardsStatus": "獎勵狀態",
+    "questThemes": "任務主題",
+    "questRewards": "任務獎勵",
+    "questStats": "任務統計",
+    "badgeManagement": "徽章管理"
   },
   "footer": {
     "title": "存在證明",
@@ -408,5 +415,81 @@
     "participants": "{count} 人參與",
     "rewardBonus": "{multiplier}x 獎勵加成",
     "endsIn": "剩餘 {days} 天"
+  },
+  "onboarding": {
+    "title": "歡迎來到畫布",
+    "subtitle": "三個步驟，留下永恆印記",
+    "step1": {
+      "title": "繪畫你的光跡",
+      "description": "按住滑鼠或觸控螢幕開始創作，放開暫停"
+    },
+    "step2": {
+      "title": "至少繪畫 10 秒",
+      "description": "完成後點擊「完成」按鈕提交"
+    },
+    "step3": {
+      "title": "選擇證明方式",
+      "description": "免費標準證明或付費即時鑄造"
+    },
+    "freeNote": "標準證明完全免費，無需支付任何費用",
+    "startButton": "開始創作"
+  },
+  "badges": {
+    "early-adopter-top-100": {
+      "name": "早期採用者",
+      "description": "前 100 位加入 Proof of Existence 的先驅者"
+    },
+    "marathon-artist": {
+      "name": "馬拉松繪畫者",
+      "description": "單次創作時間最長的藝術家"
+    },
+    "prolific-creator": {
+      "name": "創作狂人",
+      "description": "創作數量最多的活躍用戶"
+    },
+    "streak-master": {
+      "name": "連續創作大師",
+      "description": "保持最長連續創作紀錄"
+    },
+    "most-liked": {
+      "name": "最受歡迎",
+      "description": "獲得最多社群按讚的作品"
+    },
+    "collection-star": {
+      "name": "收藏之星",
+      "description": "作品被收藏次數最多"
+    },
+    "generous-giver": {
+      "name": "慷慨贈與者",
+      "description": "贈送最多 TIME26 代幣"
+    },
+    "reward-collector": {
+      "name": "獎勵收集者",
+      "description": "累積獲得最多 TIME26 獎勵"
+    },
+    "referral-ambassador": {
+      "name": "推薦大使",
+      "description": "成功推薦最多新用戶"
+    },
+    "distance-explorer": {
+      "name": "探索者",
+      "description": "光軌繪製距離最遠"
+    },
+    "speed-demon": {
+      "name": "速度惡魔",
+      "description": "繪畫速度最快的創作者"
+    }
+  },
+  "badgesPage": {
+    "title": "成就徽章",
+    "description": "探索 Proof of Existence 中所有可獲得的成就徽章。透過參與社群、創作光軌和達成里程碑來解鎖這些獨特的榮譽。",
+    "howToEarn": {
+      "title": "如何獲得徽章",
+      "description": "徽章是對您在 Proof of Existence 社群中貢獻和成就的認可。每個徽章都代表著一項獨特的成就:",
+      "tip1": "早期採用者徽章會自動授予前 100 位註冊用戶",
+      "tip2": "創作相關徽章透過您的繪畫活動、時長和連續性獲得",
+      "tip3": "社群徽章來自其他用戶對您作品的按讚和收藏",
+      "tip4": "TIME26 徽章透過代幣的贈送和領取獲得"
+    }
   }
 }

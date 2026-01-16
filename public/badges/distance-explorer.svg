@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="explorerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#14B8A6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0D9488;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Compass rose outer ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#explorerGrad)" stroke-width="3" stroke-dasharray="10 5"/>
+
+  <!-- Compass directions -->
+  <polygon points="100,20 105,35 100,40 95,35" fill="url(#explorerGrad)"/>
+  <text x="100" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="url(#explorerGrad)" text-anchor="middle">N</text>
+
+  <polygon points="180,100 165,105 160,100 165,95" fill="url(#explorerGrad)" opacity="0.7"/>
+  <text x="188" y="105" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="url(#explorerGrad)" text-anchor="middle">E</text>
+
+  <polygon points="100,180 105,165 100,160 95,165" fill="url(#explorerGrad)" opacity="0.7"/>
+  <text x="100" y="195" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="url(#explorerGrad)" text-anchor="middle">S</text>
+
+  <polygon points="20,100 35,105 40,100 35,95" fill="url(#explorerGrad)" opacity="0.7"/>
+  <text x="12" y="105" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="url(#explorerGrad)" text-anchor="middle">W</text>
+
+  <!-- Main badge circle -->
+  <circle cx="100" cy="100" r="75" fill="url(#explorerGrad)"/>
+  <circle cx="100" cy="100" r="70" fill="#FFF" opacity="0.9"/>
+
+  <!-- Compass needle -->
+  <g transform="rotate(-25 100 100)">
+    <path d="M100,60 L110,100 L100,105 L90,100 Z" fill="#EF4444"/>
+    <path d="M100,140 L110,100 L100,95 L90,100 Z" fill="url(#explorerGrad)"/>
+  </g>
+
+  <!-- Center pivot -->
+  <circle cx="100" cy="100" r="8" fill="url(#explorerGrad)"/>
+  <circle cx="100" cy="100" r="4" fill="#FFF"/>
+
+  <!-- Trail path decoration -->
+  <path d="M60,120 Q70,130 80,125 T100,130 T120,125 T135,130"
+        stroke="url(#explorerGrad)" stroke-width="2" fill="none"
+        stroke-dasharray="5 3" opacity="0.5"/>
+
+  <!-- Distance markers -->
+  <circle cx="60" cy="120" r="3" fill="url(#explorerGrad)" opacity="0.6"/>
+  <circle cx="80" cy="125" r="3" fill="url(#explorerGrad)" opacity="0.6"/>
+  <circle cx="100" cy="130" r="3" fill="url(#explorerGrad)" opacity="0.6"/>
+  <circle cx="120" cy="125" r="3" fill="url(#explorerGrad)" opacity="0.6"/>
+  <circle cx="135" cy="130" r="3" fill="url(#explorerGrad)" opacity="0.6"/>
+</svg>

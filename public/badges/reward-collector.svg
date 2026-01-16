@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="rewardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer decorative ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#rewardGrad)" stroke-width="3" stroke-dasharray="10 5"/>
+
+  <!-- Main badge circle -->
+  <circle cx="100" cy="100" r="75" fill="url(#rewardGrad)"/>
+  <circle cx="100" cy="100" r="70" fill="#FFF" opacity="0.9"/>
+
+  <!-- Treasure chest -->
+  <rect x="60" y="90" width="80" height="50" rx="3" fill="url(#rewardGrad)"/>
+  <rect x="65" y="95" width="70" height="40" rx="2" fill="#8B4513"/>
+
+  <!-- Chest lock -->
+  <circle cx="100" cy="115" r="8" fill="#FCD34D"/>
+  <rect x="98" y="115" width="4" height="10" fill="#FCD34D"/>
+
+  <!-- Coins overflowing -->
+  <circle cx="75" cy="75" r="8" fill="#FCD34D" stroke="url(#rewardGrad)" stroke-width="2"/>
+  <circle cx="90" cy="70" r="7" fill="#FCD34D" stroke="url(#rewardGrad)" stroke-width="2"/>
+  <circle cx="110" cy="70" r="7" fill="#FCD34D" stroke="url(#rewardGrad)" stroke-width="2"/>
+  <circle cx="125" cy="75" r="8" fill="#FCD34D" stroke="url(#rewardGrad)" stroke-width="2"/>
+
+  <!-- Sparkle effects -->
+  <path d="M65,60 L67,65 L72,67 L67,69 L65,74 L63,69 L58,67 L63,65 Z" fill="#FCD34D"/>
+  <path d="M135,60 L137,65 L142,67 L137,69 L135,74 L133,69 L128,67 L133,65 Z" fill="#FCD34D"/>
+
+  <!-- Money bag symbol -->
+  <text x="100" y="160" font-family="Arial, sans-serif" font-size="24" fill="url(#rewardGrad)" text-anchor="middle">💰</text>
+</svg>

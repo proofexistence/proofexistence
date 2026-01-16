@@ -13,6 +13,7 @@ export interface Profile {
   avatarUrl: string | null;
   referralCode: string | null;
   time26Balance: string | null;
+  isAdmin: boolean;
 }
 
 // Helper to truncate wallet address for display

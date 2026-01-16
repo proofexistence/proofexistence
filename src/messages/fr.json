@@ -7,6 +7,7 @@
     "whitepaper": "Livre Blanc",
     "explore": "Explorer",
     "cosmos": "Cosmos",
+    "badges": "Badges",
     "learn": "Apprendre",
     "gettingStarted": "Premiers Pas",
     "tutorials": "Tutoriels",
@@ -22,7 +23,13 @@
     "logOut": "Déconnexion",
     "balances": "Soldes",
     "pendingRewards": "Récompenses en Attente",
-    "referral": "Parrainage"
+    "referral": "Parrainage",
+    "admin": "Administrateur",
+    "rewardsStatus": "État des Récompenses",
+    "questThemes": "Thèmes de Quêtes",
+    "questRewards": "Récompenses de Quêtes",
+    "questStats": "Statistiques de Quêtes",
+    "badgeManagement": "Gestion des Badges"
   },
   "footer": {
     "title": "Preuve d'Existence",
@@ -408,5 +415,81 @@
     "participants": "{count} participants",
     "rewardBonus": "Récompenses {multiplier}x",
     "endsIn": "Se termine dans {days} jours"
+  },
+  "onboarding": {
+    "title": "Bienvenue sur le Canvas",
+    "subtitle": "Trois étapes pour laisser votre marque éternelle",
+    "step1": {
+      "title": "Dessinez votre traînée de lumière",
+      "description": "Maintenez la souris ou l'écran pour dessiner, relâchez pour pause"
+    },
+    "step2": {
+      "title": "Dessinez au moins 10 secondes",
+      "description": "Cliquez sur 'Terminé' quand vous avez fini"
+    },
+    "step3": {
+      "title": "Choisissez votre type de preuve",
+      "description": "Preuve standard gratuite ou frappe instantanée payante"
+    },
+    "freeNote": "La preuve standard est entièrement gratuite, aucun paiement requis",
+    "startButton": "Commencer à Créer"
+  },
+  "badges": {
+    "early-adopter-top-100": {
+      "name": "Adopteur Précoce",
+      "description": "L'un des 100 premiers pionniers à rejoindre Proof of Existence"
+    },
+    "marathon-artist": {
+      "name": "Artiste Marathon",
+      "description": "Session de création individuelle la plus longue"
+    },
+    "prolific-creator": {
+      "name": "Créateur Prolifique",
+      "description": "Utilisateur le plus actif avec le plus grand nombre de créations"
+    },
+    "streak-master": {
+      "name": "Maître des Séries",
+      "description": "Plus longue série de créations consécutives"
+    },
+    "most-liked": {
+      "name": "Le Plus Aimé",
+      "description": "Le plus de likes de la communauté reçus"
+    },
+    "collection-star": {
+      "name": "Étoile de Collection",
+      "description": "Œuvre d'art la plus mise en favoris"
+    },
+    "generous-giver": {
+      "name": "Donateur Généreux",
+      "description": "Le plus de jetons TIME26 donnés"
+    },
+    "reward-collector": {
+      "name": "Collectionneur de Récompenses",
+      "description": "Le plus de récompenses TIME26 accumulées"
+    },
+    "referral-ambassador": {
+      "name": "Ambassadeur de Parrainage",
+      "description": "Le plus grand nombre de nouveaux utilisateurs parrainés avec succès"
+    },
+    "distance-explorer": {
+      "name": "Explorateur de Distance",
+      "description": "La plus longue distance de traînée lumineuse dessinée"
+    },
+    "speed-demon": {
+      "name": "Démon de Vitesse",
+      "description": "Créateur avec la vitesse de dessin la plus rapide"
+    }
+  },
+  "badgesPage": {
+    "title": "Badges de Réussite",
+    "description": "Découvrez tous les badges de réussite disponibles dans Proof of Existence. Débloquez ces honneurs uniques en participant à la communauté, en créant des traînées lumineuses et en atteignant des jalons.",
+    "howToEarn": {
+      "title": "Comment Gagner des Badges",
+      "description": "Les badges reconnaissent vos contributions et réalisations dans la communauté Proof of Existence. Chaque badge représente une réalisation unique:",
+      "tip1": "Le badge Adopteur Précoce est automatiquement attribué aux 100 premiers utilisateurs enregistrés",
+      "tip2": "Les badges de création sont gagnés grâce à votre activité de dessin, sa durée et sa constance",
+      "tip3": "Les badges communautaires proviennent des likes et sauvegardes de votre travail par d'autres utilisateurs",
+      "tip4": "Les badges TIME26 sont gagnés grâce aux dons et collections de jetons"
+    }
   }
 }

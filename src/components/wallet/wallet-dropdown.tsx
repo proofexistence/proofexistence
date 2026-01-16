@@ -5,7 +5,20 @@ import { useProfile } from '@/hooks/use-profile';
 import { useState, useEffect, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
-import { Settings, LogOut, User, Key, Share2, Copy, Check } from 'lucide-react';
+import {
+  Settings,
+  LogOut,
+  User,
+  Key,
+  Share2,
+  Copy,
+  Check,
+  ShieldCheck,
+  BarChart3,
+  Crown,
+  Gift,
+  Award,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { WalletHeader } from './wallet-header';
 import { WalletBalances } from './wallet-balances';
@@ -182,6 +195,60 @@ export function WalletDropdown() {
                       <Settings className="w-4 h-4" />
                       {t('settings')}
                     </Link>
+
+                    {/* Admin Section */}
+                    {profile?.isAdmin && (
+                      <>
+                        <div className="border-t border-white/10 my-1" />
+                        <div className="px-4 py-2">
+                          <div className="flex items-center gap-2 text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <span>{t('admin')}</span>
+                          </div>
+                        </div>
+                        <Link
+                          href="/admin/rewards"
+                          onClick={() => setIsOpen(false)}
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
+                        >
+                          <BarChart3 className="w-4 h-4" />
+                          {t('rewardsStatus')}
+                        </Link>
+                        <Link
+                          href="/admin/quests/themes"
+                          onClick={() => setIsOpen(false)}
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
+                        >
+                          <Crown className="w-4 h-4" />
+                          {t('questThemes')}
+                        </Link>
+                        <Link
+                          href="/admin/quests/rewards"
+                          onClick={() => setIsOpen(false)}
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
+                        >
+                          <Gift className="w-4 h-4" />
+                          {t('questRewards')}
+                        </Link>
+                        <Link
+                          href="/admin/quests/stats"
+                          onClick={() => setIsOpen(false)}
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
+                        >
+                          <BarChart3 className="w-4 h-4" />
+                          {t('questStats')}
+                        </Link>
+                        <Link
+                          href="/admin/badges"
+                          onClick={() => setIsOpen(false)}
+                          className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
+                        >
+                          <Award className="w-4 h-4" />
+                          {t('badgeManagement')}
+                        </Link>
+                        <div className="border-t border-white/10 my-1" />
+                      </>
+                    )}
 
                     <button
                       onClick={() => logout()}

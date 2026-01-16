@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="referralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891B2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer decorative ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#referralGrad)" stroke-width="3" stroke-dasharray="10 5"/>
+
+  <!-- Network connection lines -->
+  <line x1="100" y1="100" x2="60" y2="60" stroke="url(#referralGrad)" stroke-width="2" opacity="0.5"/>
+  <line x1="100" y1="100" x2="140" y2="60" stroke="url(#referralGrad)" stroke-width="2" opacity="0.5"/>
+  <line x1="100" y1="100" x2="60" y2="140" stroke="url(#referralGrad)" stroke-width="2" opacity="0.5"/>
+  <line x1="100" y1="100" x2="140" y2="140" stroke="url(#referralGrad)" stroke-width="2" opacity="0.5"/>
+
+  <!-- Outer nodes -->
+  <circle cx="60" cy="60" r="15" fill="url(#referralGrad)" opacity="0.7"/>
+  <circle cx="140" cy="60" r="15" fill="url(#referralGrad)" opacity="0.7"/>
+  <circle cx="60" cy="140" r="15" fill="url(#referralGrad)" opacity="0.7"/>
+  <circle cx="140" cy="140" r="15" fill="url(#referralGrad)" opacity="0.7"/>
+
+  <!-- Main badge circle -->
+  <circle cx="100" cy="100" r="75" fill="url(#referralGrad)"/>
+  <circle cx="100" cy="100" r="70" fill="#FFF" opacity="0.9"/>
+
+  <!-- Group of people icon -->
+  <!-- Person 1 (center) -->
+  <circle cx="100" cy="85" r="12" fill="url(#referralGrad)"/>
+  <path d="M80,115 Q80,100 100,100 Q120,100 120,115 L120,125 L80,125 Z" fill="url(#referralGrad)"/>
+
+  <!-- Person 2 (left) -->
+  <circle cx="75" cy="95" r="10" fill="url(#referralGrad)" opacity="0.7"/>
+  <path d="M60,120 Q60,108 75,108 Q90,108 90,120 L90,128 L60,128 Z" fill="url(#referralGrad)" opacity="0.7"/>
+
+  <!-- Person 3 (right) -->
+  <circle cx="125" cy="95" r="10" fill="url(#referralGrad)" opacity="0.7"/>
+  <path d="M110,120 Q110,108 125,108 Q140,108 140,120 L140,128 L110,128 Z" fill="url(#referralGrad)" opacity="0.7"/>
+</svg>

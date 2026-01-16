@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { isLaunchTime } from '@/lib/launch-config';
 import { useWeb3Auth } from '@/lib/web3auth';
+import { CanvasOnboardingModal } from '@/components/canvas/canvas-onboarding-modal';
 
 const POECanvas = dynamic(
   () => import('@/components/canvas/poe-canvas').then((mod) => mod.POECanvas),
@@ -53,6 +54,8 @@ export default function CanvasPage() {
   return (
     <>
       <POECanvas />
+      {/* Onboarding modal for first-time users */}
+      {isConnected && <CanvasOnboardingModal />}
       {/* Overlay with back button when not connected */}
       {!isConnected && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">

@@ -10,6 +10,7 @@ import {
   Sparkles,
   MessageCircle,
   FileText,
+  Award,
 } from 'lucide-react';
 
 export function LearnDropdown() {
@@ -77,6 +78,15 @@ export function LearnDropdown() {
 
             {/* Divider */}
             <div className="my-2 border-t border-white/10" />
+
+            {/* Badges Link */}
+            <Link
+              href="/badges"
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <Award className="w-4 h-4" />
+              {t('badges')}
+            </Link>
 
             {/* Whitepaper Link */}
             <Link

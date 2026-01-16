@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="generousGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer decorative circle with giving hands pattern -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#generousGrad)" stroke-width="3" stroke-dasharray="5 3"/>
+
+  <!-- Radiating lines (generosity spreading) -->
+  <line x1="100" y1="30" x2="100" y2="15" stroke="url(#generousGrad)" stroke-width="3"/>
+  <line x1="145" y1="45" x2="155" y2="35" stroke="url(#generousGrad)" stroke-width="3"/>
+  <line x1="170" y1="100" x2="185" y2="100" stroke="url(#generousGrad)" stroke-width="3"/>
+  <line x1="145" y1="155" x2="155" y2="165" stroke="url(#generousGrad)" stroke-width="3"/>
+  <line x1="100" y1="170" x2="100" y2="185" stroke="url(#generousGrad)" stroke-width="3"/>
+  <line x1="55" y1="155" x2="45" y2="165" stroke="url(#generousGrad)" stroke-width="3"/>
+  <line x1="30" y1="100" x2="15" y2="100" stroke="url(#generousGrad)" stroke-width="3"/>
+  <line x1="55" y1="45" x2="45" y2="35" stroke="url(#generousGrad)" stroke-width="3"/>
+
+  <!-- Main badge circle -->
+  <circle cx="100" cy="100" r="75" fill="url(#generousGrad)"/>
+  <circle cx="100" cy="100" r="70" fill="#FFF" opacity="0.9"/>
+
+  <!-- Giving hand with coins -->
+  <path d="M70,100 L70,90 Q70,85 75,85 L85,85 L85,75 Q85,70 90,70 L95,70 L95,65 Q95,60 100,60 L105,60 Q110,60 110,65 L110,70 L115,70 Q120,70 120,75 L120,100 Q120,105 115,105 L75,105 Q70,105 70,100 Z"
+        fill="url(#generousGrad)"/>
+
+  <!-- Coins/Tokens -->
+  <circle cx="110" cy="110" r="12" fill="#FCD34D" stroke="url(#generousGrad)" stroke-width="2"/>
+  <text x="110" y="115" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="url(#generousGrad)" text-anchor="middle">T</text>
+
+  <circle cx="95" cy="125" r="10" fill="#FCD34D" stroke="url(#generousGrad)" stroke-width="2"/>
+  <text x="95" y="129" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="url(#generousGrad)" text-anchor="middle">T</text>
+
+  <circle cx="125" cy="125" r="10" fill="#FCD34D" stroke="url(#generousGrad)" stroke-width="2"/>
+  <text x="125" y="129" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="url(#generousGrad)" text-anchor="middle">T</text>
+
+  <!-- Heart symbol -->
+  <path d="M80,140 Q75,135 75,130 Q75,125 80,125 Q83,125 85,128 Q87,125 90,125 Q95,125 95,130 Q95,135 90,140 L85,145 Z"
+        fill="#EC4899" opacity="0.7"/>
+</svg>

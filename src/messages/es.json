@@ -7,6 +7,7 @@
     "whitepaper": "Whitepaper",
     "explore": "Explorar",
     "cosmos": "Cosmos",
+    "badges": "Insignias",
     "learn": "Aprender",
     "gettingStarted": "Primeros Pasos",
     "tutorials": "Tutoriales",
@@ -22,7 +23,13 @@
     "logOut": "Cerrar Sesión",
     "balances": "Saldos",
     "pendingRewards": "Recompensas Pendientes",
-    "referral": "Referido"
+    "referral": "Referido",
+    "admin": "Administrador",
+    "rewardsStatus": "Estado de Recompensas",
+    "questThemes": "Temas de Misiones",
+    "questRewards": "Recompensas de Misiones",
+    "questStats": "Estadísticas de Misiones",
+    "badgeManagement": "Gestión de Insignias"
   },
   "footer": {
     "title": "Prueba de Existencia",
@@ -408,5 +415,81 @@
     "participants": "{count} participantes",
     "rewardBonus": "Recompensas {multiplier}x",
     "endsIn": "Termina en {days} días"
+  },
+  "onboarding": {
+    "title": "Bienvenido al Lienzo",
+    "subtitle": "Tres pasos para dejar tu marca eterna",
+    "step1": {
+      "title": "Dibuja tu rastro de luz",
+      "description": "Mantén presionado el ratón o la pantalla para dibujar, suelta para pausar"
+    },
+    "step2": {
+      "title": "Dibuja al menos 10 segundos",
+      "description": "Haz clic en 'Listo' cuando termines"
+    },
+    "step3": {
+      "title": "Elige tu tipo de prueba",
+      "description": "Prueba estándar gratis o acuñación instantánea de pago"
+    },
+    "freeNote": "La prueba estándar es completamente gratis, sin pago requerido",
+    "startButton": "Empezar a Crear"
+  },
+  "badges": {
+    "early-adopter-top-100": {
+      "name": "Adoptador Temprano",
+      "description": "Uno de los primeros 100 pioneros en unirse a Proof of Existence"
+    },
+    "marathon-artist": {
+      "name": "Artista Maratonista",
+      "description": "Sesión de creación individual más larga"
+    },
+    "prolific-creator": {
+      "name": "Creador Prolífico",
+      "description": "Usuario más activo con mayor cantidad de creaciones"
+    },
+    "streak-master": {
+      "name": "Maestro de Racha",
+      "description": "Racha de creación consecutiva más larga"
+    },
+    "most-liked": {
+      "name": "Más Popular",
+      "description": "Mayor cantidad de me gusta de la comunidad recibidos"
+    },
+    "collection-star": {
+      "name": "Estrella de Colección",
+      "description": "Obra de arte más guardada en favoritos"
+    },
+    "generous-giver": {
+      "name": "Donante Generoso",
+      "description": "Mayor cantidad de tokens TIME26 donados"
+    },
+    "reward-collector": {
+      "name": "Coleccionista de Recompensas",
+      "description": "Mayor cantidad de recompensas TIME26 acumuladas"
+    },
+    "referral-ambassador": {
+      "name": "Embajador de Referencias",
+      "description": "Mayor cantidad de nuevos usuarios referidos exitosamente"
+    },
+    "distance-explorer": {
+      "name": "Explorador de Distancia",
+      "description": "Distancia de rastro de luz más larga dibujada"
+    },
+    "speed-demon": {
+      "name": "Demonio de Velocidad",
+      "description": "Creador con velocidad de dibujo más rápida"
+    }
+  },
+  "badgesPage": {
+    "title": "Insignias de Logros",
+    "description": "Descubre todas las insignias de logros disponibles en Proof of Existence. Desbloquea estos honores únicos participando en la comunidad, creando rastros de luz y alcanzando hitos.",
+    "howToEarn": {
+      "title": "Cómo Ganar Insignias",
+      "description": "Las insignias reconocen tus contribuciones y logros en la comunidad de Proof of Existence. Cada insignia representa un logro único:",
+      "tip1": "La insignia de Adoptador Temprano se otorga automáticamente a los primeros 100 usuarios registrados",
+      "tip2": "Las insignias de creación se ganan a través de tu actividad de dibujo, duración y consistencia",
+      "tip3": "Las insignias de comunidad provienen de los me gusta y guardados de tu trabajo por otros usuarios",
+      "tip4": "Las insignias TIME26 se ganan a través de donaciones y colecciones de tokens"
+    }
   }
 }

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="streakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#EF4444;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FCD34D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer decorative ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#streakGrad)" stroke-width="3" stroke-dasharray="10 5"/>
+
+  <!-- Main badge circle -->
+  <circle cx="100" cy="100" r="75" fill="url(#streakGrad)"/>
+  <circle cx="100" cy="100" r="70" fill="#FFF" opacity="0.9"/>
+
+  <!-- Fire icon -->
+  <path d="M100,55 Q95,65 95,75 Q95,80 90,85 Q85,90 85,95 Q85,105 92,112 Q100,120 108,112 Q115,105 115,95 Q115,90 110,85 Q105,80 105,75 Q105,65 100,55 Z"
+        fill="url(#fireGrad)"/>
+
+  <!-- Inner flame detail -->
+  <path d="M100,70 Q98,75 98,80 Q98,85 100,88 Q102,85 102,80 Q102,75 100,70 Z"
+        fill="#FCD34D" opacity="0.8"/>
+
+  <!-- Calendar/Streak indicator -->
+  <g transform="translate(70, 125)">
+    <rect x="0" y="0" width="8" height="8" rx="1" fill="url(#streakGrad)"/>
+    <rect x="10" y="0" width="8" height="8" rx="1" fill="url(#streakGrad)"/>
+    <rect x="20" y="0" width="8" height="8" rx="1" fill="url(#streakGrad)"/>
+    <rect x="30" y="0" width="8" height="8" rx="1" fill="url(#streakGrad)"/>
+    <rect x="40" y="0" width="8" height="8" rx="1" fill="url(#streakGrad)"/>
+    <rect x="50" y="0" width="8" height="8" rx="1" fill="url(#streakGrad)"/>
+    <rect x="60" y="0" width="8" height="8" rx="1" fill="url(#streakGrad)"/>
+  </g>
+
+  <!-- Fire emoji style decoration -->
+  <text x="100" y="153" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="url(#streakGrad)" text-anchor="middle">🔥</text>
+</svg>

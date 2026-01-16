@@ -43,6 +43,7 @@ import { useWalletBalances } from '@/hooks/use-wallet-balances';
 import { LearnDropdown } from './learn-dropdown';
 import { QuestDropdown } from '@/components/quests/quest-dropdown';
 import { useTodayQuest } from '@/hooks/use-today-quest';
+import { DrawToProofHint } from './draw-to-proof-hint';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useClaimTime26 } from '@/hooks/useClaimTime26';
 
@@ -231,20 +232,23 @@ export function Navbar() {
               </div>
             </div>
 
-            {/* Independent CTA */}
+            {/* Independent CTA with Hint */}
             {launched && (
-              <Link
-                href="/canvas"
-                className="flex items-center gap-2 cursor-pointer transition-all hover:scale-105 group/proof"
-              >
-                <LineSquiggle className="w-5 h-5 text-zinc-400 group-hover/proof:text-white transition-colors" />
-                <VariableFontHoverByRandomLetter
-                  label={t('drawToProof')}
-                  className="text-lg font-medium font-sans bg-clip-text text-transparent bg-[linear-gradient(to_right,#0CC9F2,#4877DA,#7E44DB)]"
-                  fromFontVariationSettings={'"wght" 400'}
-                  toFontVariationSettings={'"wght" 900'}
-                />
-              </Link>
+              <div className="relative">
+                <Link
+                  href="/canvas"
+                  className="flex items-center gap-2 cursor-pointer transition-all hover:scale-105 group/proof"
+                >
+                  <LineSquiggle className="w-5 h-5 text-zinc-400 group-hover/proof:text-white transition-colors" />
+                  <VariableFontHoverByRandomLetter
+                    label={t('drawToProof')}
+                    className="text-lg font-medium font-sans bg-clip-text text-transparent bg-[linear-gradient(to_right,#0CC9F2,#4877DA,#7E44DB)]"
+                    fromFontVariationSettings={'"wght" 400'}
+                    toFontVariationSettings={'"wght" 900'}
+                  />
+                </Link>
+                <DrawToProofHint />
+              </div>
             )}
           </div>
 

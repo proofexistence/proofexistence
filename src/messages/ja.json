@@ -7,6 +7,7 @@
     "whitepaper": "ホワイトペーパー",
     "explore": "探索",
     "cosmos": "コスモス",
+    "badges": "バッジ",
     "learn": "学ぶ",
     "gettingStarted": "はじめに",
     "tutorials": "チュートリアル",
@@ -22,7 +23,13 @@
     "logOut": "ログアウト",
     "balances": "残高",
     "pendingRewards": "保留中の報酬",
-    "referral": "紹介"
+    "referral": "紹介",
+    "admin": "管理者",
+    "rewardsStatus": "報酬ステータス",
+    "questThemes": "クエストテーマ",
+    "questRewards": "クエスト報酬",
+    "questStats": "クエスト統計",
+    "badgeManagement": "バッジ管理"
   },
   "footer": {
     "title": "存在証明",
@@ -408,5 +415,81 @@
     "participants": "{count} 人参加",
     "rewardBonus": "報酬 {multiplier}x",
     "endsIn": "残り {days} 日"
+  },
+  "onboarding": {
+    "title": "キャンバスへようこそ",
+    "subtitle": "3つのステップで永遠の記録を残す",
+    "step1": {
+      "title": "光の軌跡を描く",
+      "description": "マウスまたは画面を長押しして描画、離すと一時停止"
+    },
+    "step2": {
+      "title": "10秒以上描く",
+      "description": "完了したら「完了」ボタンをクリック"
+    },
+    "step3": {
+      "title": "証明タイプを選択",
+      "description": "無料の標準証明または有料の即時ミント"
+    },
+    "freeNote": "標準証明は完全無料、支払い不要",
+    "startButton": "創作を始める"
+  },
+  "badges": {
+    "early-adopter-top-100": {
+      "name": "アーリーアダプター",
+      "description": "Proof of Existenceに参加した最初の100人のパイオニア"
+    },
+    "marathon-artist": {
+      "name": "マラソンアーティスト",
+      "description": "最長の単一創作セッション"
+    },
+    "prolific-creator": {
+      "name": "多作クリエイター",
+      "description": "最も創作数が多い活発なユーザー"
+    },
+    "streak-master": {
+      "name": "連続創作マスター",
+      "description": "最長の連続創作記録"
+    },
+    "most-liked": {
+      "name": "最も人気",
+      "description": "最も多くのコミュニティいいねを獲得"
+    },
+    "collection-star": {
+      "name": "コレクションスター",
+      "description": "最もブックマークされた作品"
+    },
+    "generous-giver": {
+      "name": "寛大な贈与者",
+      "description": "最も多くのTIME26トークンを寄付"
+    },
+    "reward-collector": {
+      "name": "報酬コレクター",
+      "description": "最も多くのTIME26報酬を獲得"
+    },
+    "referral-ambassador": {
+      "name": "紹介アンバサダー",
+      "description": "最も多くの新規ユーザーを紹介"
+    },
+    "distance-explorer": {
+      "name": "距離探検家",
+      "description": "最も長い光跡距離を描画"
+    },
+    "speed-demon": {
+      "name": "スピードデーモン",
+      "description": "最速の描画速度クリエイター"
+    }
+  },
+  "badgesPage": {
+    "title": "実績バッジ",
+    "description": "Proof of Existenceで獲得可能なすべての実績バッジを発見しましょう。コミュニティへの参加、光跡の作成、マイルストーンの達成により、これらのユニークな栄誉を解除できます。",
+    "howToEarn": {
+      "title": "バッジの獲得方法",
+      "description": "バッジは、Proof of Existenceコミュニティでのあなたの貢献と成果を認識します。各バッジはユニークな成果を表しています:",
+      "tip1": "アーリーアダプターバッジは、最初の100人の登録ユーザーに自動的に授与されます",
+      "tip2": "創作バッジは、描画活動、時間、継続性によって獲得されます",
+      "tip3": "コミュニティバッジは、他のユーザーからの作品へのいいねや保存から得られます",
+      "tip4": "TIME26バッジは、トークンの寄付と収集によって獲得されます"
+    }
   }
 }

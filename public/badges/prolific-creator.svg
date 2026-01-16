@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="prolificGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer decorative ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#prolificGrad)" stroke-width="3" stroke-dasharray="10 5"/>
+
+  <!-- Main badge circle -->
+  <circle cx="100" cy="100" r="75" fill="url(#prolificGrad)"/>
+  <circle cx="100" cy="100" r="70" fill="#FFF" opacity="0.9"/>
+
+  <!-- Multiple paint brushes icon -->
+  <g transform="translate(70, 60)">
+    <!-- Brush 1 -->
+    <rect x="10" y="0" width="8" height="45" rx="2" fill="url(#prolificGrad)"/>
+    <path d="M10,45 L10,55 L18,55 L18,45 Z" fill="url(#prolificGrad)" opacity="0.7"/>
+
+    <!-- Brush 2 -->
+    <rect x="22" y="10" width="8" height="45" rx="2" fill="url(#prolificGrad)"/>
+    <path d="M22,55 L22,65 L30,65 L30,55 Z" fill="url(#prolificGrad)" opacity="0.7"/>
+
+    <!-- Brush 3 -->
+    <rect x="34" y="5" width="8" height="45" rx="2" fill="url(#prolificGrad)"/>
+    <path d="M34,50 L34,60 L42,60 L42,50 Z" fill="url(#prolificGrad)" opacity="0.7"/>
+  </g>
+
+  <!-- Paint splatter decorations -->
+  <circle cx="65" cy="120" r="4" fill="url(#prolificGrad)" opacity="0.6"/>
+  <circle cx="78" cy="130" r="3" fill="url(#prolificGrad)" opacity="0.5"/>
+  <circle cx="122" cy="125" r="5" fill="url(#prolificGrad)" opacity="0.6"/>
+  <circle cx="135" cy="115" r="3" fill="url(#prolificGrad)" opacity="0.5"/>
+
+  <!-- Counter/Numbers decoration -->
+  <text x="100" y="150" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="url(#prolificGrad)" text-anchor="middle">∞</text>
+</svg>
