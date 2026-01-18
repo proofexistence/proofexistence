@@ -106,7 +106,7 @@ export function DrawToProofHint() {
 
           {/* Tap to dismiss hint */}
           <motion.span
-            className="mt-2 text-[10px] text-zinc-500"
+            className="mt-2 text-[10px] text-zinc-500 whitespace-nowrap"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2 }}
