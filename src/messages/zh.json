@@ -129,7 +129,8 @@
       "themeAlreadyMarked": "你今天已經標記過主題作品了",
       "themeReward": "創作主題作品可獲得 TIME26 獎勵",
       "supportsCreators": "支持創作者",
-      "insufficientBalance": "餘額不足"
+      "insufficientBalance": "餘額不足",
+      "chooseSubmission": "選擇一種"
     },
     "clearConfirm": {
       "title": "開始新繪畫？",

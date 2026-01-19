@@ -826,10 +826,10 @@ export function SubmissionModal({
             </div>
           </div>
 
-          {/* Theme Marking Option */}
+          {/* Theme Marking Option - Simpler checkbox style */}
           {themeName && (
-            <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl border border-purple-500/20 mb-4">
-              <label className="flex items-center gap-3 cursor-pointer group">
+            <div className="px-1 mb-2">
+              <label className="flex items-center gap-3 cursor-pointer group py-2">
                 <div className="relative">
                   <input
                     type="checkbox"
@@ -880,8 +880,15 @@ export function SubmissionModal({
             </div>
           )}
 
-          {/* Payment Options - Three Cards */}
+          {/* Payment Options Section */}
           <div className="space-y-3">
+            {/* Section Header */}
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="text-[10px] font-bold text-zinc-400 tracking-widest uppercase">
+                {t('modal.chooseSubmission')}
+              </h4>
+              <div className="flex-1 h-px bg-zinc-800" />
+            </div>
             {/* Option 1: Instant Proof with POL */}
             <ProofOptionCard
               variant="instant-pol"

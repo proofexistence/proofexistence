@@ -34,7 +34,7 @@ export function ProofOptionCard({
       <button
         onClick={onClick}
         disabled={disabled || isLoading}
-        className="group relative flex flex-col p-5 rounded-3xl border transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg bg-gradient-to-br from-[#0CC9F2]/10 to-[#7E44DB]/10 hover:from-[#0CC9F2]/20 hover:to-[#7E44DB]/20 border-[#4877DA]/20 hover:border-[#4877DA]/40 shadow-blue-900/20"
+        className="w-full group relative flex flex-col p-5 rounded-3xl border transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg bg-gradient-to-br from-[#0CC9F2]/10 to-[#7E44DB]/10 hover:from-[#0CC9F2]/20 hover:to-[#7E44DB]/20 border-[#4877DA]/20 hover:border-[#4877DA]/40 shadow-blue-900/20"
       >
         {/* Hover glow effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0CC9F2]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -113,7 +113,7 @@ export function ProofOptionCard({
       <button
         onClick={onClick}
         disabled={disabled || isLoading || isInsufficient}
-        className={`group relative flex flex-col p-5 rounded-3xl border transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg bg-gradient-to-br ${colors.bg} ${colors.bgHover} ${colors.border} ${colors.shadow}`}
+        className={`w-full group relative flex flex-col p-5 rounded-3xl border transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg bg-gradient-to-br ${colors.bg} ${colors.bgHover} ${colors.border} ${colors.shadow}`}
       >
         {/* Hover glow effect */}
         <div
@@ -195,7 +195,7 @@ export function ProofOptionCard({
     <button
       onClick={onClick}
       disabled={disabled || isLoading}
-      className="group relative flex flex-col p-4 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full group relative flex flex-col p-5 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {/* Header */}
       <div className="flex items-start justify-between w-full mb-2">

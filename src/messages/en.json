@@ -129,7 +129,8 @@
       "themeAlreadyMarked": "You've already marked a work for today's theme",
       "themeReward": "Earn TIME26 rewards for creating themed works",
       "supportsCreators": "Supports Creators",
-      "insufficientBalance": "Insufficient balance"
+      "insufficientBalance": "Insufficient balance",
+      "chooseSubmission": "Choose One"
     },
     "clearConfirm": {
       "title": "Start New Drawing?",
