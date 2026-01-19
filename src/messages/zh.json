@@ -127,7 +127,9 @@
       "techDesc2": "最後，我們將這些證明批量處理成區塊鏈上的單一可驗證交易。這確保你的作品在數學上被證明存在於這個特定時間，並具有整個網絡的安全性。",
       "markAsTheme": "標記為今日主題",
       "themeAlreadyMarked": "你今天已經標記過主題作品了",
-      "themeReward": "創作主題作品可獲得 TIME26 獎勵"
+      "themeReward": "創作主題作品可獲得 TIME26 獎勵",
+      "supportsCreators": "支持創作者",
+      "insufficientBalance": "餘額不足"
     },
     "clearConfirm": {
       "title": "開始新繪畫？",

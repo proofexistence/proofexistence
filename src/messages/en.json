@@ -127,7 +127,9 @@
       "techDesc2": "Finally, we batch these proofs into a single verifiable transaction on the blockchain. This ensures your work is mathematically proven to exist at this specific time, with the security of the entire network.",
       "markAsTheme": "Mark as Today's Theme",
       "themeAlreadyMarked": "You've already marked a work for today's theme",
-      "themeReward": "Earn TIME26 rewards for creating themed works"
+      "themeReward": "Earn TIME26 rewards for creating themed works",
+      "supportsCreators": "Supports Creators",
+      "insufficientBalance": "Insufficient balance"
     },
     "clearConfirm": {
       "title": "Start New Drawing?",
