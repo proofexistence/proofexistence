@@ -190,6 +190,35 @@ export function ProofOptionCard({
     );
   }
 
-  // Placeholder for other variants
-  return <div>Other variant placeholder</div>;
+  // Standard Proof (always last - free daily batch)
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled || isLoading}
+      className="group relative flex flex-col p-4 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between w-full mb-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-lg grayscale group-hover:grayscale-0 transition-all">
+            ⏳
+          </div>
+          <div>
+            <h3 className="text-zinc-400 font-medium text-base group-hover:text-white transition-colors">
+              {t('modal.standardProof')}
+            </h3>
+          </div>
+        </div>
+        {/* Free badge */}
+        <span className="text-[10px] font-mono bg-zinc-800 text-zinc-500 px-2 py-1 rounded-full">
+          {t('modal.free')}
+        </span>
+      </div>
+
+      {/* Description */}
+      <p className="text-zinc-500 text-xs">
+        <strong>{t('modal.gasFree')}.</strong> {t('modal.standardDesc')}
+      </p>
+    </button>
+  );
 }
