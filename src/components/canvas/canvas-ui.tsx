@@ -613,7 +613,6 @@ export function SubmissionModal({
   gaslessEligible = false,
   gaslessTotalCost = '0',
   gaslessLoading = false,
-  unclaimedBalance = '0',
   themeName,
   themeCompleted = false,
 }: SubmissionModalProps) {

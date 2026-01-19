@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { BadgeManagementClient } from './badge-management-client';
 import { db } from '@/db';
-import { userBadges, badges, users, sessions } from '@/db/schema';
-import { eq, sql, inArray, desc } from 'drizzle-orm';
+import { userBadges, badges, users } from '@/db/schema';
+import { eq, sql, desc } from 'drizzle-orm';
 
 export const metadata: Metadata = {
   title: 'Badge Management | Admin',

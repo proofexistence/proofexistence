@@ -89,9 +89,6 @@ export function BadgeManagementClient({
     },
   });
 
-  const earlyAdopterBadge = badges.find(
-    (b) => b.id === 'early-adopter-top-100'
-  );
   const needsUpdate =
     earlyAdopterStats.totalEligible > earlyAdopterStats.currentlyAwarded;
 

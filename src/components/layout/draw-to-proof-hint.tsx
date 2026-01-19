@@ -13,17 +13,20 @@ export function DrawToProofHint() {
   useEffect(() => {
     // Only show on homepage
     if (pathname !== '/') {
-      setShow(false);
+      // Early return for non-homepage paths without setting state
       return;
     }
 
     // Check if user has dismissed before
     const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (!dismissed) {
-      // Delay showing for smoother UX
-      const timer = setTimeout(() => setShow(true), 1500);
-      return () => clearTimeout(timer);
+    if (dismissed) {
+      // Already dismissed, no need to show
+      return;
     }
+
+    // Delay showing for smoother UX
+    const timer = setTimeout(() => setShow(true), 1500);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   const handleDismiss = () => {
