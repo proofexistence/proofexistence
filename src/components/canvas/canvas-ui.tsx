@@ -2,7 +2,8 @@
 
 import { TRAIL_COLORS } from './light-trail';
 import { MIN_SESSION_DURATION } from '@/types/session';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { ProofOptionCard } from './proof-option-card';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { GasFreeBadge } from '@/components/ui/gas-free-badge';
 import { useTranslations } from 'next-intl';
 
 // -- Helper: Format Time --
@@ -668,7 +668,6 @@ export function SubmissionModal({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState(''); // Moved up to group state
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('NATIVE');
   const [isSavingDisplayName, setIsSavingDisplayName] = useState(false);
   const [displayNameSaved, setDisplayNameSaved] = useState(false);
   const [markAsTheme, setMarkAsTheme] = useState(false);
@@ -745,6 +744,16 @@ export function SubmissionModal({
       onClose();
     }
   };
+
+  // Calculate TIME26 card state
+  const time26CardState = useMemo(() => {
+    if (gaslessEligible) return 'gasless';
+    // Parse costs to compare (remove non-numeric characters)
+    const balanceNum = parseFloat(time26Balance.replace(/[^0-9.]/g, '')) || 0;
+    const costNum = parseFloat(time26Cost.replace(/[^0-9.]/g, '')) || 0;
+    if (balanceNum >= costNum) return 'available';
+    return 'insufficient';
+  }, [gaslessEligible, time26Balance, time26Cost]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -928,202 +937,55 @@ export function SubmissionModal({
             </div>
           )}
 
-          {/* Payment Method Selector (Full Width) */}
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-zinc-500 mb-2 ml-1">
-              {t('modal.paymentMethod')}
-            </label>
-            <div className="grid grid-cols-2 gap-2 p-1.5 bg-zinc-900/60 rounded-2xl border border-white/5">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('NATIVE')}
-                className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${paymentMethod === 'NATIVE' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-              >
-                POL
-              </button>
-              {/* Show loading, TIME26_GASLESS if eligible, otherwise regular TIME26 */}
-              {gaslessLoading ? (
-                <div className="py-2.5 px-3 rounded-xl text-sm font-medium text-zinc-500 flex items-center justify-center gap-2">
-                  <div className="h-3 w-3 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
-                  <span>{t('modal.checking')}</span>
-                </div>
-              ) : gaslessEligible ? (
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('TIME26_GASLESS')}
-                  className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${paymentMethod === 'TIME26_GASLESS' ? 'bg-green-500/20 text-green-200 border border-green-500/30 shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                >
-                  <span className="flex items-center justify-center gap-1.5">
-                    TIME26
-                    <span className="text-[10px] text-green-400 font-semibold">
-                      {t('modal.free')}
-                    </span>
-                  </span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('TIME26')}
-                  className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${paymentMethod === 'TIME26' ? 'bg-[#7E44DB]/20 text-purple-200 border border-[#7E44DB]/30 shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                >
-                  TIME26
-                </button>
-              )}
-            </div>
-            {/* Balance info for TIME26 payment methods */}
-            {paymentMethod === 'TIME26' && (
-              <div className="flex justify-between items-center px-3 mt-2">
-                <span className="text-xs text-zinc-500">
-                  {t('modal.walletBalance')}{' '}
-                  <span className="text-purple-300 font-mono">
-                    {time26Balance} TIME
-                  </span>
-                </span>
-              </div>
-            )}
-            {paymentMethod === 'TIME26_GASLESS' && (
-              <div className="flex flex-col gap-1 px-3 mt-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-zinc-500">
-                    {t('modal.unclaimedBalance')}{' '}
-                    <span className="text-green-300 font-mono">
-                      {unclaimedBalance} TIME
-                    </span>
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-zinc-500">
-                    {t('modal.cost')}{' '}
-                    <span className="text-green-300 font-mono">
-                      {gaslessTotalCost} TIME
-                    </span>
-                    <span className="text-zinc-600 ml-1">
-                      {t('modal.inclGas')}
-                    </span>
-                  </span>
-                  <span className="text-xs text-green-400">
-                    {t('modal.noSignatureNeeded')}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 gap-3">
-            {/* Option 1: Instant Proof (Primary) */}
-            <button
+          {/* Payment Options - Three Cards */}
+          <div className="space-y-3">
+            {/* Option 1: Instant Proof with POL */}
+            <ProofOptionCard
+              variant="instant-pol"
+              cost={nativeCost}
+              costSubtext={nativeCostUsd}
+              disabled={isSubmitting}
               onClick={() =>
                 onSelectInstant({
                   message,
                   username,
                   title,
                   description,
-                  paymentMethod,
+                  paymentMethod: 'NATIVE',
                   markAsTheme,
                 })
               }
-              disabled={isSubmitting}
-              className={`group relative flex items-center gap-4 p-5 rounded-3xl border transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg ${
-                paymentMethod === 'TIME26_GASLESS'
-                  ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 hover:from-green-500/20 hover:to-emerald-500/20 border-green-500/30 hover:border-green-500/50 shadow-green-900/20'
-                  : paymentMethod === 'TIME26'
-                    ? 'bg-gradient-to-br from-[#7E44DB]/10 to-[#F472B6]/10 hover:from-[#7E44DB]/20 hover:to-[#F472B6]/20 border-[#7E44DB]/30 hover:border-[#7E44DB]/50 shadow-purple-900/20'
-                    : 'bg-gradient-to-br from-[#0CC9F2]/10 to-[#7E44DB]/10 hover:from-[#0CC9F2]/20 hover:to-[#7E44DB]/20 border-[#4877DA]/20 hover:border-[#4877DA]/40 shadow-blue-900/20'
-              }`}
-            >
-              <div
-                className={`absolute inset-0 bg-gradient-to-r to-transparent opacity-0 group-hover:opacity-100 transition-opacity ${
-                  paymentMethod === 'TIME26_GASLESS'
-                    ? 'from-green-500/10'
-                    : paymentMethod === 'TIME26'
-                      ? 'from-[#F472B6]/10'
-                      : 'from-[#0CC9F2]/10'
-                }`}
-              />
-              <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(255,255,255,0.1)] ${
-                  paymentMethod === 'TIME26_GASLESS'
-                    ? 'bg-green-500/20 text-green-300'
-                    : paymentMethod === 'TIME26'
-                      ? 'bg-[#7E44DB]/20 text-pink-300'
-                      : 'bg-[#4877DA]/20 text-cyan-300'
-                }`}
-              >
-                {paymentMethod === 'TIME26_GASLESS'
-                  ? '✨'
-                  : paymentMethod === 'TIME26'
-                    ? '💎'
-                    : '⚡'}
-              </div>
-              <div className="flex-1 relative z-10">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-white font-bold text-lg">
-                      {t('modal.perpetualProof')}
-                    </h3>
-                    {paymentMethod === 'TIME26_GASLESS' && (
-                      <GasFreeBadge variant="pill" />
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs font-mono px-2 py-0.5 rounded-full border ${
-                        paymentMethod === 'TIME26_GASLESS'
-                          ? 'bg-green-500/20 text-green-200 border-green-500/30'
-                          : paymentMethod === 'TIME26'
-                            ? 'bg-pink-500/20 text-pink-200 border-pink-500/30'
-                            : 'bg-cyan-500/20 text-cyan-200 border-cyan-500/30'
-                      }`}
-                    >
-                      {paymentMethod === 'TIME26_GASLESS'
-                        ? `${gaslessTotalCost} TIME`
-                        : paymentMethod === 'TIME26'
-                          ? time26Cost
-                          : nativeCost}
-                    </span>
-                    {paymentMethod === 'NATIVE' && nativeCostUsd && (
-                      <span className="text-[10px] text-cyan-200/50 font-mono">
-                        {nativeCostUsd}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <p className="text-purple-200/70 text-sm leading-snug">
-                  {paymentMethod === 'TIME26_GASLESS'
-                    ? t('modal.perpetualDescGasless')
-                    : paymentMethod === 'TIME26'
-                      ? t('modal.perpetualDescTime26')
-                      : t('modal.perpetualDescNative')}
-                </p>
-              </div>
-            </button>
+            />
 
-            {/* Option 2: Standard Proof (Secondary) */}
-            <button
+            {/* Option 2: Instant Proof with TIME26 */}
+            <ProofOptionCard
+              variant="instant-time26"
+              cost={time26CardState === 'gasless' ? gaslessTotalCost + ' TIME' : time26Cost}
+              time26State={time26CardState as 'gasless' | 'available' | 'insufficient'}
+              balance={time26Balance}
+              disabled={isSubmitting}
+              isLoading={gaslessLoading}
+              onClick={() =>
+                onSelectInstant({
+                  message,
+                  username,
+                  title,
+                  description,
+                  paymentMethod: time26CardState === 'gasless' ? 'TIME26_GASLESS' : 'TIME26',
+                  markAsTheme,
+                })
+              }
+            />
+
+            {/* Option 3: Standard Proof (Free) */}
+            <ProofOptionCard
+              variant="standard"
+              cost="FREE"
+              disabled={isSubmitting}
               onClick={() =>
                 onSelectStandard({ message, username, title, description, markAsTheme })
               }
-              disabled={isSubmitting}
-              className="group relative flex items-center gap-4 p-5 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-lg grayscale group-hover:grayscale-0 transition-all">
-                ⏳
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-0.5">
-                  <h3 className="text-zinc-400 font-medium text-base group-hover:text-white transition-colors">
-                    {t('modal.standardProof')}
-                  </h3>
-                  <span className="text-[10px] font-mono bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">
-                    {t('modal.free')}
-                  </span>
-                </div>
-                <p className="text-zinc-500 text-xs">
-                  <strong>{t('modal.gasFree')}. </strong>{' '}
-                  {t('modal.standardDesc')}
-                </p>
-              </div>
-            </button>
+            />
           </div>
 
           {/* Info Box: Technology Explanation */}
