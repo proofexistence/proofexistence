@@ -938,20 +938,13 @@ export function SubmissionModal({
             />
           </div>
 
-          {/* Info Box: Technology Explanation */}
-          <div className="mt-4 p-4 bg-zinc-900/40 rounded-2xl border border-white/5">
-            <h4 className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
-              {t('modal.techTitle')}
-            </h4>
-            <div className="space-y-2">
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                {t('modal.techDesc1')}
-              </p>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                {t('modal.techDesc2')}
-              </p>
-            </div>
+          {/* Info: Technology Explanation - plain text, not a card */}
+          <div className="mt-4 px-1">
+            <p className="text-[10px] text-zinc-600 leading-relaxed">
+              <span className="text-zinc-500 font-medium">{t('modal.techTitle')}</span>
+              {' — '}
+              {t('modal.techDesc1')} {t('modal.techDesc2')}
+            </p>
           </div>
 
           <div className="text-center pt-4">
