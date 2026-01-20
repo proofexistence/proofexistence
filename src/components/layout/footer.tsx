@@ -93,6 +93,23 @@ export function Footer() {
                   unoptimized
                 />
               </a>
+
+              <a
+                href="https://artizen.fund/index/p/proof-of-existence-2026?season=6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 h-[54px] px-5 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 hover:border-white/10 transition-all duration-300"
+              >
+                <Image
+                  src="/brands/artizen.svg"
+                  alt="Artizen"
+                  width={28}
+                  height={28}
+                />
+                <span className="text-sm font-medium text-zinc-300 hover:text-white">
+                  Artizen
+                </span>
+              </a>
             </div>
 
             <p className="text-xs text-zinc-500 mt-3 pl-1">
