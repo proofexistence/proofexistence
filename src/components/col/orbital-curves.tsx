@@ -216,7 +216,7 @@ export function OrbitalCurves({ trails }: OrbitalCurvesProps) {
 
   // Generate base seed from trails
   const baseSeed = useMemo(() => {
-    if (trails.length === 0) return Math.random() * 1583;
+    if (trails.length === 0) return 42; // Fixed seed when no trails
     let hash = 0;
     const str = trails[0]?.id || 'default';
     for (let i = 0; i < str.length; i++) {
