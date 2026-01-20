@@ -581,6 +581,7 @@ interface SubmissionModalProps {
   profileName?: string;
   profileUsername?: string;
   time26Balance?: string;
+  polBalance?: string;
   nativeCost?: string;
   nativeCostUsd?: string;
   time26Cost?: string;
@@ -605,6 +606,7 @@ export function SubmissionModal({
   profileName,
   profileUsername,
   time26Balance = '0',
+  polBalance = '0',
   nativeCost = '... POL',
   nativeCostUsd = '',
   time26Cost = '... TIME',
@@ -893,6 +895,7 @@ export function SubmissionModal({
               variant="instant-pol"
               cost={nativeCost}
               costSubtext={nativeCostUsd}
+              balance={polBalance}
               disabled={isSubmitting}
               onClick={() =>
                 onSelectInstant({

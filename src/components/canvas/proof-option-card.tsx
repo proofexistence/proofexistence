@@ -69,6 +69,11 @@ export function ProofOptionCard({
           {costSubtext && (
             <div className="text-xs text-zinc-400 mt-0.5">{costSubtext}</div>
           )}
+          {balance && (
+            <div className="text-xs text-zinc-400 mt-0.5">
+              {t('modal.walletBalance')}: {balance} POL
+            </div>
+          )}
         </div>
       </button>
     );

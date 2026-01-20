@@ -451,6 +451,7 @@ export function POECanvas() {
   const [time26Cost, setTime26Cost] = useState<string>('... TIME');
   const [nativeCost, setNativeCost] = useState<string>('... POL');
   const [nativeCostUsd, setNativeCostUsd] = useState<string>('');
+  const [polBalance, setPolBalance] = useState<string>('0');
 
   // Gasless minting eligibility - only fetch when submission modal is open
   const { data: gaslessEligibility, isLoading: gaslessLoading } =
@@ -1345,9 +1346,13 @@ export function POECanvas() {
           provider
         );
 
-        // Fetch TIME26 balance
+        // Fetch TIME26 balance (on-chain)
         const bal = await time26Contract.balanceOf(address);
         setTime26Balance(ethers.formatEther(bal));
+
+        // Fetch POL balance
+        const polBal = await provider.getBalance(address);
+        setPolBalance(ethers.formatEther(polBal));
 
         // Fetch costs
         const duration = completedSessionRef.current?.duration || 10;
@@ -1497,7 +1502,15 @@ export function POECanvas() {
           profileName={profile?.name || undefined}
           profileUsername={profile?.username || undefined}
           loadingMessage={loadingStatus}
-          time26Balance={parseFloat(time26Balance).toFixed(1)}
+          time26Balance={(() => {
+            // Combine on-chain balance + unclaimed balance
+            const onChainBal = parseFloat(time26Balance) || 0;
+            const unclaimedBal = profile?.time26Balance
+              ? parseFloat(ethers.formatEther(profile.time26Balance))
+              : 0;
+            return (onChainBal + unclaimedBal).toFixed(1);
+          })()}
+          polBalance={parseFloat(polBalance).toFixed(4)}
           nativeCost={nativeCost}
           nativeCostUsd={nativeCostUsd}
           time26Cost={time26Cost}
