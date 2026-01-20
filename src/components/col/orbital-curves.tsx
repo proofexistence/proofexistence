@@ -1,10 +1,25 @@
 'use client';
 
 import { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, extend } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AnimatedTrail } from './types';
 import { COLOR_PALETTES } from './color-utils';
+
+// Extend Three.js Line to R3F with unique name to avoid SVG conflict
+extend({ Line_: THREE.Line });
+
+// Type declaration for the extended element
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      line_: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        ref?: React.Ref<THREE.Line>;
+        geometry?: THREE.BufferGeometry;
+      };
+    }
+  }
+}
 
 interface OrbitalCurvesProps {
   trails: AnimatedTrail[];
@@ -188,9 +203,9 @@ function TrailCurve({
   if (!trail.isVisible) return null;
 
   return (
-    <line ref={lineRef} geometry={geometry}>
+    <line_ ref={lineRef} geometry={geometry}>
       <lineBasicMaterial color={color} transparent opacity={0.75} />
-    </line>
+    </line_>
   );
 }
 
