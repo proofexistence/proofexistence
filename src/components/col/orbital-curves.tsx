@@ -27,7 +27,7 @@ class SeededRandom {
     return min + r * (max - min);
   }
 
-  randomChoice<T>(arr: T[]): T {
+  randomChoice<T>(arr: readonly T[]): T {
     return arr[Math.floor(this.random() * arr.length)];
   }
 }
