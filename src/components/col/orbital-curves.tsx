@@ -109,7 +109,7 @@ function TrailCurve({
   index: number;
   totalTrails: number;
   baseSeed: number;
-  palette: string[];
+  palette: readonly string[];
   numPoints: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
