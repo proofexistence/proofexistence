@@ -1,25 +1,11 @@
 'use client';
 
 import { useRef, useMemo } from 'react';
-import { useFrame, extend } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
+import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import type { AnimatedTrail } from './types';
 import { COLOR_PALETTES } from './color-utils';
-
-// Extend Three.js Line to R3F with unique name to avoid SVG conflict
-extend({ Line_: THREE.Line });
-
-// Type declaration for the extended element
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      line_: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        ref?: React.Ref<THREE.Line>;
-        geometry?: THREE.BufferGeometry;
-      };
-    }
-  }
-}
 
 interface OrbitalCurvesProps {
   trails: AnimatedTrail[];
@@ -126,9 +112,9 @@ function TrailCurve({
   palette: string[];
   numPoints: number;
 }) {
-  const lineRef = useRef<THREE.Line>(null);
+  const groupRef = useRef<THREE.Group>(null);
 
-  const { geometry, color, rotationOffsets } = useMemo(() => {
+  const { curvePoints, color, rotationOffsets } = useMemo(() => {
     // Mix trail id with base seed for unique but consistent randomization
     const trailSeed = hashString(trail.id) + baseSeed;
     const rng = new SeededRandom(trailSeed);
@@ -176,26 +162,25 @@ function TrailCurve({
       points.push(points[0].clone());
     }
 
-    // Create smooth curve
+    // Create smooth curve and get points as [x,y,z] tuples for drei Line
     const curve = new THREE.CatmullRomCurve3(points, true);
-    const geo = new THREE.BufferGeometry().setFromPoints(
-      curve.getPoints(numPoints * 3)
-    );
+    const smoothPoints = curve.getPoints(numPoints * 3);
+    const curvePoints = smoothPoints.map((p) => [p.x, p.y, p.z] as [number, number, number]);
 
-    return { geometry: geo, color: curveColor, rotationOffsets };
+    return { curvePoints, color: curveColor, rotationOffsets };
   }, [trail, index, totalTrails, baseSeed, palette, numPoints]);
 
   // Animate rotation
   useFrame((state) => {
-    if (lineRef.current) {
+    if (groupRef.current) {
       const time = state.clock.elapsedTime;
       const q = index / totalTrails * 0.2;
 
-      lineRef.current.rotation.x =
+      groupRef.current.rotation.x =
         rotationOffsets.x + time / 10 + q / rotationOffsets.xSpeed / 10;
-      lineRef.current.rotation.y =
+      groupRef.current.rotation.y =
         rotationOffsets.y - time / 10 - q / rotationOffsets.ySpeed / 10;
-      lineRef.current.rotation.z =
+      groupRef.current.rotation.z =
         rotationOffsets.z - time / 10 + q / rotationOffsets.zSpeed / 10;
     }
   });
@@ -203,9 +188,15 @@ function TrailCurve({
   if (!trail.isVisible) return null;
 
   return (
-    <line_ ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial color={color} transparent opacity={0.75} />
-    </line_>
+    <group ref={groupRef}>
+      <Line
+        points={curvePoints}
+        color={color}
+        transparent
+        opacity={0.75}
+        lineWidth={1}
+      />
+    </group>
   );
 }
 
