@@ -100,7 +100,7 @@ export function DailyArtCanvas({
   const fetchSessions = useCallback(async (dateStr: string) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/daily-art?date=${dateStr}`);
+      const res = await fetch(`/api/daisy?date=${dateStr}`);
       if (res.ok) {
         const data = await res.json();
         setSessions(data.sessions || []);

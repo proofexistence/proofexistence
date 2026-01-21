@@ -13,17 +13,17 @@ export function ArtDropdown() {
   const items = [
     {
       key: 'daisyPoe',
-      href: '/daily-art' as const,
+      href: '/poe/daisy' as const,
       icon: <Flower2 className="w-4 h-4" />,
     },
     {
       key: 'orbitPoe',
-      href: '/col' as const,
+      href: '/poe/col' as const,
       icon: <Circle className="w-4 h-4" />,
     },
     {
       key: 'walkerPoe',
-      href: '/lab' as const,
+      href: '/poe/lab' as const,
       icon: <FlaskConical className="w-4 h-4" />,
     },
   ];

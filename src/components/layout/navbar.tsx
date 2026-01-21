@@ -474,7 +474,7 @@ export function Navbar() {
                     >
                       <div className="pl-4 mt-2 space-y-2">
                         <Link
-                          href="/daily-art"
+                          href="/poe/daisy"
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
                         >
@@ -482,7 +482,7 @@ export function Navbar() {
                           {t('daisyPoe')}
                         </Link>
                         <Link
-                          href="/col"
+                          href="/poe/col"
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
                         >
@@ -490,7 +490,7 @@ export function Navbar() {
                           {t('orbitPoe')}
                         </Link>
                         <Link
-                          href="/lab"
+                          href="/poe/lab"
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
                         >
