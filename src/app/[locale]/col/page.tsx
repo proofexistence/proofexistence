@@ -29,14 +29,8 @@ export default async function ColPage() {
     }));
 
   return (
-    <div className="w-full h-[calc(100vh-64px)] bg-[#202020]">
-      <ColCanvas
-        initialTrails={trails}
-        initialTimeRange={{
-          start: startDate.toISOString(),
-          end: endDate.toISOString(),
-        }}
-      />
+    <div className="w-full h-[calc(100vh-5rem)] mt-20 overflow-hidden">
+      <ColCanvas initialTrails={trails} />
     </div>
   );
 }

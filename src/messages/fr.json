@@ -9,6 +9,10 @@
     "cosmos": "Cosmos",
     "badges": "Badges",
     "learn": "Apprendre",
+    "poeGen": "POE Gen",
+    "daisyPoe": "Daisy POE",
+    "orbitPoe": "Orbit POE",
+    "walkerPoe": "Walker POE",
     "gettingStarted": "Premiers Pas",
     "tutorials": "Tutoriels",
     "stories": "Histoires",
@@ -490,6 +494,20 @@
       "tip2": "Les badges de création sont gagnés grâce à votre activité de dessin, sa durée et sa constance",
       "tip3": "Les badges communautaires proviennent des likes et sauvegardes de votre travail par d'autres utilisateurs",
       "tip4": "Les badges TIME26 sont gagnés grâce aux dons et collections de jetons"
+    }
+  },
+  "col": {
+    "granularity": {
+      "day": "Jour",
+      "month": "Mois",
+      "quarter": "Trimestre",
+      "year": "Année"
+    },
+    "loading": "Chargement...",
+    "trailCount": "{count} traces",
+    "emptyState": {
+      "title": "Aucune trace dans cette période",
+      "subtitle": "Essayez de sélectionner une autre date"
     }
   }
 }

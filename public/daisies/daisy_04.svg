@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<rect width="200" height="200" fill="#C0C0C0" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(0.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(15.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(30.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(45.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(60.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(75.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(90.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(105.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(120.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(135.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(150.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(165.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(180.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(195.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(210.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(225.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(240.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(255.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(270.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(285.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(300.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(315.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(330.0)" />
+<rect x="25" y="-5.0" width="40" height="10.0" rx="5.0" ry="5.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(345.0)" />
+<circle cx="100.0" cy="100.0" r="25" fill="#F5A623" />
+</svg>

@@ -1,5 +1,7 @@
-// Time range options
-export type TimeRange = '1h' | '1d' | '1w' | '1m' | '3m' | '6m' | '1y';
+// Time granularity options
+export type TimeGranularity = 'day' | 'month' | 'quarter' | 'year';
+
+export const TIME_GRANULARITIES: TimeGranularity[] = ['day', 'month', 'quarter', 'year'];
 
 // Trail point coordinate
 export interface TrailPoint {
@@ -30,42 +32,88 @@ export interface ColTrailsResponse {
   count: number;
 }
 
-// Time range display info
-export interface TimeRangeInfo {
-  value: TimeRange;
-  label: string;
-  labelZh: string;
+// Get date range for a given date and granularity
+export function getDateRange(
+  date: Date,
+  granularity: TimeGranularity
+): { start: Date; end: Date } {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  switch (granularity) {
+    case 'day': {
+      const start = new Date(year, month, date.getDate(), 0, 0, 0, 0);
+      const end = new Date(year, month, date.getDate(), 23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'month': {
+      const start = new Date(year, month, 1, 0, 0, 0, 0);
+      const end = new Date(year, month + 1, 0, 23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'quarter': {
+      const quarterStart = Math.floor(month / 3) * 3;
+      const start = new Date(year, quarterStart, 1, 0, 0, 0, 0);
+      const end = new Date(year, quarterStart + 3, 0, 23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'year': {
+      const start = new Date(year, 0, 1, 0, 0, 0, 0);
+      const end = new Date(year, 11, 31, 23, 59, 59, 999);
+      return { start, end };
+    }
+  }
 }
 
-export const TIME_RANGES: TimeRangeInfo[] = [
-  { value: '1h', label: 'Last Hour', labelZh: '一小時' },
-  { value: '1d', label: 'Last Day', labelZh: '一天' },
-  { value: '1w', label: 'Last Week', labelZh: '一週' },
-  { value: '1m', label: 'Last Month', labelZh: '一個月' },
-  { value: '3m', label: 'Last Quarter', labelZh: '一季' },
-  { value: '6m', label: 'Last 6 Months', labelZh: '半年' },
-  { value: '1y', label: 'Last Year', labelZh: '一年' },
-];
+// Navigate to previous/next period
+export function navigateDate(
+  date: Date,
+  granularity: TimeGranularity,
+  direction: 'prev' | 'next'
+): Date {
+  const delta = direction === 'prev' ? -1 : 1;
+  const year = date.getFullYear();
+  const month = date.getMonth();
 
-// Get duration in milliseconds for a time range
-export function getTimeRangeDuration(range: TimeRange): number {
-  switch (range) {
-    case '1h':
-      return 60 * 60 * 1000;
-    case '1d':
-      return 24 * 60 * 60 * 1000;
-    case '1w':
-      return 7 * 24 * 60 * 60 * 1000;
-    case '1m':
-      return 30 * 24 * 60 * 60 * 1000;
-    case '3m':
-      return 90 * 24 * 60 * 60 * 1000;
-    case '6m':
-      return 180 * 24 * 60 * 60 * 1000;
-    case '1y':
-      return 365 * 24 * 60 * 60 * 1000;
-    default:
-      return 24 * 60 * 60 * 1000;
+  switch (granularity) {
+    case 'day':
+      return new Date(year, month, date.getDate() + delta);
+    case 'month':
+      return new Date(year, month + delta, 1);
+    case 'quarter':
+      return new Date(year, month + delta * 3, 1);
+    case 'year':
+      return new Date(year + delta, 0, 1);
+  }
+}
+
+// Format date for display based on granularity
+export function formatDateByGranularity(
+  date: Date,
+  granularity: TimeGranularity,
+  locale: string = 'en'
+): string {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  switch (granularity) {
+    case 'day':
+      return date.toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    case 'month':
+      return date.toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'long',
+      });
+    case 'quarter': {
+      const quarter = Math.floor(month / 3) + 1;
+      return `Q${quarter} ${year}`;
+    }
+    case 'year':
+      return `${year}`;
   }
 }
 

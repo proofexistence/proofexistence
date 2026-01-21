@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<rect width="200" height="200" fill="#C0C0C0" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(0.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(36.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(72.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(108.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(144.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(180.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(216.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(252.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(288.0)" />
+<rect x="15" y="-10.0" width="50" height="20.0" rx="10.0" ry="10.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(324.0)" />
+<circle cx="100.0" cy="100.0" r="20" fill="#F5A623" />
+<circle cx="100.0" cy="100.0" r="24" fill="none" stroke="#C0C0C0" stroke-width="3" />
+<circle cx="100.0" cy="100.0" r="18" fill="#F5A623" />
+</svg>

@@ -30,6 +30,9 @@ import {
   Pencil,
   Heart,
   Palette,
+  FlaskConical,
+  Circle,
+  Flower2,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -41,6 +44,7 @@ import { WalletDropdown, ExportKeyDialog } from '@/components/wallet';
 import { useNetworkInfo } from '@/hooks/use-network-info';
 import { useWalletBalances } from '@/hooks/use-wallet-balances';
 import { LearnDropdown } from './learn-dropdown';
+import { ArtDropdown } from './art-dropdown';
 import { QuestDropdown } from '@/components/quests/quest-dropdown';
 import { useTodayQuest } from '@/hooks/use-today-quest';
 import { DrawToProofHint } from './draw-to-proof-hint';
@@ -86,6 +90,7 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileLearnOpen, setIsMobileLearnOpen] = useState(false);
+  const [isMobileArtOpen, setIsMobileArtOpen] = useState(false);
   const [isMobileQuestOpen, setIsMobileQuestOpen] = useState(false);
   const [launched, setLaunched] = useState(false);
   const tQuests = useTranslations('quests');
@@ -215,6 +220,7 @@ export function Navbar() {
 
               <div className="flex items-center">
                 <LearnDropdown />
+                <ArtDropdown />
                 {leftNavLinks.map((link) => (
                   <Link
                     key={link.name}
@@ -433,6 +439,63 @@ export function Navbar() {
                         >
                           <FileText className="w-4 h-4" />
                           {t('whitepaper')}
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* POE Gen Section - Expandable */}
+              <div className="mt-2">
+                <button
+                  onClick={() => setIsMobileArtOpen(!isMobileArtOpen)}
+                  className="w-full flex items-center justify-between gap-4 p-4 rounded-2xl text-lg font-medium text-zinc-300 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 hover:text-white transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    <Palette className="w-5 h-5 text-zinc-400" />
+                    <span>{t('poeGen')}</span>
+                  </div>
+                  <ChevronRight
+                    className={`w-5 h-5 text-zinc-400 transition-transform duration-200 ${
+                      isMobileArtOpen ? 'rotate-90' : ''
+                    }`}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {isMobileArtOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 mt-2 space-y-2">
+                        <Link
+                          href="/daily-art"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <Flower2 className="w-4 h-4" />
+                          {t('daisyPoe')}
+                        </Link>
+                        <Link
+                          href="/col"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <Circle className="w-4 h-4" />
+                          {t('orbitPoe')}
+                        </Link>
+                        <Link
+                          href="/lab"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 p-3 rounded-xl text-base text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <FlaskConical className="w-4 h-4" />
+                          {t('walkerPoe')}
                         </Link>
                       </div>
                     </motion.div>

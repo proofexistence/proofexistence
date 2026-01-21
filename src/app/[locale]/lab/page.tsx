@@ -32,7 +32,7 @@ export default async function LabPage() {
     }));
 
   return (
-    <div className="w-full h-screen bg-black overflow-hidden">
+    <div className="w-full h-[calc(100vh-5rem)] mt-20 bg-black overflow-hidden">
       <TrailWalkers trails={trails} />
     </div>
   );

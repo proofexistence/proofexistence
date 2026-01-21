@@ -9,6 +9,10 @@
     "cosmos": "Cosmos",
     "badges": "Badges",
     "learn": "Learn",
+    "poeGen": "POE Gen",
+    "daisyPoe": "Daisy POE",
+    "orbitPoe": "Orbit POE",
+    "walkerPoe": "Walker POE",
     "gettingStarted": "Getting Started",
     "tutorials": "Tutorials",
     "stories": "Stories",
@@ -493,6 +497,20 @@
       "tip2": "Creation badges are earned through your drawing activity, duration, and consistency",
       "tip3": "Community badges come from likes and saves on your work by other users",
       "tip4": "TIME26 badges are earned through token donations and collections"
+    }
+  },
+  "col": {
+    "granularity": {
+      "day": "Day",
+      "month": "Month",
+      "quarter": "Quarter",
+      "year": "Year"
+    },
+    "loading": "Loading...",
+    "trailCount": "{count} trails",
+    "emptyState": {
+      "title": "No trails in this period",
+      "subtitle": "Try selecting a different date"
     }
   }
 }

@@ -1,15 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import type { ColTrailsResponse, TimeRange } from '@/components/col/types';
+import type { ColTrailsResponse } from '@/components/col/types';
 
 interface UseColTrailsParams {
-  range: TimeRange;
-  startDate?: Date;
-  endDate?: Date;
+  startDate: Date;
+  endDate: Date;
   enabled?: boolean;
 }
 
 export function useColTrails({
-  range,
   startDate,
   endDate,
   enabled = true,
@@ -17,20 +15,13 @@ export function useColTrails({
   return useQuery({
     queryKey: [
       'col-trails',
-      range,
-      startDate?.toISOString(),
-      endDate?.toISOString(),
+      startDate.toISOString(),
+      endDate.toISOString(),
     ],
     queryFn: async (): Promise<ColTrailsResponse> => {
       const params = new URLSearchParams();
-      params.set('range', range);
-
-      if (startDate) {
-        params.set('start', startDate.toISOString());
-      }
-      if (endDate) {
-        params.set('end', endDate.toISOString());
-      }
+      params.set('start', startDate.toISOString());
+      params.set('end', endDate.toISOString());
 
       const res = await fetch(`/api/col/trails?${params}`);
       if (!res.ok) {

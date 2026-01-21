@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<rect width="200" height="200" fill="#C0C0C0" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(0.0)" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(45.0)" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(90.0)" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(135.0)" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(180.0)" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(225.0)" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(270.0)" />
+<ellipse cx="38.0" cy="0" rx="20.0" ry="16.0" fill="#FFFFFF" transform="translate(100.0, 100.0) rotate(315.0)" />
+<circle cx="125.86862691031602" cy="110.71513610622252" r="5" fill="#C0C0C0" />
+<circle cx="110.71513610622252" cy="125.86862691031602" r="5" fill="#C0C0C0" />
+<circle cx="89.28486389377748" cy="125.86862691031602" r="5" fill="#C0C0C0" />
+<circle cx="74.13137308968398" cy="110.71513610622252" r="5" fill="#C0C0C0" />
+<circle cx="74.13137308968396" cy="89.28486389377748" r="5" fill="#C0C0C0" />
+<circle cx="89.2848638937775" cy="74.13137308968396" r="5" fill="#C0C0C0" />
+<circle cx="110.71513610622252" cy="74.13137308968398" r="5" fill="#C0C0C0" />
+<circle cx="125.86862691031604" cy="89.2848638937775" r="5" fill="#C0C0C0" />
+<circle cx="100.0" cy="100.0" r="18" fill="#F5A623" />
+</svg>

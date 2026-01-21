@@ -524,12 +524,12 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
 
     const resize = () => {
       const containerRect = container.getBoundingClientRect();
-      const maxSize = Math.min(
-        containerRect.width - 40,
-        containerRect.height - 120
-      );
-      const size = Math.max(Math.min(maxSize, 900), 200); // Minimum 200px
-      sizeRef.current = size; // Update ref immediately
+      // Calculate available space (subtract padding for controls below)
+      const availableWidth = containerRect.width - 32;
+      const availableHeight = containerRect.height - 100; // Space for controls
+      const maxSize = Math.min(availableWidth, availableHeight);
+      const size = Math.max(Math.min(maxSize, 900), 200); // Min 200px, max 900px
+      sizeRef.current = size;
       setCanvasSize(size);
 
       const dpr = window.devicePixelRatio || 1;
@@ -652,12 +652,16 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full flex items-center justify-center"
+      className="relative w-full h-full flex flex-col items-center justify-center"
     >
       {/* Centered Square Canvas */}
       <div
-        className="relative bg-black"
-        style={{ width: canvasSize, height: canvasSize }}
+        className="relative rounded-lg overflow-hidden"
+        style={{
+          width: canvasSize,
+          height: canvasSize,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        }}
       >
         <canvas
           ref={canvasRef}
@@ -666,9 +670,10 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
         />
       </div>
 
-      {/* Timeline at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 px-8 py-4">
-        <div className="max-w-2xl mx-auto">
+      {/* Controls - outside canvas at bottom */}
+      <div className="w-full max-w-3xl px-4 pt-4 pb-2">
+        {/* Progress bar / Timeline */}
+        <div className="mb-3">
           <input
             type="range"
             min={0}
@@ -677,87 +682,74 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
             onChange={(e) => {
               const newIndex = parseInt(e.target.value);
               setCurrentDayIndex(newIndex);
-              jumpToDay(newIndex, true); // Manual jump - clear walkers
+              jumpToDay(newIndex, true);
             }}
-            className="w-full h-0.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
+            className="w-full h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-purple-500"
           />
         </div>
 
-        <div className="flex items-center justify-center gap-6 mt-3">
+        {/* Date navigation and controls */}
+        <div className="flex items-center justify-center gap-2">
           <button
             onClick={() => {
               const newIndex = Math.max(0, currentDayIndex - 1);
               setCurrentDayIndex(newIndex);
-              jumpToDay(newIndex, true); // Manual jump - clear walkers
+              jumpToDay(newIndex, true);
             }}
-            className="text-white/30 hover:text-white/60 text-xs font-mono"
+            disabled={currentDayIndex <= 0}
+            className="p-2 text-zinc-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             ←
           </button>
 
-          <div className="text-center min-w-[140px]">
-            <div className="text-white/80 text-sm font-light">
+          {/* Date display */}
+          <div className="text-center min-w-[160px]">
+            <div className="text-white text-sm font-light tracking-wide">
               {currentGroup ? formatDate(currentGroup.date) : '--'}
               {currentTime && (
-                <span className="text-white/40 ml-2 text-xs">
+                <span className="text-zinc-400 ml-2 text-xs">
                   {formatTime(currentTime)}
                 </span>
               )}
             </div>
-            <div className="text-white/30 text-[10px] font-mono">
-              {currentGroup ? `${currentGroup.count} proofs` : ''}
+            <div className="text-zinc-500 text-[10px] font-mono">
+              {currentGroup ? `${currentGroup.count} proofs` : ''} / {walkerCount} souls
             </div>
+            {dayGroups.length > 0 && (
+              <div className="text-zinc-600 text-[10px] font-mono">
+                Day {currentDayIndex + 1} / {dayGroups.length}
+              </div>
+            )}
           </div>
 
           <button
             onClick={() => {
-              const newIndex = Math.min(
-                dayGroups.length - 1,
-                currentDayIndex + 1
-              );
+              const newIndex = Math.min(dayGroups.length - 1, currentDayIndex + 1);
               setCurrentDayIndex(newIndex);
-              jumpToDay(newIndex, true); // Manual jump - clear walkers
+              jumpToDay(newIndex, true);
             }}
-            className="text-white/30 hover:text-white/60 text-xs font-mono"
+            disabled={currentDayIndex >= dayGroups.length - 1}
+            className="p-2 text-zinc-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             →
           </button>
 
-          <div className="w-px h-4 bg-white/10" />
+          <div className="w-px h-6 bg-zinc-700 mx-2" />
 
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="text-white/40 hover:text-white/70 text-xs font-mono"
+            className="p-2 text-zinc-400 hover:text-white transition-colors"
           >
             {isPlaying ? '⏸' : '▶'}
           </button>
 
           <button
             onClick={() => setSpeed((s) => (s >= 3 ? 0.5 : s + 0.5))}
-            className="text-white/40 hover:text-white/70 text-xs font-mono min-w-[24px]"
+            className="text-zinc-400 hover:text-white text-xs font-mono min-w-[32px] p-2 transition-colors"
           >
             {speed}x
           </button>
         </div>
-      </div>
-
-      {/* Corner info */}
-      <div className="absolute top-4 left-4 text-white/20 text-[10px] font-mono">
-        {walkerCount} souls
-      </div>
-
-      <div className="absolute top-4 right-4 text-white/20 text-[10px] font-mono text-right">
-        <div>
-          {dayGroups.length > 0
-            ? `Day ${currentDayIndex + 1} / ${dayGroups.length}`
-            : ''}
-        </div>
-        {dayGroups.length > 0 && (
-          <div className="text-white/10">
-            {dayGroups[0]?.date.getFullYear()} -{' '}
-            {dayGroups[dayGroups.length - 1]?.date.getFullYear()}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -9,6 +9,10 @@
     "cosmos": "Cosmos",
     "badges": "Insignias",
     "learn": "Aprender",
+    "poeGen": "POE Gen",
+    "daisyPoe": "Daisy POE",
+    "orbitPoe": "Orbit POE",
+    "walkerPoe": "Walker POE",
     "gettingStarted": "Primeros Pasos",
     "tutorials": "Tutoriales",
     "stories": "Historias",
@@ -490,6 +494,20 @@
       "tip2": "Las insignias de creación se ganan a través de tu actividad de dibujo, duración y consistencia",
       "tip3": "Las insignias de comunidad provienen de los me gusta y guardados de tu trabajo por otros usuarios",
       "tip4": "Las insignias TIME26 se ganan a través de donaciones y colecciones de tokens"
+    }
+  },
+  "col": {
+    "granularity": {
+      "day": "Día",
+      "month": "Mes",
+      "quarter": "Trimestre",
+      "year": "Año"
+    },
+    "loading": "Cargando...",
+    "trailCount": "{count} rastros",
+    "emptyState": {
+      "title": "No hay rastros en este período",
+      "subtitle": "Intenta seleccionar otra fecha"
     }
   }
 }

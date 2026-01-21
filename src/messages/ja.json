@@ -9,6 +9,10 @@
     "cosmos": "コスモス",
     "badges": "バッジ",
     "learn": "学ぶ",
+    "poeGen": "POE Gen",
+    "daisyPoe": "Daisy POE",
+    "orbitPoe": "Orbit POE",
+    "walkerPoe": "Walker POE",
     "gettingStarted": "はじめに",
     "tutorials": "チュートリアル",
     "stories": "ストーリー",
@@ -490,6 +494,20 @@
       "tip2": "創作バッジは、描画活動、時間、継続性によって獲得されます",
       "tip3": "コミュニティバッジは、他のユーザーからの作品へのいいねや保存から得られます",
       "tip4": "TIME26バッジは、トークンの寄付と収集によって獲得されます"
+    }
+  },
+  "col": {
+    "granularity": {
+      "day": "日",
+      "month": "月",
+      "quarter": "四半期",
+      "year": "年"
+    },
+    "loading": "読み込み中...",
+    "trailCount": "{count} 本の軌跡",
+    "emptyState": {
+      "title": "この期間に軌跡はありません",
+      "subtitle": "別の日付を選択してください"
     }
   }
 }

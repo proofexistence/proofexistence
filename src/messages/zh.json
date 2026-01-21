@@ -9,6 +9,10 @@
     "cosmos": "宇宙",
     "badges": "徽章",
     "learn": "學習",
+    "poeGen": "POE 生成",
+    "daisyPoe": "Daisy POE",
+    "orbitPoe": "Orbit POE",
+    "walkerPoe": "Walker POE",
     "gettingStarted": "入門指南",
     "tutorials": "教學",
     "stories": "故事",
@@ -493,6 +497,20 @@
       "tip2": "創作相關徽章透過您的繪畫活動、時長和連續性獲得",
       "tip3": "社群徽章來自其他用戶對您作品的按讚和收藏",
       "tip4": "TIME26 徽章透過代幣的贈送和領取獲得"
+    }
+  },
+  "col": {
+    "granularity": {
+      "day": "日",
+      "month": "月",
+      "quarter": "季",
+      "year": "年"
+    },
+    "loading": "載入中...",
+    "trailCount": "{count} 個軌跡",
+    "emptyState": {
+      "title": "此期間內沒有軌跡",
+      "subtitle": "嘗試選擇其他日期"
     }
   }
 }
