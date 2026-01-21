@@ -473,7 +473,7 @@ export function POECanvas() {
     duration: number;
     points: TrailPoint[];
     sectorId: number;
-    color?: string;
+    color: string;
   } | null>(null);
 
   // Dialog State
@@ -707,10 +707,10 @@ export function POECanvas() {
       duration: session.duration,
       points: session.points,
       sectorId: session.sectorId,
-      color: trailColor,
+      color: session.color, // Use color from ref, not current state
     });
     return sessionId;
-  }, [trailColor, createSession]);
+  }, [createSession]);
 
   // Helper function to delete session
   const handleDeleteSession = useCallback(
@@ -1305,6 +1305,10 @@ export function POECanvas() {
 
   const handleColorChange = useCallback((color: string) => {
     setTrailColor(color);
+    // Sync with completed session ref to ensure screenshot uses same color
+    if (completedSessionRef.current) {
+      completedSessionRef.current.color = color;
+    }
   }, []);
 
   // Zoom Handlers
@@ -1404,7 +1408,7 @@ export function POECanvas() {
         {captureMode ? (
           <CaptureScene
             points={completedSessionRef.current?.points || []}
-            color={completedSessionRef.current?.color || trailColor}
+            color={completedSessionRef.current?.color ?? trailColor}
           />
         ) : (
           <Scene
