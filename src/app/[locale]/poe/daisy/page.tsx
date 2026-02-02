@@ -41,14 +41,31 @@ export default async function DailyArtPage() {
     }));
 
   return (
-    <div className="w-full h-[calc(100vh-5rem)] mt-20 overflow-hidden">
-      <Suspense fallback={<div className="flex items-center justify-center h-full text-zinc-400">Loading...</div>}>
-        <DailyArtCanvas
-          initialSessions={sessions}
-          initialDate={initialDate}
-          availableDates={availableDates}
-        />
-      </Suspense>
+    <div className="w-full h-screen pt-32 flex flex-col items-center">
+      <div className="text-center mb-8 px-4 animate-fade-in">
+        <h1 className="text-3xl font-light text-white mb-2 tracking-tight">
+          Daisy POE
+        </h1>
+        <p className="text-zinc-400 max-w-lg mx-auto">
+          Daily collective art visualization where sessions expand from center
+          to edge like ripples in time.
+        </p>
+      </div>
+      <div className="w-full flex-1 overflow-hidden">
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center h-full text-zinc-400">
+              Loading...
+            </div>
+          }
+        >
+          <DailyArtCanvas
+            initialSessions={sessions}
+            initialDate={initialDate}
+            availableDates={availableDates}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }
