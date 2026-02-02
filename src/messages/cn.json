@@ -509,5 +509,24 @@
       "title": "此期间内没有轨迹",
       "subtitle": "尝试选择其他日期"
     }
+  },
+  "inAppBrowser": {
+    "title": "检测到应用内浏览器",
+    "titleWithApp": "在 {app} 中打开",
+    "description": "登录功能在此浏览器中可能无法正常运作。",
+    "suggestion": "请使用外部浏览器打开以获得最佳体验。",
+    "copyUrl": "复制网址",
+    "copied": "已复制网址",
+    "continue": "继续",
+    "instructions": {
+      "Instagram": "点击右上角的「⋯」菜单，选择「在浏览器中打开」",
+      "Line": "点击右下角的「⋯」菜单，选择「以默认浏览器打开」",
+      "Facebook": "点击右下角的「⋯」菜单，选择「在浏览器中打开」",
+      "Twitter": "点击右上角的「⋯」菜单，选择「在浏览器中打开」",
+      "WeChat": "点击右上角的「⋯」菜单，选择「在浏览器打开」",
+      "Telegram": "点击右上角的「⋯」菜单，选择「Open in Browser」",
+      "TikTok": "点击右上角的「⋯」菜单，选择「在浏览器中打开」",
+      "default": "请复制网址并在 Safari 或 Chrome 中打开"
+    }
   }
 }

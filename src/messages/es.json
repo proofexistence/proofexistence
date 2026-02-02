@@ -509,5 +509,24 @@
       "title": "No hay rastros en este período",
       "subtitle": "Intenta seleccionar otra fecha"
     }
+  },
+  "inAppBrowser": {
+    "title": "Navegador in-app detectado",
+    "titleWithApp": "Abierto en {app}",
+    "description": "El inicio de sesión puede no funcionar correctamente en este navegador.",
+    "suggestion": "Por favor, abre en un navegador externo para una mejor experiencia.",
+    "copyUrl": "Copiar URL",
+    "copied": "URL copiada",
+    "continue": "Continuar",
+    "instructions": {
+      "Instagram": "Toca el menú ⋯ en la esquina superior derecha y selecciona \"Abrir en navegador\"",
+      "Line": "Toca el menú ⋯ en la esquina inferior derecha y selecciona \"Abrir en navegador predeterminado\"",
+      "Facebook": "Toca el menú ⋯ en la esquina inferior derecha y selecciona \"Abrir en navegador\"",
+      "Twitter": "Toca el menú ⋯ en la esquina superior derecha y selecciona \"Abrir en navegador\"",
+      "WeChat": "Toca el menú ⋯ en la esquina superior derecha y selecciona \"Abrir en navegador\"",
+      "Telegram": "Toca el menú ⋯ en la esquina superior derecha y selecciona \"Open in Browser\"",
+      "TikTok": "Toca el menú ⋯ en la esquina superior derecha y selecciona \"Abrir en navegador\"",
+      "default": "Por favor, copia la URL y ábrela en Safari o Chrome"
+    }
   }
 }

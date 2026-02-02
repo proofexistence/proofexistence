@@ -509,5 +509,24 @@
       "title": "Aucune trace dans cette période",
       "subtitle": "Essayez de sélectionner une autre date"
     }
+  },
+  "inAppBrowser": {
+    "title": "Navigateur in-app détecté",
+    "titleWithApp": "Ouvert dans {app}",
+    "description": "La connexion peut ne pas fonctionner correctement dans ce navigateur.",
+    "suggestion": "Veuillez ouvrir dans un navigateur externe pour une meilleure expérience.",
+    "copyUrl": "Copier l'URL",
+    "copied": "URL copiée",
+    "continue": "Continuer",
+    "instructions": {
+      "Instagram": "Appuyez sur le menu ⋯ en haut à droite, puis sélectionnez \"Ouvrir dans le navigateur\"",
+      "Line": "Appuyez sur le menu ⋯ en bas à droite, puis sélectionnez \"Ouvrir dans le navigateur par défaut\"",
+      "Facebook": "Appuyez sur le menu ⋯ en bas à droite, puis sélectionnez \"Ouvrir dans le navigateur\"",
+      "Twitter": "Appuyez sur le menu ⋯ en haut à droite, puis sélectionnez \"Ouvrir dans le navigateur\"",
+      "WeChat": "Appuyez sur le menu ⋯ en haut à droite, puis sélectionnez \"Ouvrir dans le navigateur\"",
+      "Telegram": "Appuyez sur le menu ⋯ en haut à droite, puis sélectionnez \"Open in Browser\"",
+      "TikTok": "Appuyez sur le menu ⋯ en haut à droite, puis sélectionnez \"Ouvrir dans le navigateur\"",
+      "default": "Veuillez copier l'URL et l'ouvrir dans Safari ou Chrome"
+    }
   }
 }

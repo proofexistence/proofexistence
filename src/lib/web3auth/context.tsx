@@ -12,6 +12,7 @@ import { Web3Auth } from '@web3auth/modal';
 import { ADAPTER_EVENTS, type IProvider } from '@web3auth/base';
 import { web3AuthConfig, chainConfig } from './config';
 import { ethers } from 'ethers';
+import { detectInAppBrowser, isMobileBrowser } from '@/lib/browser-detect';
 
 export interface Web3AuthUser {
   // From ID token
@@ -33,6 +34,8 @@ interface Web3AuthContextType {
   getIdToken: () => Promise<string | null>;
   exportPrivateKey: () => Promise<string | null>;
   isExternalWallet: boolean;
+  isInAppBrowser: boolean;
+  inAppBrowserName: string | null;
 }
 
 const Web3AuthContext = createContext<Web3AuthContextType | null>(null);
@@ -44,6 +47,10 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [user, setUser] = useState<Web3AuthUser | null>(null);
+  const [inAppBrowserInfo, setInAppBrowserInfo] = useState({
+    isInAppBrowser: false,
+    browserName: null as string | null,
+  });
 
   const fetchUserData = useCallback(async (web3authInstance: Web3Auth) => {
     if (!web3authInstance.provider) return;
@@ -116,11 +123,23 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        // Detect mobile browser to prevent auto MetaMask deep link on page load
-        const isMobile =
-          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
+        // Detect in-app browser (Instagram, Line, etc.) which have OAuth restrictions
+        const browserInfo = detectInAppBrowser();
+        const isMobile = isMobileBrowser();
+
+        // Store in-app browser info for context
+        setInAppBrowserInfo({
+          isInAppBrowser: browserInfo.isInAppBrowser,
+          browserName: browserInfo.browserName,
+        });
+
+        // Log warning for in-app browsers
+        if (browserInfo.isInAppBrowser) {
+          console.warn(
+            `[Web3Auth] Detected in-app browser: ${browserInfo.browserName}. ` +
+              'OAuth login may not work. Users should open in external browser.'
           );
+        }
 
         const web3authInstance = new Web3Auth({
           clientId: web3AuthConfig.clientId,
@@ -128,6 +147,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           // @ts-expect-error - chainConfig exists in IWeb3AuthCoreOptions but not in modal's Web3AuthOptions
           chainConfig,
           // Use redirect mode on mobile to avoid popup blockers
+          // Note: redirect mode still won't work for OAuth in in-app browsers (Google blocks it)
           uxMode: isMobile ? 'redirect' : 'popup',
           // Note: uiConfig and walletServicesConfig removed to avoid 403 on Base plan
           // (appName triggers whitelabel check, walletServicesConfig triggers wallet services check)
@@ -318,6 +338,8 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         getIdToken,
         exportPrivateKey,
         isExternalWallet,
+        isInAppBrowser: inAppBrowserInfo.isInAppBrowser,
+        inAppBrowserName: inAppBrowserInfo.browserName,
       }}
     >
       {children}
@@ -337,6 +359,8 @@ const defaultContext: Web3AuthContextType = {
   getIdToken: async () => null,
   exportPrivateKey: async () => null,
   isExternalWallet: false,
+  isInAppBrowser: false,
+  inAppBrowserName: null,
 };
 
 export function useWeb3Auth() {

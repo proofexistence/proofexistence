@@ -512,5 +512,24 @@
       "title": "此期間內沒有軌跡",
       "subtitle": "嘗試選擇其他日期"
     }
+  },
+  "inAppBrowser": {
+    "title": "偵測到應用內瀏覽器",
+    "titleWithApp": "在 {app} 中開啟",
+    "description": "登入功能在此瀏覽器中可能無法正常運作。",
+    "suggestion": "請使用外部瀏覽器開啟以獲得最佳體驗。",
+    "copyUrl": "複製網址",
+    "copied": "已複製網址",
+    "continue": "繼續",
+    "instructions": {
+      "Instagram": "點擊右上角的「⋯」選單，選擇「在瀏覽器中開啟」",
+      "Line": "點擊右下角的「⋯」選單，選擇「以預設瀏覽器開啟」",
+      "Facebook": "點擊右下角的「⋯」選單，選擇「在瀏覽器中開啟」",
+      "Twitter": "點擊右上角的「⋯」選單，選擇「在瀏覽器中開啟」",
+      "WeChat": "點擊右上角的「⋯」選單，選擇「在瀏覽器打開」",
+      "Telegram": "點擊右上角的「⋯」選單，選擇「Open in Browser」",
+      "TikTok": "點擊右上角的「⋯」選單，選擇「在瀏覽器中開啟」",
+      "default": "請複製網址並在 Safari 或 Chrome 中開啟"
+    }
   }
 }

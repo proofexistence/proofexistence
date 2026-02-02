@@ -512,5 +512,24 @@
       "title": "No trails in this period",
       "subtitle": "Try selecting a different date"
     }
+  },
+  "inAppBrowser": {
+    "title": "In-App Browser Detected",
+    "titleWithApp": "Opened in {app}",
+    "description": "Login may not work properly in this browser.",
+    "suggestion": "Please open in an external browser for the best experience.",
+    "copyUrl": "Copy URL",
+    "copied": "URL Copied",
+    "continue": "Continue Anyway",
+    "instructions": {
+      "Instagram": "Tap the ⋯ menu at the top right, then select \"Open in Browser\"",
+      "Line": "Tap the ⋯ menu at the bottom right, then select \"Open in default browser\"",
+      "Facebook": "Tap the ⋯ menu at the bottom right, then select \"Open in Browser\"",
+      "Twitter": "Tap the ⋯ menu at the top right, then select \"Open in Browser\"",
+      "WeChat": "Tap the ⋯ menu at the top right, then select \"Open in Browser\"",
+      "Telegram": "Tap the ⋯ menu at the top right, then select \"Open in Browser\"",
+      "TikTok": "Tap the ⋯ menu at the top right, then select \"Open in Browser\"",
+      "default": "Please copy the URL and open in Safari or Chrome"
+    }
   }
 }
