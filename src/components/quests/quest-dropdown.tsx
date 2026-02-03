@@ -319,13 +319,19 @@ function ThemeTaskItem({
     <div
       className={cn(
         'p-2 rounded-lg',
-        completed ? 'bg-green-500/10' : 'bg-gradient-to-r from-purple-500/10 to-blue-500/10'
+        completed
+          ? 'bg-green-500/10'
+          : 'bg-gradient-to-r from-purple-500/10 to-blue-500/10'
       )}
     >
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <span className={completed ? 'text-green-400' : 'text-purple-400'}>
-            {completed ? <Check className="w-4 h-4" /> : <Palette className="w-4 h-4" />}
+            {completed ? (
+              <Check className="w-4 h-4" />
+            ) : (
+              <Palette className="w-4 h-4" />
+            )}
           </span>
           <span className="text-[10px] text-zinc-500 uppercase tracking-wider">
             {t('todayTheme')}
@@ -350,10 +356,12 @@ function ThemeTaskItem({
           {translatedName}
         </span>
         {translatedDesc && (
-          <p className={cn(
-            'text-xs mt-0.5',
-            completed ? 'text-green-400/60' : 'text-zinc-500'
-          )}>
+          <p
+            className={cn(
+              'text-xs mt-0.5',
+              completed ? 'text-green-400/60' : 'text-zinc-500'
+            )}
+          >
             {translatedDesc}
           </p>
         )}

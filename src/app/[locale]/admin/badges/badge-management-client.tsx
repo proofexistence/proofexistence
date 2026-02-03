@@ -200,8 +200,8 @@ export function BadgeManagementClient({
           {/* Description */}
           <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
             <p className="text-sm text-blue-300">
-              💡 此功能會自動找出前 100 位創建 proof 的用戶並頒發 Early
-              Adopter 徽章。
+              💡 此功能會自動找出前 100 位創建 proof 的用戶並頒發 Early Adopter
+              徽章。
               <br />
               This will automatically find the first 100 users who created
               proofs and award them the Early Adopter badge.

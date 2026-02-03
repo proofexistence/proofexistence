@@ -2,7 +2,15 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Play, Pause, Download, RotateCcw, SkipForward } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  Download,
+  RotateCcw,
+  SkipForward,
+} from 'lucide-react';
 import { DatePicker } from './date-picker';
 
 import {
@@ -25,8 +33,8 @@ import type { DailyArtSession } from './types';
 
 const CANVAS_SIZE = 2048;
 const ANIMATION_DURATION = 60000; // Always 60 seconds for full animation
-const FILL_FLOWER_COUNT = 400; // More fill flowers
-const POSITION_SPACING = 80; // Closer initial spacing
+const FILL_FLOWER_COUNT = 500; // Dense but not chaotic
+const POSITION_SPACING = 70; // Close but organized
 
 interface DailyArtCanvasProps {
   initialSessions: DailyArtSession[];
@@ -48,7 +56,9 @@ export function DailyArtCanvas({
   const svgsRef = useRef<string[]>([]);
   const animationRef = useRef<number>(0);
   const animationStartTimeRef = useRef<number>(0);
-  const existingPositionsRef = useRef<{ x: number; y: number; size: number }[]>([]);
+  const existingPositionsRef = useRef<{ x: number; y: number; size: number }[]>(
+    []
+  );
   const svgsLoadedRef = useRef(false);
   const isPlayingRef = useRef(true);
   const isCompleteRef = useRef(false);
@@ -69,12 +79,19 @@ export function DailyArtCanvas({
   const [currentProgress, setCurrentProgress] = useState(0);
   const [remainingSeconds, setRemainingSeconds] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
-  const [autoAdvanceCountdown, setAutoAdvanceCountdown] = useState<number | null>(null);
+  const [autoAdvanceCountdown, setAutoAdvanceCountdown] = useState<
+    number | null
+  >(null);
   const [totalDaisies, setTotalDaisies] = useState(0);
-  const [phase, setPhase] = useState<'loading' | 'sessions' | 'filling' | 'complete'>('loading');
+  const [phase, setPhase] = useState<
+    'loading' | 'sessions' | 'filling' | 'complete'
+  >('loading');
 
   // Derived values
-  const date = useMemo(() => new Date(currentDate + 'T00:00:00Z'), [currentDate]);
+  const date = useMemo(
+    () => new Date(currentDate + 'T00:00:00Z'),
+    [currentDate]
+  );
   const background = useMemo(() => getBackgroundForDate(date), [date]);
   const candyPalette = useMemo(() => getCandyPaletteForDate(date), [date]);
   const centerColors = useMemo(() => getCenterColorsForDate(date), [date]);
@@ -89,7 +106,8 @@ export function DailyArtCanvas({
   // Sort sessions by createdAt (with stable secondary sort by id)
   const sortedSessions = useMemo(() => {
     return [...sessions].sort((a, b) => {
-      const timeDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      const timeDiff =
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       if (timeDiff !== 0) return timeDiff;
       // Secondary sort by id for stability
       return a.id.localeCompare(b.id);
@@ -154,22 +172,35 @@ export function DailyArtCanvas({
   }, [clearAutoAdvance]);
 
   // Update URL with date
-  const updateUrlWithDate = useCallback((date: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('date', date);
-    router.push(`?${params.toString()}`, { scroll: false });
-  }, [router, searchParams]);
+  const updateUrlWithDate = useCallback(
+    (date: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('date', date);
+      router.push(`?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams]
+  );
 
   // Set date (updates both state and URL)
-  const setDateWithUrl = useCallback((newDate: string) => {
-    if (newDate !== currentDate && availableDates.includes(newDate)) {
-      clearAutoAdvance();
-      setCurrentDate(newDate);
-      updateUrlWithDate(newDate);
-      resetAnimation();
-      fetchSessions(newDate);
-    }
-  }, [currentDate, availableDates, clearAutoAdvance, updateUrlWithDate, resetAnimation, fetchSessions]);
+  const setDateWithUrl = useCallback(
+    (newDate: string) => {
+      if (newDate !== currentDate && availableDates.includes(newDate)) {
+        clearAutoAdvance();
+        setCurrentDate(newDate);
+        updateUrlWithDate(newDate);
+        resetAnimation();
+        fetchSessions(newDate);
+      }
+    },
+    [
+      currentDate,
+      availableDates,
+      clearAutoAdvance,
+      updateUrlWithDate,
+      resetAnimation,
+      fetchSessions,
+    ]
+  );
 
   // Change date (prev/next)
   const changeDate = useCallback(
@@ -178,7 +209,8 @@ export function DailyArtCanvas({
       let newIdx: number;
 
       if (direction === 'prev') {
-        newIdx = currentIdx < availableDates.length - 1 ? currentIdx + 1 : currentIdx;
+        newIdx =
+          currentIdx < availableDates.length - 1 ? currentIdx + 1 : currentIdx;
       } else {
         newIdx = currentIdx > 0 ? currentIdx - 1 : currentIdx;
       }
@@ -215,7 +247,8 @@ export function DailyArtCanvas({
       }
     }, 1000);
 
-    autoAdvanceTimerRef.current = countdownInterval as unknown as NodeJS.Timeout;
+    autoAdvanceTimerRef.current =
+      countdownInterval as unknown as NodeJS.Timeout;
   }, [availableDates, currentDate, changeDate]);
 
   // Skip to end - instantly complete the animation
@@ -275,7 +308,9 @@ export function DailyArtCanvas({
     let flowerSpawnInterval = 40; // Will be calculated based on queue length
 
     // Session-based queue: each session's trail flowers in order, with fill flowers between sessions
-    type FlowerItem = { type: 'trail'; data: PendingDaisy } | { type: 'fill'; data: { x: number; y: number; size: number } };
+    type FlowerItem =
+      | { type: 'trail'; data: PendingDaisy }
+      | { type: 'fill'; data: { x: number; y: number; size: number } };
     const flowerQueue: FlowerItem[] = [];
     let currentQueueIndex = 0;
 
@@ -307,7 +342,43 @@ export function DailyArtCanvas({
         daisiesRef.current = [];
         existingPositionsRef.current = [];
 
-        // Pre-generate all fill flower positions
+        // --- STEP 1: Pre-calculate ALL trail flowers first to ensure they get priority ---
+        // We want trails to be unbroken, so we reserve their space before placing any fill flowers.
+        const allSessionTrails: {
+          [key: number]: { type: 'trail'; data: PendingDaisy }[];
+        } = {};
+
+        sortedSessions.forEach((session, idx) => {
+          // Calculate trail flowers for this session
+          // Use session.id for deterministic positioning (consistent across renders)
+          const trailFlowers = calculateTrailDaisyPositions(
+            session.trailData,
+            session.duration,
+            candyPalette,
+            centerColors,
+            CANVAS_SIZE,
+            session.id, // Use session ID for consistent seed
+            existingPositionsRef.current
+          );
+
+          // IMPORTANT: Add these to existingPositionsRef immediately so subsequent generations (fills) respect them
+          trailFlowers.forEach((flower) => {
+            existingPositionsRef.current.push({
+              x: flower.x,
+              y: flower.y,
+              size: flower.maxSize,
+            });
+          });
+
+          // Store for queue building
+          allSessionTrails[idx] = trailFlowers.map((f) => ({
+            type: 'trail',
+            data: f,
+          }));
+        });
+
+        // --- STEP 2: Generate background fill positions ---
+        // Now that trails are reserved, we can generate fill positions that won't block them
         const allFillPositions = generateBackgroundPositions(
           CANVAS_SIZE,
           FILL_FLOWER_COUNT,
@@ -315,26 +386,24 @@ export function DailyArtCanvas({
           daySeed + 9999
         );
 
-        // Build queue: for each session, add trail flowers in sequence
-        // Sprinkle fill flowers between sessions
-        const fillPerSession = Math.floor(allFillPositions.length / (sortedSessions.length + 1));
+        // Filter valid fill positions (check against established trail positions)
+        const validFillPositions: { x: number; y: number; size: number }[] = [];
+        const fillBaseSize = CANVAS_SIZE * 0.07; // Slightly larger background flowers
+
+        // Dense but clear: edges can touch but no heavy overlap
+        const FILL_COLLISION_THRESHOLD = 0.75; // 25% overlap max
+
         let fillIdx = 0;
-
-        // Fill flowers smaller as background layer (trail flowers are larger)
-        const fillBaseSize = CANVAS_SIZE * 0.065;
-
-        // Add some initial fill flowers
-        for (let i = 0; i < fillPerSession && fillIdx < allFillPositions.length; i++) {
-          const pos = allFillPositions[fillIdx];
-          // Mixed size layers: 30% tiny, 40% small, 30% medium
+        for (const pos of allFillPositions) {
+          // More uniform sizes for Murakami style (0.7 to 1.2x)
           const sizeCategory = (fillIdx * 777) % 100;
           let sizeMult: number;
-          if (sizeCategory < 30) {
-            sizeMult = 0.4 + ((fillIdx * 123) % 20) / 100; // tiny: 0.4-0.6
-          } else if (sizeCategory < 70) {
-            sizeMult = 0.7 + ((fillIdx * 456) % 30) / 100; // small: 0.7-1.0
+          if (sizeCategory < 40) {
+            sizeMult = 0.7 + ((fillIdx * 123) % 15) / 100;
+          } else if (sizeCategory < 80) {
+            sizeMult = 0.85 + ((fillIdx * 456) % 20) / 100;
           } else {
-            sizeMult = 1.0 + ((fillIdx * 789) % 40) / 100; // medium: 1.0-1.4
+            sizeMult = 1.05 + ((fillIdx * 789) % 15) / 100;
           }
           const flowerSize = fillBaseSize * sizeMult;
           const radius = flowerSize / 2;
@@ -345,114 +414,83 @@ export function DailyArtCanvas({
             const dy = pos.y - existing.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             const minDist = radius + existing.size / 2;
-            if (dist < minDist * 0.5) {
+            if (dist < minDist * FILL_COLLISION_THRESHOLD) {
               tooClose = true;
               break;
             }
           }
+
           if (!tooClose) {
-            flowerQueue.push({ type: 'fill', data: { ...pos, size: flowerSize } });
+            validFillPositions.push({ ...pos, size: flowerSize });
             existingPositionsRef.current.push({ ...pos, size: flowerSize });
           }
           fillIdx++;
         }
 
-        // Process each session - trail flowers appear in sequence along the path
-        sortedSessions.forEach((session, idx) => {
-          // Calculate trail flowers for this session (they're already in path order)
-          const trailFlowers = calculateTrailDaisyPositions(
-            session.trailData,
-            session.duration,
-            candyPalette,
-            centerColors,
-            CANVAS_SIZE,
-            idx,
-            existingPositionsRef.current
-          );
+        // --- STEP 3: Build the animation queue ---
+        // We interleave the pre-calculated trails with the valid background flowers
+        // to create a balanced "planting" animation.
 
-          // Add all trail flowers for this session in order (this forms the line!)
-          for (const flower of trailFlowers) {
-            flowerQueue.push({ type: 'trail', data: flower });
-          }
+        const fillPerSession = Math.floor(
+          validFillPositions.length / (sortedSessions.length + 1)
+        );
+        let validFillIdx = 0;
 
-          // Add fill flowers between sessions
-          for (let i = 0; i < fillPerSession && fillIdx < allFillPositions.length; i++) {
-            const pos = allFillPositions[fillIdx];
-            // Mixed size layers
-            const sizeCategory = (fillIdx * 777) % 100;
-            let sizeMult: number;
-            if (sizeCategory < 30) {
-              sizeMult = 0.4 + ((fillIdx * 123) % 20) / 100;
-            } else if (sizeCategory < 70) {
-              sizeMult = 0.7 + ((fillIdx * 456) % 30) / 100;
-            } else {
-              sizeMult = 1.0 + ((fillIdx * 789) % 40) / 100;
-            }
-            const flowerSize = fillBaseSize * sizeMult;
-            const radius = flowerSize / 2;
+        // Add initial batch of background flowers
+        for (
+          let i = 0;
+          i < fillPerSession && validFillIdx < validFillPositions.length;
+          i++
+        ) {
+          flowerQueue.push({
+            type: 'fill',
+            data: validFillPositions[validFillIdx],
+          });
+          validFillIdx++;
+        }
 
-            let tooClose = false;
-            for (const existing of existingPositionsRef.current) {
-              const dx = pos.x - existing.x;
-              const dy = pos.y - existing.y;
-              const dist = Math.sqrt(dx * dx + dy * dy);
-              const minDist = radius + existing.size / 2;
-              if (dist < minDist * 0.5) {
-                tooClose = true;
-                break;
-              }
-            }
-            if (!tooClose) {
-              flowerQueue.push({ type: 'fill', data: { ...pos, size: flowerSize } });
-              existingPositionsRef.current.push({ ...pos, size: flowerSize });
-            }
-            fillIdx++;
+        // Process each session
+        sortedSessions.forEach((_, idx) => {
+          const sessionPoints = allSessionTrails[idx] || [];
+
+          // Add all flowers for this session
+          flowerQueue.push(...sessionPoints);
+
+          // Add batch of background flowers
+          for (
+            let i = 0;
+            i < fillPerSession && validFillIdx < validFillPositions.length;
+            i++
+          ) {
+            flowerQueue.push({
+              type: 'fill',
+              data: validFillPositions[validFillIdx],
+            });
+            validFillIdx++;
           }
         });
 
-        // Add remaining fill flowers
-        while (fillIdx < allFillPositions.length) {
-          const pos = allFillPositions[fillIdx];
-          // Mixed size layers
-          const sizeCategory = (fillIdx * 777) % 100;
-          let sizeMult: number;
-          if (sizeCategory < 30) {
-            sizeMult = 0.4 + ((fillIdx * 123) % 20) / 100;
-          } else if (sizeCategory < 70) {
-            sizeMult = 0.7 + ((fillIdx * 456) % 30) / 100;
-          } else {
-            sizeMult = 1.0 + ((fillIdx * 789) % 40) / 100;
-          }
-          const flowerSize = fillBaseSize * sizeMult;
-          const radius = flowerSize / 2;
-
-          let tooClose = false;
-          for (const existing of existingPositionsRef.current) {
-            const dx = pos.x - existing.x;
-            const dy = pos.y - existing.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const minDist = radius + existing.size / 2;
-            if (dist < minDist * 0.5) {
-              tooClose = true;
-              break;
-            }
-          }
-          if (!tooClose) {
-            flowerQueue.push({ type: 'fill', data: { ...pos, size: flowerSize } });
-            existingPositionsRef.current.push({ ...pos, size: flowerSize });
-          }
-          fillIdx++;
+        // Add any remaining background flowers
+        while (validFillIdx < validFillPositions.length) {
+          flowerQueue.push({
+            type: 'fill',
+            data: validFillPositions[validFillIdx],
+          });
+          validFillIdx++;
         }
 
-        // Calculate spawn interval to make animation always 60 seconds
-        // Minimum interval of 20ms to prevent too fast spawning
-        flowerSpawnInterval = Math.max(20, Math.floor(ANIMATION_DURATION / Math.max(1, flowerQueue.length)));
+        // Calculate spawn interval
+        flowerSpawnInterval = Math.max(
+          20,
+          Math.floor(ANIMATION_DURATION / Math.max(1, flowerQueue.length))
+        );
 
         setPhase('sessions');
       }
 
       // Calculate progress
-      const queueProgress = flowerQueue.length > 0 ? currentQueueIndex / flowerQueue.length : 0;
+      const queueProgress =
+        flowerQueue.length > 0 ? currentQueueIndex / flowerQueue.length : 0;
 
       // Update progress
       if (isPlayingLocal) {
@@ -465,7 +503,11 @@ export function DailyArtCanvas({
 
       // Spawn flowers from queue - supports speed multiplier and skip to end
       // Uses calculated interval to ensure 60-second total animation at 1x speed
-      if (isPlayingLocal && currentQueueIndex < flowerQueue.length && !isCompleteRef.current) {
+      if (
+        isPlayingLocal &&
+        currentQueueIndex < flowerQueue.length &&
+        !isCompleteRef.current
+      ) {
         const shouldSkip = skipToEndRef.current;
         const speed = playbackSpeedRef.current;
         const adjustedInterval = flowerSpawnInterval / speed;
@@ -480,7 +522,11 @@ export function DailyArtCanvas({
           flowersToSpawn = speed; // 1x = 1, 2x = 2, 4x = 4 flowers per interval
         }
 
-        for (let i = 0; i < flowersToSpawn && currentQueueIndex < flowerQueue.length; i++) {
+        for (
+          let i = 0;
+          i < flowersToSpawn && currentQueueIndex < flowerQueue.length;
+          i++
+        ) {
           const item = flowerQueue[currentQueueIndex];
 
           if (item.type === 'trail') {
@@ -500,7 +546,8 @@ export function DailyArtCanvas({
               return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
             };
 
-            const centerColor = centerColors[Math.floor(random() * centerColors.length)];
+            const centerColor =
+              centerColors[Math.floor(random() * centerColors.length)];
             const svgIndex = Math.floor(random() * 12);
 
             const daisy = new Daisy(
@@ -533,7 +580,11 @@ export function DailyArtCanvas({
       }
 
       // Check completion - only if we actually have flowers to show
-      if (flowerQueue.length > 0 && currentQueueIndex >= flowerQueue.length && !isCompleteRef.current) {
+      if (
+        flowerQueue.length > 0 &&
+        currentQueueIndex >= flowerQueue.length &&
+        !isCompleteRef.current
+      ) {
         const allDone = daisiesRef.current.every((d) => d.isDone());
         if (allDone) {
           isCompleteRef.current = true;
@@ -598,7 +649,8 @@ export function DailyArtCanvas({
         style={{
           width: displaySize,
           height: displaySize,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          boxShadow:
+            '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1)',
         }}
       >
         <canvas
@@ -616,14 +668,17 @@ export function DailyArtCanvas({
           </div>
         )}
 
-        {!isLoading && sortedSessions.length === 0 && phase !== 'filling' && phase !== 'complete' && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-zinc-500 text-sm text-center">
-              <div>No proofs on this day</div>
-              <div className="text-xs mt-1 opacity-60">Try another date</div>
+        {!isLoading &&
+          sortedSessions.length === 0 &&
+          phase !== 'filling' &&
+          phase !== 'complete' && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-zinc-500 text-sm text-center">
+                <div>No proofs on this day</div>
+                <div className="text-xs mt-1 opacity-60">Try another date</div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
 
       {/* Controls */}
@@ -718,7 +773,8 @@ export function DailyArtCanvas({
 
           {!isComplete && (
             <div className="text-zinc-500 text-[10px] font-mono min-w-[50px] text-center">
-              {Math.floor(remainingSeconds / 60)}:{String(remainingSeconds % 60).padStart(2, '0')}
+              {Math.floor(remainingSeconds / 60)}:
+              {String(remainingSeconds % 60).padStart(2, '0')}
             </div>
           )}
 
@@ -742,7 +798,6 @@ export function DailyArtCanvas({
           </button>
         </div>
       </div>
-
-      </div>
+    </div>
   );
 }

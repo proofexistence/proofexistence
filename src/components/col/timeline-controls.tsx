@@ -46,7 +46,10 @@ export function TimelineControls({
   // Close calendar on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(e.target as Node)
+      ) {
         setIsCalendarOpen(false);
       }
     };
@@ -102,7 +105,8 @@ export function TimelineControls({
     }
 
     const today = new Date();
-    const isCurrentMonth = year === currentDate.getFullYear() && month === currentDate.getMonth();
+    const isCurrentMonth =
+      year === currentDate.getFullYear() && month === currentDate.getMonth();
     const selectedDay = isCurrentMonth ? currentDate.getDate() : null;
 
     return (
@@ -128,11 +132,12 @@ export function TimelineControls({
               disabled={isFuture}
               className={`
                 w-7 h-7 text-xs rounded-full flex items-center justify-center transition-colors
-                ${isSelected
-                  ? 'bg-purple-500 text-white'
-                  : isFuture
-                    ? 'text-zinc-600 cursor-not-allowed'
-                    : 'text-white hover:bg-white/20 cursor-pointer'
+                ${
+                  isSelected
+                    ? 'bg-purple-500 text-white'
+                    : isFuture
+                      ? 'text-zinc-600 cursor-not-allowed'
+                      : 'text-white hover:bg-white/20 cursor-pointer'
                 }
               `}
             >
@@ -159,7 +164,9 @@ export function TimelineControls({
         {/* Date display with calendar */}
         <div className="relative" ref={calendarRef}>
           <button
-            onClick={() => isCalendarOpen ? setIsCalendarOpen(false) : openCalendar()}
+            onClick={() =>
+              isCalendarOpen ? setIsCalendarOpen(false) : openCalendar()
+            }
             className="text-center min-w-[160px] hover:opacity-80 transition-opacity cursor-pointer"
           >
             <div className="text-white text-sm font-light tracking-wide flex items-center justify-center gap-2">
@@ -167,7 +174,9 @@ export function TimelineControls({
               <Calendar className="w-3.5 h-3.5 text-zinc-400" />
             </div>
             <div className="text-zinc-500 text-[10px] font-mono">
-              {isLoading ? t('loading') : t('trailCount', { count: trailCount })}
+              {isLoading
+                ? t('loading')
+                : t('trailCount', { count: trailCount })}
             </div>
           </button>
 
@@ -177,10 +186,12 @@ export function TimelineControls({
               {/* Month navigation */}
               <div className="flex items-center justify-between mb-2">
                 <button
-                  onClick={() => setViewMonth((prev) => ({
-                    year: prev.month === 0 ? prev.year - 1 : prev.year,
-                    month: prev.month === 0 ? 11 : prev.month - 1,
-                  }))}
+                  onClick={() =>
+                    setViewMonth((prev) => ({
+                      year: prev.month === 0 ? prev.year - 1 : prev.year,
+                      month: prev.month === 0 ? 11 : prev.month - 1,
+                    }))
+                  }
                   className="p-1 text-zinc-400 hover:text-white transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -189,10 +200,12 @@ export function TimelineControls({
                   {formatMonthYear(viewMonth.year, viewMonth.month)}
                 </span>
                 <button
-                  onClick={() => setViewMonth((prev) => ({
-                    year: prev.month === 11 ? prev.year + 1 : prev.year,
-                    month: prev.month === 11 ? 0 : prev.month + 1,
-                  }))}
+                  onClick={() =>
+                    setViewMonth((prev) => ({
+                      year: prev.month === 11 ? prev.year + 1 : prev.year,
+                      month: prev.month === 11 ? 0 : prev.month + 1,
+                    }))
+                  }
                   className="p-1 text-zinc-400 hover:text-white transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />

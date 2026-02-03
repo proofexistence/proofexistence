@@ -43,10 +43,7 @@ export async function getTrailsForCol(options: ColTrailOptions) {
 }
 
 // Helper to calculate start date based on time range
-export function calculateStartDate(
-  endDate: Date,
-  range: string
-): Date {
+export function calculateStartDate(endDate: Date, range: string): Date {
   const end = new Date(endDate);
 
   switch (range) {

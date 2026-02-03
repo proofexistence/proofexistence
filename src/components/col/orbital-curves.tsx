@@ -75,7 +75,8 @@ function FloatingParticles({ count, seed }: { count: number; seed: number }) {
   useFrame((state) => {
     if (pointsRef.current) {
       pointsRef.current.rotation.y = state.clock.elapsedTime * 0.02;
-      pointsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.1;
+      pointsRef.current.rotation.x =
+        Math.sin(state.clock.elapsedTime * 0.01) * 0.1;
     }
   });
 
@@ -138,7 +139,7 @@ function TrailCurve({
     const radius = 3; // Fixed radius for cohesive look
 
     for (let i = 0; i < numPoints; i++) {
-      const a = (Math.PI * 2 / numPoints) * i;
+      const a = ((Math.PI * 2) / numPoints) * i;
 
       // v_planet style calculation
       const divX = rng.random(3, 5);
@@ -165,7 +166,9 @@ function TrailCurve({
     // Create smooth curve and get points as [x,y,z] tuples for drei Line
     const curve = new THREE.CatmullRomCurve3(points, true);
     const smoothPoints = curve.getPoints(numPoints * 3);
-    const curvePoints = smoothPoints.map((p) => [p.x, p.y, p.z] as [number, number, number]);
+    const curvePoints = smoothPoints.map(
+      (p) => [p.x, p.y, p.z] as [number, number, number]
+    );
 
     return { curvePoints, color: curveColor, rotationOffsets };
   }, [trail, index, totalTrails, baseSeed, palette, numPoints]);
@@ -174,7 +177,7 @@ function TrailCurve({
   useFrame((state) => {
     if (groupRef.current) {
       const time = state.clock.elapsedTime;
-      const q = index / totalTrails * 0.2;
+      const q = (index / totalTrails) * 0.2;
 
       groupRef.current.rotation.x =
         rotationOffsets.x + time / 10 + q / rotationOffsets.xSpeed / 10;

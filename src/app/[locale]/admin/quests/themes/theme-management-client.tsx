@@ -296,7 +296,9 @@ export function ThemeManagementClient({ defaultThemes, overrides }: Props) {
 
       {/* Date Overrides Section */}
       <section className="bg-white/5 rounded-xl p-6 border border-white/10">
-        <h2 className="text-lg font-semibold text-white mb-4">Date Overrides</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">
+          Date Overrides
+        </h2>
 
         <div className="flex gap-4 mb-6 flex-wrap">
           <Input
@@ -317,7 +319,10 @@ export function ThemeManagementClient({ defaultThemes, overrides }: Props) {
             placeholder="Description"
             value={overrideTheme.description}
             onChange={(e) =>
-              setOverrideTheme({ ...overrideTheme, description: e.target.value })
+              setOverrideTheme({
+                ...overrideTheme,
+                description: e.target.value,
+              })
             }
             className="bg-white/5 border-white/10 text-white"
           />
@@ -359,7 +364,10 @@ export function ThemeManagementClient({ defaultThemes, overrides }: Props) {
             <tbody>
               {overrides.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-4 px-4 text-center text-zinc-500">
+                  <td
+                    colSpan={4}
+                    className="py-4 px-4 text-center text-zinc-500"
+                  >
                     No overrides set
                   </td>
                 </tr>

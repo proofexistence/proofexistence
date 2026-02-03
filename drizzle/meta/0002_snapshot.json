@@ -155,12 +155,8 @@
           "name": "bonus_rewards_user_id_users_id_fk",
           "tableFrom": "bonus_rewards",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -413,12 +409,8 @@
           "name": "daily_themes_created_by_users_id_fk",
           "tableFrom": "daily_themes",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -428,9 +420,7 @@
         "daily_themes_date_unique": {
           "name": "daily_themes_date_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "date"
-          ]
+          "columns": ["date"]
         }
       },
       "policies": {},
@@ -575,12 +565,8 @@
           "name": "event_participants_event_id_events_id_fk",
           "tableFrom": "event_participants",
           "tableTo": "events",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -588,12 +574,8 @@
           "name": "event_participants_user_id_users_id_fk",
           "tableFrom": "event_participants",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -779,12 +761,8 @@
           "name": "likes_user_id_users_id_fk",
           "tableFrom": "likes",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -792,12 +770,8 @@
           "name": "likes_session_id_sessions_id_fk",
           "tableFrom": "likes",
           "tableTo": "sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -805,10 +779,7 @@
       "compositePrimaryKeys": {
         "likes_user_id_session_id_pk": {
           "name": "likes_user_id_session_id_pk",
-          "columns": [
-            "user_id",
-            "session_id"
-          ]
+          "columns": ["user_id", "session_id"]
         }
       },
       "uniqueConstraints": {},
@@ -930,12 +901,8 @@
           "name": "quest_rewards_user_id_users_id_fk",
           "tableFrom": "quest_rewards",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -992,12 +959,8 @@
           "name": "saved_sessions_user_id_users_id_fk",
           "tableFrom": "saved_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1005,12 +968,8 @@
           "name": "saved_sessions_session_id_sessions_id_fk",
           "tableFrom": "saved_sessions",
           "tableTo": "sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1018,10 +977,7 @@
       "compositePrimaryKeys": {
         "saved_sessions_user_id_session_id_pk": {
           "name": "saved_sessions_user_id_session_id_pk",
-          "columns": [
-            "user_id",
-            "session_id"
-          ]
+          "columns": ["user_id", "session_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1221,12 +1177,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1394,12 +1346,8 @@
           "name": "time26_transactions_user_id_users_id_fk",
           "tableFrom": "time26_transactions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1525,12 +1473,8 @@
           "name": "time_capsules_user_id_users_id_fk",
           "tableFrom": "time_capsules",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1538,12 +1482,8 @@
           "name": "time_capsules_session_id_sessions_id_fk",
           "tableFrom": "time_capsules",
           "tableTo": "sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1584,12 +1524,8 @@
           "name": "user_badges_user_id_users_id_fk",
           "tableFrom": "user_badges",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1597,12 +1533,8 @@
           "name": "user_badges_badge_id_badges_id_fk",
           "tableFrom": "user_badges",
           "tableTo": "badges",
-          "columnsFrom": [
-            "badge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["badge_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1610,10 +1542,7 @@
       "compositePrimaryKeys": {
         "user_badges_user_id_badge_id_pk": {
           "name": "user_badges_user_id_badge_id_pk",
-          "columns": [
-            "user_id",
-            "badge_id"
-          ]
+          "columns": ["user_id", "badge_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1714,12 +1643,8 @@
           "name": "user_daily_quests_user_id_users_id_fk",
           "tableFrom": "user_daily_quests",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1727,12 +1652,8 @@
           "name": "user_daily_quests_theme_session_id_sessions_id_fk",
           "tableFrom": "user_daily_quests",
           "tableTo": "sessions",
-          "columnsFrom": [
-            "theme_session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["theme_session_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1847,12 +1768,8 @@
           "name": "user_daily_rewards_user_id_users_id_fk",
           "tableFrom": "user_daily_rewards",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1907,12 +1824,8 @@
           "name": "user_streaks_user_id_users_id_fk",
           "tableFrom": "user_streaks",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2070,30 +1983,22 @@
         "users_clerk_id_unique": {
           "name": "users_clerk_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "clerk_id"
-          ]
+          "columns": ["clerk_id"]
         },
         "users_wallet_address_unique": {
           "name": "users_wallet_address_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "wallet_address"
-          ]
+          "columns": ["wallet_address"]
         },
         "users_username_unique": {
           "name": "users_username_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "username"
-          ]
+          "columns": ["username"]
         },
         "users_referral_code_unique": {
           "name": "users_referral_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "referral_code"
-          ]
+          "columns": ["referral_code"]
         }
       },
       "policies": {},

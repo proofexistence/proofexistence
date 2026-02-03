@@ -660,7 +660,8 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
         style={{
           width: canvasSize,
           height: canvasSize,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          boxShadow:
+            '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1)',
         }}
       >
         <canvas
@@ -713,7 +714,8 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
               )}
             </div>
             <div className="text-zinc-500 text-[10px] font-mono">
-              {currentGroup ? `${currentGroup.count} proofs` : ''} / {walkerCount} souls
+              {currentGroup ? `${currentGroup.count} proofs` : ''} /{' '}
+              {walkerCount} souls
             </div>
             {dayGroups.length > 0 && (
               <div className="text-zinc-600 text-[10px] font-mono">
@@ -724,7 +726,10 @@ export function TrailWalkers({ trails }: TrailWalkersProps) {
 
           <button
             onClick={() => {
-              const newIndex = Math.min(dayGroups.length - 1, currentDayIndex + 1);
+              const newIndex = Math.min(
+                dayGroups.length - 1,
+                currentDayIndex + 1
+              );
               setCurrentDayIndex(newIndex);
               jumpToDay(newIndex, true);
             }}

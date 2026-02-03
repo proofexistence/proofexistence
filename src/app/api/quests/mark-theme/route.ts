@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/get-user';
 import { checkRateLimit } from '@/lib/ratelimit';
-import {
-  markThemeCompleted,
-  createQuestReward,
-} from '@/lib/db/queries/quests';
+import { markThemeCompleted, createQuestReward } from '@/lib/db/queries/quests';
 import { QUEST_CONFIG, QUEST_REWARD_TYPES } from '@/lib/quests/config';
 import { formatEther } from 'ethers';
 

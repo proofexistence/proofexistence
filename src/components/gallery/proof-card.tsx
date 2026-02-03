@@ -122,10 +122,16 @@ export function ProofCard({
   const { toggleVisibility } = useVisibility();
 
   // Theme marking
-  const { markThemeAsync, unmarkThemeAsync, isPending: isMarkingTheme } = useMarkTheme();
+  const {
+    markThemeAsync,
+    unmarkThemeAsync,
+    isPending: isMarkingTheme,
+  } = useMarkTheme();
 
   // Local optimistic state for theme marking
-  const [optimisticIsMarked, setOptimisticIsMarked] = useState<boolean | null>(null);
+  const [optimisticIsMarked, setOptimisticIsMarked] = useState<boolean | null>(
+    null
+  );
 
   // Show as marked if: explicitly marked via prop OR themeSessionId matches this proof
   const initialIsMarked = isThemeMarked || themeSessionId === id;

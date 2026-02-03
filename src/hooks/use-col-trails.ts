@@ -13,11 +13,7 @@ export function useColTrails({
   enabled = true,
 }: UseColTrailsParams) {
   return useQuery({
-    queryKey: [
-      'col-trails',
-      startDate.toISOString(),
-      endDate.toISOString(),
-    ],
+    queryKey: ['col-trails', startDate.toISOString(), endDate.toISOString()],
     queryFn: async (): Promise<ColTrailsResponse> => {
       const params = new URLSearchParams();
       params.set('start', startDate.toISOString());

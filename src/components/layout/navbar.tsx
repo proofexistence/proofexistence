@@ -537,7 +537,10 @@ export function Navbar() {
                               <div className="flex items-center gap-2 text-purple-300">
                                 <Palette className="w-4 h-4" />
                                 <span className="text-sm">
-                                  {tQuests('todayTheme')}: <span className="text-white font-medium">{questData.theme.name}</span>
+                                  {tQuests('todayTheme')}:{' '}
+                                  <span className="text-white font-medium">
+                                    {questData.theme.name}
+                                  </span>
                                 </span>
                               </div>
                             </div>
@@ -552,8 +555,11 @@ export function Navbar() {
                                   <Pencil className="w-4 h-4" />
                                   <span className="text-sm">
                                     {tQuests('tasks.dailyCreate', {
-                                      current: questData.tasks.dailyCreate.current ?? 0,
-                                      target: questData.tasks.dailyCreate.target ?? 1,
+                                      current:
+                                        questData.tasks.dailyCreate.current ??
+                                        0,
+                                      target:
+                                        questData.tasks.dailyCreate.target ?? 1,
                                     })}
                                   </span>
                                 </div>
@@ -572,8 +578,10 @@ export function Navbar() {
                                   <Heart className="w-4 h-4" />
                                   <span className="text-sm">
                                     {tQuests('tasks.dailyLike', {
-                                      current: questData.tasks.dailyLike.current ?? 0,
-                                      target: questData.tasks.dailyLike.target ?? 3,
+                                      current:
+                                        questData.tasks.dailyLike.current ?? 0,
+                                      target:
+                                        questData.tasks.dailyLike.target ?? 3,
                                     })}
                                   </span>
                                 </div>
@@ -611,7 +619,9 @@ export function Navbar() {
                               <div className="flex items-center gap-3 text-zinc-400">
                                 <Sparkles className="w-4 h-4 text-purple-400" />
                                 <span className="text-sm">
-                                  {tQuests('streak.days', { count: questData.streak.current })}
+                                  {tQuests('streak.days', {
+                                    count: questData.streak.current,
+                                  })}
                                 </span>
                               </div>
                               {questData.streak.todayClaimed ? (
@@ -622,7 +632,11 @@ export function Navbar() {
                                   disabled={claimStreakMutation.isPending}
                                   className="px-2 py-1 text-xs font-medium bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-50"
                                 >
-                                  {claimStreakMutation.isPending ? '...' : tQuests('streak.claim', { amount: questData.streak.dailyReward })}
+                                  {claimStreakMutation.isPending
+                                    ? '...'
+                                    : tQuests('streak.claim', {
+                                        amount: questData.streak.dailyReward,
+                                      })}
                                 </button>
                               )}
                             </div>

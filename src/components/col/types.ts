@@ -1,7 +1,12 @@
 // Time granularity options
 export type TimeGranularity = 'day' | 'month' | 'quarter' | 'year';
 
-export const TIME_GRANULARITIES: TimeGranularity[] = ['day', 'month', 'quarter', 'year'];
+export const TIME_GRANULARITIES: TimeGranularity[] = [
+  'day',
+  'month',
+  'quarter',
+  'year',
+];
 
 // Trail point coordinate
 export interface TrailPoint {

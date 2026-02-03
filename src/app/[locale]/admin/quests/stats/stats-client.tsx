@@ -108,7 +108,9 @@ export function StatsClient({
                     className="w-full bg-purple-500/60 rounded-t min-h-[4px]"
                     style={{ height: `${Math.max(height, 4)}%` }}
                   />
-                  <div className="text-xs text-zinc-400 mt-2">{item.bucket}</div>
+                  <div className="text-xs text-zinc-400 mt-2">
+                    {item.bucket}
+                  </div>
                   <div className="text-xs text-white">{item.count}</div>
                 </div>
               );

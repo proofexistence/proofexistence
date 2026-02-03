@@ -10,7 +10,10 @@ export const metadata: Metadata = {
 
 export default async function ThemeManagementPage() {
   // Fetch default themes
-  const themes = await db.select().from(defaultThemes).orderBy(defaultThemes.id);
+  const themes = await db
+    .select()
+    .from(defaultThemes)
+    .orderBy(defaultThemes.id);
 
   // Fetch upcoming overrides (next 14 days)
   const today = new Date().toISOString().split('T')[0];

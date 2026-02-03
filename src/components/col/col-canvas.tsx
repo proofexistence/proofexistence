@@ -116,9 +116,12 @@ export function ColCanvas({ initialTrails }: ColCanvasProps) {
     [granularity]
   );
 
-  const handleGranularityChange = useCallback((newGranularity: TimeGranularity) => {
-    setGranularity(newGranularity);
-  }, []);
+  const handleGranularityChange = useCallback(
+    (newGranularity: TimeGranularity) => {
+      setGranularity(newGranularity);
+    },
+    []
+  );
 
   const handleDateSelect = useCallback((date: Date) => {
     setCurrentDate(date);
@@ -143,7 +146,11 @@ export function ColCanvas({ initialTrails }: ColCanvasProps) {
             alpha: true,
             antialias: true,
           }}
-          style={{ width: canvasSize, height: canvasSize, background: 'transparent' }}
+          style={{
+            width: canvasSize,
+            height: canvasSize,
+            background: 'transparent',
+          }}
         >
           <SceneContent trails={animatedTrails} />
         </Canvas>

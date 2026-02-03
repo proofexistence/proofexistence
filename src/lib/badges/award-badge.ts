@@ -15,7 +15,10 @@ export async function awardBadge(
   try {
     // Check if user already has this badge
     const existing = await db.query.userBadges.findFirst({
-      where: and(eq(userBadges.userId, userId), eq(userBadges.badgeId, badgeId)),
+      where: and(
+        eq(userBadges.userId, userId),
+        eq(userBadges.badgeId, badgeId)
+      ),
     });
 
     if (existing) {

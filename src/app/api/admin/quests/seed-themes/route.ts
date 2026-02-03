@@ -7,7 +7,10 @@ import { eq } from 'drizzle-orm';
 // 52 weekly themes - one for each week of the year
 const DEFAULT_THEMES = [
   // Week 1-13: Winter/Spring themes
-  { theme: 'New Beginning', description: 'Fresh start, blank canvas, potential' },
+  {
+    theme: 'New Beginning',
+    description: 'Fresh start, blank canvas, potential',
+  },
   { theme: 'Frost', description: 'Ice crystals, winter beauty, stillness' },
   { theme: 'Reflection', description: 'Mirror, introspection, self-discovery' },
   { theme: 'Warmth', description: 'Cozy moments, inner fire, comfort' },

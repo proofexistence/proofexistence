@@ -10,7 +10,12 @@ interface DatePickerProps {
   children?: ReactNode;
 }
 
-export function DatePicker({ selectedDate, availableDates, onDateSelect, children }: DatePickerProps) {
+export function DatePicker({
+  selectedDate,
+  availableDates,
+  onDateSelect,
+  children,
+}: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [viewMonth, setViewMonth] = useState(() => {
     const d = new Date(selectedDate + 'T00:00:00Z');
@@ -21,7 +26,10 @@ export function DatePicker({ selectedDate, availableDates, onDateSelect, childre
   // Close on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -118,11 +126,12 @@ export function DatePicker({ selectedDate, availableDates, onDateSelect, childre
               disabled={!isAvailable}
               className={`
                 w-7 h-7 text-xs rounded-full flex items-center justify-center transition-colors
-                ${isSelected
-                  ? 'bg-purple-500 text-white'
-                  : isAvailable
-                    ? 'text-white hover:bg-white/20 cursor-pointer'
-                    : 'text-zinc-600 cursor-not-allowed'
+                ${
+                  isSelected
+                    ? 'bg-purple-500 text-white'
+                    : isAvailable
+                      ? 'text-white hover:bg-white/20 cursor-pointer'
+                      : 'text-zinc-600 cursor-not-allowed'
                 }
               `}
             >
@@ -137,12 +146,12 @@ export function DatePicker({ selectedDate, availableDates, onDateSelect, childre
   return (
     <div className="relative" ref={popoverRef}>
       {children ? (
-        <div onClick={() => isOpen ? setIsOpen(false) : openPicker()}>
+        <div onClick={() => (isOpen ? setIsOpen(false) : openPicker())}>
           {children}
         </div>
       ) : (
         <button
-          onClick={() => isOpen ? setIsOpen(false) : openPicker()}
+          onClick={() => (isOpen ? setIsOpen(false) : openPicker())}
           className="p-2 text-zinc-400 hover:text-white transition-colors"
           title="Select date"
         >

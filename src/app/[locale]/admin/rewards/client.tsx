@@ -396,8 +396,8 @@ export function AdminRewardsClient() {
                     <div className="text-sm text-zinc-400">
                       {data.verification.snapshot.latest ? (
                         <>
-                          Snapshot: {data.verification.snapshot.latest.userCount}{' '}
-                          users @{' '}
+                          Snapshot:{' '}
+                          {data.verification.snapshot.latest.userCount} users @{' '}
                           {data.verification.snapshot.latest.createdAt
                             ? new Date(
                                 data.verification.snapshot.latest.createdAt

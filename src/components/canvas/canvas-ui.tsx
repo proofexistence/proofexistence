@@ -366,7 +366,9 @@ export function Instructions({
     }
   };
 
-  const translatedThemeName = themeName ? getTranslatedThemeName(themeName) : null;
+  const translatedThemeName = themeName
+    ? getTranslatedThemeName(themeName)
+    : null;
   // Position changes based on state
   // Paused state uses pointer-events-none on container so clicks pass through to canvas
   const getPositionClass = () => {
@@ -912,8 +914,14 @@ export function SubmissionModal({
             {/* Option 2: Instant Proof with TIME26 */}
             <ProofOptionCard
               variant="instant-time26"
-              cost={time26CardState === 'gasless' ? gaslessTotalCost + ' TIME' : time26Cost}
-              time26State={time26CardState as 'gasless' | 'available' | 'insufficient'}
+              cost={
+                time26CardState === 'gasless'
+                  ? gaslessTotalCost + ' TIME'
+                  : time26Cost
+              }
+              time26State={
+                time26CardState as 'gasless' | 'available' | 'insufficient'
+              }
               balance={time26Balance}
               disabled={isSubmitting}
               isLoading={gaslessLoading}
@@ -923,7 +931,8 @@ export function SubmissionModal({
                   username,
                   title,
                   description,
-                  paymentMethod: time26CardState === 'gasless' ? 'TIME26_GASLESS' : 'TIME26',
+                  paymentMethod:
+                    time26CardState === 'gasless' ? 'TIME26_GASLESS' : 'TIME26',
                   markAsTheme,
                 })
               }
@@ -935,7 +944,13 @@ export function SubmissionModal({
               cost="FREE"
               disabled={isSubmitting}
               onClick={() =>
-                onSelectStandard({ message, username, title, description, markAsTheme })
+                onSelectStandard({
+                  message,
+                  username,
+                  title,
+                  description,
+                  markAsTheme,
+                })
               }
             />
           </div>
@@ -943,7 +958,9 @@ export function SubmissionModal({
           {/* Info: Technology Explanation - plain text, not a card */}
           <div className="mt-4 px-1">
             <p className="text-[10px] text-zinc-600 leading-relaxed">
-              <span className="text-zinc-500 font-medium">{t('modal.techTitle')}</span>
+              <span className="text-zinc-500 font-medium">
+                {t('modal.techTitle')}
+              </span>
               {' — '}
               {t('modal.techDesc1')} {t('modal.techDesc2')}
             </p>

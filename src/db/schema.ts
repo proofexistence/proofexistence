@@ -204,9 +204,9 @@ export const rewardsMerkleSnapshots = pgTable('rewards_merkle_snapshots', {
   id: uuid('id').primaryKey().defaultRandom(),
   merkleRoot: varchar('merkle_root', { length: 66 }).notNull().unique(),
   // Store entries as JSON: [{walletAddress, cumulativeAmount}, ...]
-  entries: jsonb('entries').notNull().$type<
-    Array<{ walletAddress: string; cumulativeAmount: string }>
-  >(),
+  entries: jsonb('entries')
+    .notNull()
+    .$type<Array<{ walletAddress: string; cumulativeAmount: string }>>(),
   userCount: integer('user_count').notNull(),
   txHash: varchar('tx_hash', { length: 66 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
