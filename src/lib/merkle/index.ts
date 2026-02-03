@@ -44,3 +44,10 @@ export function verifyProof(
   const proof = tree.getHexProof(leaf);
   return tree.verify(proof, leaf, root);
 }
+
+// Re-export participant Merkle tree utilities
+export {
+  generateParticipantsMerkleTree,
+  getParticipantProof,
+  verifyParticipant,
+} from './participants';
