@@ -3,28 +3,6 @@ import { createRandom } from './utils';
 const TAU = Math.PI * 2;
 const DAISY_COUNT = 12;
 
-/**
- * Interpolate between two hex colors
- */
-function lerpColor(color1: string, color2: string, t: number): string {
-  const c1 = parseInt(color1.slice(1), 16);
-  const c2 = parseInt(color2.slice(1), 16);
-
-  const r1 = (c1 >> 16) & 0xff;
-  const g1 = (c1 >> 8) & 0xff;
-  const b1 = c1 & 0xff;
-
-  const r2 = (c2 >> 16) & 0xff;
-  const g2 = (c2 >> 8) & 0xff;
-  const b2 = c2 & 0xff;
-
-  const r = Math.round(r1 + (r2 - r1) * t);
-  const g = Math.round(g1 + (g2 - g1) * t);
-  const b = Math.round(b1 + (b2 - b1) * t);
-
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
-}
-
 // Cache for loaded SVG strings
 let svgCache: string[] | null = null;
 
@@ -46,7 +24,7 @@ export async function loadDaisySVGs(): Promise<string[]> {
 }
 
 /**
- * Modify SVG to apply candy colors to petals
+ * Modify SVG to apply candy colors to petals with black outline
  */
 function colorizeSVG(
   svgString: string,
@@ -56,21 +34,28 @@ function colorizeSVG(
   // Remove background rect
   let svg = svgString.replace(/<rect[^>]*fill="#C0C0C0"[^>]*\/>/, '');
 
-  // Find all petal elements (ellipse or rect with white fill)
-  const petalRegex = /(<(?:ellipse|rect)[^>]*)(fill="#FFFFFF")([^>]*\/>)/g;
+  // Find all petal elements (ellipse or rect with white fill) and add stroke
+  const petalRegex = /(<(?:ellipse|rect)[^>]*)(fill="#FFFFFF")([^>]*)(\/?>)/g;
   let petalIndex = 0;
 
-  svg = svg.replace(petalRegex, (match, before, fill, after) => {
+  svg = svg.replace(petalRegex, (match, before, fill, after, closing) => {
     const color = petalColors[petalIndex % petalColors.length];
     petalIndex++;
-    return `${before}fill="${color}"${after}`;
+    // Add thin black stroke for outline effect
+    return `${before}fill="${color}" stroke="#1a1a1a" stroke-width="1.5"${after}${closing}`;
   });
 
-  // Replace center color (orange #F5A623)
-  svg = svg.replace(/fill="#F5A623"/g, `fill="${centerColor}"`);
+  // Replace center color (orange #F5A623) with stroke
+  svg = svg.replace(
+    /(<(?:ellipse|circle)[^>]*)(fill="#F5A623")([^>]*)(\/?>)/g,
+    `$1fill="${centerColor}" stroke="#1a1a1a" stroke-width="1.5"$3$4`
+  );
 
-  // Replace gray circles (#C0C0C0) with darker center color
-  svg = svg.replace(/fill="#C0C0C0"/g, `fill="${darkenColor(centerColor, 0.2)}"`);
+  // Replace gray circles (#C0C0C0) with darker center color and stroke
+  svg = svg.replace(
+    /(<(?:ellipse|circle)[^>]*)(fill="#C0C0C0")([^>]*)(\/?>)/g,
+    `$1fill="${darkenColor(centerColor, 0.2)}" stroke="#1a1a1a" stroke-width="1"$3$4`
+  );
 
   return svg;
 }
@@ -262,11 +247,22 @@ export function createBackgroundDaisies(
     const pos = positions[i];
     const sizeVar = 0.5 + random() * 0.6; // 0.5-1.1x
     const size = baseSize * sizeVar;
-    const centerColor = centerColors[Math.floor(random() * centerColors.length)];
+    const centerColor =
+      centerColors[Math.floor(random() * centerColors.length)];
     const svgIndex = Math.floor(random() * DAISY_COUNT);
 
     daisies.push(
-      new Daisy(pos.x, pos.y, size, candyPalette, centerColor, seed + i * 123, true, 0, svgIndex)
+      new Daisy(
+        pos.x,
+        pos.y,
+        size,
+        candyPalette,
+        centerColor,
+        seed + i * 123,
+        true,
+        0,
+        svgIndex
+      )
     );
   }
 
@@ -287,8 +283,22 @@ export interface PendingDaisy {
 }
 
 /**
+ * Hash a string to a number (for deterministic seeding)
+ */
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+/**
  * Calculate trail daisy positions for a session (without creating daisies yet)
- * Creates a dense line of flowers along the trail path
+ * Creates a line of flowers along the trail path - close but not overlapping
+ * Uses sessionId for deterministic positioning (consistent across renders)
  */
 export function calculateTrailDaisyPositions(
   trailData: { x: number; y: number }[],
@@ -296,30 +306,23 @@ export function calculateTrailDaisyPositions(
   candyPalette: readonly string[],
   centerColors: readonly string[],
   canvasSize: number,
-  sessionIndex: number,
+  sessionId: string, // Use session ID for consistent seed
   existingPositions: { x: number; y: number; size: number }[]
 ): PendingDaisy[] {
   if (!trailData || trailData.length < 2) return [];
 
   const pending: PendingDaisy[] = [];
-  const random = createRandom(sessionIndex * 7777);
+  // Use session ID hash for deterministic random - same session always gets same flowers
+  const sessionSeed = hashString(sessionId);
+  const random = createRandom(sessionSeed);
 
-  // More flowers for longer trails - create dense lines
-  const daisyCount = Math.min(80, Math.max(15, Math.floor(duration / 2)));
+  // Session-wide consistent center color for cohesion
+  const sessionCenterColor =
+    centerColors[Math.floor(random() * centerColors.length)];
 
-  // Session-wide consistent style
-  const sessionCenterColor = centerColors[Math.floor(random() * centerColors.length)];
-  const sessionSvgIndex = Math.floor(random() * DAISY_COUNT);
-
-  // Pick two colors for gradient along the trail path
-  const startColorIdx = Math.floor(random() * candyPalette.length);
-  let endColorIdx = Math.floor(random() * candyPalette.length);
-  // Ensure different colors for visible gradient
-  if (endColorIdx === startColorIdx) {
-    endColorIdx = (endColorIdx + 1) % candyPalette.length;
-  }
-  const startColor = candyPalette[startColorIdx];
-  const endColor = candyPalette[endColorIdx];
+  // Single consistent petal color for the whole trail (makes sessions distinguishable)
+  const colorIdx = Math.floor(random() * candyPalette.length);
+  const sessionColor = candyPalette[colorIdx];
 
   // Find bounds for normalization
   let minX = Infinity,
@@ -340,8 +343,8 @@ export function calculateTrailDaisyPositions(
   const margin = canvasSize * 0.06;
   const usableSize = canvasSize - margin * 2;
 
-  // Trail flower size (larger)
-  const baseSize = canvasSize * 0.12;
+  // Trail flower size - Murakami style: prominent, uniform-ish
+  const baseSize = canvasSize * 0.1;
 
   // Calculate total path length for even distribution
   let totalLength = 0;
@@ -354,9 +357,19 @@ export function calculateTrailDaisyPositions(
     segmentLengths.push(totalLength);
   }
 
+  // Local positions for this session (to check collision within same session)
+  const localPositions: { x: number; y: number; size: number }[] = [];
+
+  // Dense but organized: flowers touch edges but don't heavily overlap
+  const SAME_SESSION_THRESHOLD = 0.6; // 40% overlap within session (continuous line)
+  const OTHER_SESSION_THRESHOLD = 0.8; // 20% overlap between sessions (distinct trails)
+
+  // Moderate flower count
+  const daisyCount = Math.min(120, Math.max(25, Math.floor(duration * 2.5)));
+
   // Place flowers evenly along the path
   for (let i = 0; i < daisyCount; i++) {
-    const targetDist = (i / (daisyCount - 1)) * totalLength;
+    const targetDist = (i / Math.max(1, daisyCount - 1)) * totalLength;
 
     // Find the segment containing this distance
     let segIdx = 0;
@@ -384,47 +397,61 @@ export function calculateTrailDaisyPositions(
     let x = margin + ((rawX - minX) / rangeX) * usableSize;
     let y = margin + ((rawY - minY) / rangeY) * usableSize;
 
-    // Smaller random offset to keep flowers closer to path
+    // Small random offset for natural look
     x += (random() - 0.5) * baseSize * 0.1;
     y += (random() - 0.5) * baseSize * 0.1;
 
-    // Progress along the trail (0 to 1)
-    const progress = daisyCount > 1 ? i / (daisyCount - 1) : 0;
-
-    // Size gradient: start smaller, grow larger along the trail
-    const sizeProgress = 0.5 + progress * 0.7; // 0.5 to 1.2
-    const sizeVar = 0.8 + random() * 0.3;
-    const maxSize = baseSize * sizeProgress * sizeVar;
+    // Size variation: more uniform (0.85 to 1.15x) for Murakami look
+    const sizeVar = 0.85 + random() * 0.3;
+    const maxSize = baseSize * sizeVar;
     const radius = maxSize / 2;
 
-    // Check collision based on actual flower sizes (center-to-center distance)
-    let tooClose = false;
+    // Each flower gets a different SVG variant (1-12)
+    const svgIndex = Math.floor(random() * DAISY_COUNT);
+
+    // Check collision against OTHER sessions (existingPositions) - stricter
+    let tooCloseToOther = false;
     for (const pos of existingPositions) {
       const dx = x - pos.x;
       const dy = y - pos.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const minDist = radius + pos.size / 2; // Sum of both radii
-      if (dist < minDist * 0.25) { // Allow more overlap for trail visibility
-        tooClose = true;
+      const minDist = radius + pos.size / 2;
+
+      if (dist < minDist * OTHER_SESSION_THRESHOLD) {
+        tooCloseToOther = true;
         break;
       }
     }
 
-    if (tooClose) continue;
+    // Check collision within THIS session (localPositions) - more lenient for continuous line
+    let tooCloseToLocal = false;
+    for (const pos of localPositions) {
+      const dx = x - pos.x;
+      const dy = y - pos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const minDist = radius + pos.size / 2;
 
-    existingPositions.push({ x, y, size: maxSize });
+      if (dist < minDist * SAME_SESSION_THRESHOLD) {
+        tooCloseToLocal = true;
+        break;
+      }
+    }
 
-    // Color gradient along the trail
-    const gradientColor = lerpColor(startColor, endColor, progress);
+    if (tooCloseToOther || tooCloseToLocal) {
+      continue;
+    }
+
+    // Add to local positions for subsequent collision checks
+    localPositions.push({ x, y, size: maxSize });
 
     pending.push({
       x,
       y,
       maxSize,
-      candyPalette: [gradientColor] as readonly string[], // Gradient color
-      centerColor: sessionCenterColor, // Same center color
-      seed: sessionIndex * 1000 + i,
-      svgIndex: sessionSvgIndex, // Same flower shape
+      candyPalette: [sessionColor] as readonly string[], // Single color for session cohesion
+      centerColor: sessionCenterColor,
+      seed: sessionSeed + i * 123, // Deterministic seed based on session ID
+      svgIndex, // Different SVG for each flower
     });
   }
 
@@ -451,6 +478,9 @@ export function createSingleTrailDaisy(pending: PendingDaisy): Daisy {
 /**
  * Initialize images for all daisies
  */
-export async function initializeDaisyImages(daisies: Daisy[], svgs: string[]): Promise<void> {
+export async function initializeDaisyImages(
+  daisies: Daisy[],
+  svgs: string[]
+): Promise<void> {
   await Promise.all(daisies.map((d) => d.initImage(svgs)));
 }
