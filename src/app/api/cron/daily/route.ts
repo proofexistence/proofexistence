@@ -20,8 +20,14 @@ import {
   time26Transactions,
   questRewards,
   rewardsMerkleSnapshots,
+  daisyMints,
 } from '@/db/schema';
-import { eq, and, gte, lte, gt, inArray, sql } from 'drizzle-orm';
+import { eq, and, gte, lte, gt, inArray, sql, between } from 'drizzle-orm';
+import { generateParticipantsMerkleTree } from '@/lib/merkle/participants';
+import { getDateMultiplier, getSpecialDay } from '@/lib/daisy/special-days';
+import { GENESIS_AUCTION } from '@/lib/daisy/pricing';
+import { renderDaisyVisualization } from '@/lib/daisy/render-daisy';
+import { uploadToR2 } from '@/lib/r2';
 import { generateMerkleTree } from '@/lib/merkle';
 import {
   generateRewardsMerkleTree,
@@ -698,6 +704,152 @@ async function runQuestRewards(): Promise<{
 }
 
 // ============================================================
+// Task 5: Generate Daily Daisy NFT
+// ============================================================
+async function generateDaisyNFT(
+  yesterday: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    console.log('[Daisy] Starting generation for', yesterday);
+
+    // Check if already generated
+    const [existing] = await db
+      .select()
+      .from(daisyMints)
+      .where(eq(daisyMints.date, yesterday))
+      .limit(1);
+
+    if (existing) {
+      console.log('[Daisy] Already generated for', yesterday);
+      return { success: true };
+    }
+
+    // Get yesterday's sessions
+    const startOfDay = new Date(yesterday + 'T00:00:00Z');
+    const endOfDay = new Date(yesterday + 'T23:59:59.999Z');
+
+    const sessionsData = await db
+      .select({
+        id: sessions.id,
+        trailData: sessions.trailData,
+        color: sessions.color,
+        duration: sessions.duration,
+        createdAt: sessions.createdAt,
+        userName: users.name,
+        walletAddress: users.walletAddress,
+      })
+      .from(sessions)
+      .leftJoin(users, eq(sessions.userId, users.id))
+      .where(
+        and(
+          sql`${sessions.trailData} IS NOT NULL`,
+          between(sessions.createdAt, startOfDay, endOfDay)
+        )
+      );
+
+    if (sessionsData.length === 0) {
+      console.log('[Daisy] No sessions for', yesterday);
+      return { success: true };
+    }
+
+    // Get unique participants
+    const uniqueParticipants = [
+      ...new Set(
+        sessionsData
+          .map((s) => s.walletAddress)
+          .filter((addr): addr is string => addr !== null)
+      ),
+    ];
+
+    // Generate Merkle tree for participants
+    const { root: participantsMerkleRoot } =
+      generateParticipantsMerkleTree(uniqueParticipants);
+
+    // Get special day info
+    const specialDay = getSpecialDay(yesterday);
+    const { multiplier: dateMultiplier } = getDateMultiplier(yesterday);
+
+    // Get theme name (simple hash-based selection)
+    const themeIndex = hashString(yesterday) % 12;
+    const themeNames = [
+      'Murakami Pop',
+      'Morandi',
+      'Cool Ocean',
+      'Warm Sunset',
+      'Spring Garden',
+      'Autumn Harvest',
+      'Cotton Candy',
+      'Nordic',
+      'Tropical',
+      'Lavender Dreams',
+      'Vintage Rose',
+      'Mint Fresh',
+    ];
+    const themeName = themeNames[themeIndex];
+
+    // Render static image
+    const { staticImage } = await renderDaisyVisualization(
+      sessionsData.map((s) => ({
+        id: s.id,
+        trailData: s.trailData as { x: number; y: number }[],
+        color: s.color || '#FFFFFF',
+        duration: s.duration,
+        createdAt: s.createdAt?.toISOString() || new Date().toISOString(),
+        userName: s.userName || undefined,
+      })),
+      yesterday
+    );
+
+    // Upload preview to R2
+    const previewKey = `daisy/${yesterday}/preview.png`;
+    const previewUrl = await uploadToR2(staticImage, previewKey, 'image/png');
+
+    // TODO: Upload metadata to Arweave (requires funded Irys wallet)
+    // For now, just store preview URL
+
+    // Calculate auction end time (24 hours from now)
+    const auctionEndTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    // Store in database
+    await db.insert(daisyMints).values({
+      date: yesterday,
+      participantCount: uniqueParticipants.length,
+      sessionCount: sessionsData.length,
+      participantsMerkleRoot,
+      isSpecialDay: !!specialDay,
+      specialDayName: specialDay?.name || null,
+      specialDayMultiplier: dateMultiplier.toString(),
+      theme: themeName,
+      dominantColor: '#FF69B4', // TODO: Calculate from theme
+      previewUrl,
+      auctionStartPrice: GENESIS_AUCTION.START_PRICE.toString(),
+      auctionEndTime,
+      status: 'active',
+    });
+
+    console.log('[Daisy] Successfully generated for', yesterday, {
+      participants: uniqueParticipants.length,
+      sessions: sessionsData.length,
+      previewUrl,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('[Daisy] Generation error:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+// ============================================================
 // Main Handler
 // ============================================================
 export async function GET(req: NextRequest) {
@@ -769,6 +921,14 @@ export async function GET(req: NextRequest) {
     burnMerkleResult = await runBurnAndMerkle();
   }
 
+  // Task 5: Generate Daisy NFT for yesterday
+  const yesterday = getYesterdayDayId();
+  const daisyResult = await generateDaisyNFT(yesterday);
+  if (!daisyResult.success) {
+    console.error('[Cron] Daisy generation failed:', daisyResult.error);
+    // Continue - don't fail the whole cron job
+  }
+
   const success =
     settleResult.success &&
     allRewardsSucceeded &&
@@ -784,5 +944,6 @@ export async function GET(req: NextRequest) {
     },
     questRewards: questRewardsResult,
     burnMerkle: burnMerkleResult,
+    daisy: daisyResult,
   });
 }
