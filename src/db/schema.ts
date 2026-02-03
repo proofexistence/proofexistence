@@ -13,6 +13,7 @@ import {
   check,
   primaryKey,
   boolean,
+  unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -194,6 +195,92 @@ export const dailySnapshots = pgTable('daily_snapshots', {
   txHash: varchar('tx_hash', { length: 66 }), // On-chain settlement tx
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// ============================================================================
+// DAISY MINTS TABLE
+// Tracks daily Daisy NFT editions (Genesis ERC-721 1/1 + Standard ERC-1155)
+// ============================================================================
+export const daisyMints = pgTable('daisy_mints', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  date: varchar('date', { length: 10 }).notNull().unique(), // YYYY-MM-DD
+
+  // Genesis Edition (ERC-721, 1/1)
+  genesisTokenId: varchar('genesis_token_id', { length: 78 }),
+  genesisArweaveHash: varchar('genesis_arweave_hash', { length: 255 }),
+  genesisTxHash: varchar('genesis_tx_hash', { length: 66 }),
+  genesisMintedAt: timestamp('genesis_minted_at', { withTimezone: true }),
+  genesisMintedTo: varchar('genesis_minted_to', { length: 42 }),
+
+  // Genesis Auction
+  auctionStartPrice: decimal('auction_start_price', {
+    precision: 36,
+    scale: 18,
+  }),
+  auctionCurrentBid: decimal('auction_current_bid', {
+    precision: 36,
+    scale: 18,
+  }),
+  auctionHighestBidder: varchar('auction_highest_bidder', { length: 42 }),
+  auctionEndTime: timestamp('auction_end_time', { withTimezone: true }),
+  auctionSettled: boolean('auction_settled').default(false),
+
+  // Standard Edition (ERC-1155, unlimited)
+  standardArweaveHash: varchar('standard_arweave_hash', { length: 255 }),
+  standardMintCount: integer('standard_mint_count').default(0),
+
+  // Pricing factors
+  participantCount: integer('participant_count').default(0),
+  sessionCount: integer('session_count').default(0),
+  isSpecialDay: boolean('is_special_day').default(false),
+  specialDayName: varchar('special_day_name', { length: 100 }),
+  specialDayMultiplier: decimal('special_day_multiplier', {
+    precision: 4,
+    scale: 2,
+  }).default('1.00'),
+
+  // Merkle tree for free mints
+  participantsMerkleRoot: varchar('participants_merkle_root', { length: 66 }),
+
+  // Visual metadata
+  theme: varchar('theme', { length: 100 }),
+  dominantColor: varchar('dominant_color', { length: 100 }),
+  previewUrl: varchar('preview_url', { length: 500 }),
+
+  // Status
+  status: varchar('status', { length: 20 }).default('pending'),
+
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+// ============================================================================
+// DAISY MINT CLAIMS TABLE
+// Tracks individual Daisy NFT claims/purchases
+// ============================================================================
+export const daisyMintClaims = pgTable(
+  'daisy_mint_claims',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    daisyMintId: uuid('daisy_mint_id')
+      .references(() => daisyMints.id)
+      .notNull(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    walletAddress: varchar('wallet_address', { length: 42 }).notNull(),
+
+    edition: varchar('edition', { length: 20 }).notNull(), // 'genesis' | 'standard'
+    tokenId: varchar('token_id', { length: 78 }),
+    txHash: varchar('tx_hash', { length: 66 }),
+
+    paidAmount: decimal('paid_amount', { precision: 36, scale: 18 }),
+    paymentToken: varchar('payment_token', { length: 10 }), // 'MATIC' | 'TIME26'
+    isFreeParticipant: boolean('is_free_participant').default(false),
+
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => [unique().on(table.daisyMintId, table.userId, table.edition)]
+);
 
 // ============================================================================
 // REWARDS MERKLE SNAPSHOTS TABLE
@@ -586,6 +673,12 @@ export type NewTimeCapsule = typeof timeCapsules.$inferInsert;
 
 export type EventParticipant = typeof eventParticipants.$inferSelect;
 export type NewEventParticipant = typeof eventParticipants.$inferInsert;
+
+export type DaisyMint = typeof daisyMints.$inferSelect;
+export type NewDaisyMint = typeof daisyMints.$inferInsert;
+
+export type DaisyMintClaim = typeof daisyMintClaims.$inferSelect;
+export type NewDaisyMintClaim = typeof daisyMintClaims.$inferInsert;
 
 // Session status enum for type safety
 export const SESSION_STATUS = {
