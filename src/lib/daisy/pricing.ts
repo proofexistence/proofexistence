@@ -1,6 +1,10 @@
 // src/lib/daisy/pricing.ts
 
-import { getDateMultiplier, getQuarter, getQuarterBasePrice } from './special-days';
+import {
+  getDateMultiplier,
+  getQuarter,
+  getQuarterBasePrice,
+} from './special-days';
 
 interface PricingFactors {
   quarterBasePrice: number;
@@ -51,9 +55,11 @@ export function calculateStandardPrice(
 
   const timeMultiplier = getTimeMultiplier(hoursRemaining);
   const participantMultiplier = getParticipantMultiplier(participantCount);
-  const { multiplier: dateMultiplier, reason: dateReason } = getDateMultiplier(date);
+  const { multiplier: dateMultiplier, reason: dateReason } =
+    getDateMultiplier(date);
 
-  const finalPrice = quarterBasePrice * timeMultiplier * participantMultiplier * dateMultiplier;
+  const finalPrice =
+    quarterBasePrice * timeMultiplier * participantMultiplier * dateMultiplier;
 
   return {
     finalPrice: Math.round(finalPrice * 100) / 100, // Round to 2 decimal places
@@ -82,6 +88,7 @@ export const GENESIS_AUCTION = {
  * Calculate minimum next bid for Genesis auction
  */
 export function calculateMinNextBid(currentBid: number): number {
-  const increment = currentBid * (GENESIS_AUCTION.MIN_BID_INCREMENT_PERCENT / 100);
+  const increment =
+    currentBid * (GENESIS_AUCTION.MIN_BID_INCREMENT_PERCENT / 100);
   return Math.ceil((currentBid + increment) * 100) / 100;
 }

@@ -174,7 +174,15 @@ function renderDaisy(
     ctx.save();
     ctx.rotate(angle);
     ctx.beginPath();
-    ctx.ellipse(0, -petalLength * 0.6, petalWidth, petalLength, 0, 0, Math.PI * 2);
+    ctx.ellipse(
+      0,
+      -petalLength * 0.6,
+      petalWidth,
+      petalLength,
+      0,
+      0,
+      Math.PI * 2
+    );
     ctx.fill();
     ctx.stroke();
     ctx.restore();

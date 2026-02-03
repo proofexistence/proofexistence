@@ -130,6 +130,65 @@ export const SNAPSHOT_NFT_ABI = [
   'event SnapshotMinted(address indexed to, uint256 indexed tokenId, uint8 snapshotType, uint256 timestamp, string arweaveHash)',
 ];
 
+// DaisyChronicles Genesis (ERC-721, 1/1 Auctions)
+export const DAISY_GENESIS_ADDRESS = isTestnet
+  ? '0x0000000000000000000000000000000000000000' // TODO: Deploy to Amoy
+  : '0x0000000000000000000000000000000000000000'; // TODO: Deploy to mainnet
+
+// DaisyChronicles Standard (ERC-1155, Unlimited Editions)
+export const DAISY_STANDARD_ADDRESS = isTestnet
+  ? '0x0000000000000000000000000000000000000000' // TODO: Deploy to Amoy
+  : '0x0000000000000000000000000000000000000000'; // TODO: Deploy to mainnet
+
+export const DAISY_GENESIS_ABI = [
+  // Auction
+  'function createAuction(uint256 date, uint256 startPrice, string calldata metadataURI, uint256 participantCount, uint256 sessionCount) external',
+  'function bid(uint256 date) external payable',
+  'function settleAuction(uint256 date) external',
+  'function getAuctionInfo(uint256 date) external view returns (uint256 startPrice, uint256 currentBid, address highestBidder, uint256 endTime, bool settled, uint256 minNextBid, bool isActive)',
+  'function getDaisyData(uint256 tokenId) external view returns (uint256 date, string memory metadataURI, uint256 participantCount, uint256 sessionCount)',
+  // ERC-721
+  'function balanceOf(address owner) public view returns (uint256)',
+  'function ownerOf(uint256 tokenId) public view returns (address)',
+  'function tokenURI(uint256 tokenId) public view returns (string)',
+  'function totalSupply() public view returns (uint256)',
+  // Admin
+  'function pause() external',
+  'function unpause() external',
+  // Events
+  'event AuctionCreated(uint256 indexed date, uint256 startPrice, uint256 endTime, string metadataURI)',
+  'event BidPlaced(uint256 indexed date, address indexed bidder, uint256 amount)',
+  'event AuctionSettled(uint256 indexed date, uint256 indexed tokenId, address winner, uint256 amount)',
+  'event AuctionExtended(uint256 indexed date, uint256 newEndTime)',
+];
+
+export const DAISY_STANDARD_ABI = [
+  // Config
+  'function setDailyConfig(uint256 date, string calldata metadataURI, bytes32 participantRoot, uint256 participantCount, uint8 quarter, uint256 dateMultiplierBps, uint256 startTime, uint256 endTime) external',
+  // Pricing
+  'function getPrice(uint256 date) public view returns (uint256)',
+  'function quarterBasePrices(uint8 quarter) public view returns (uint256)',
+  // Minting
+  'function mint(uint256 date) external payable',
+  'function mintFree(uint256 date, bytes32[] calldata proof) external',
+  // Views
+  'function getDailyInfo(uint256 date) external view returns (string memory metadataURI, uint256 participantCount, uint256 mintCount, uint256 currentPrice, bool active)',
+  'function canMintFree(uint256 date, address user) external view returns (bool)',
+  'function canMintPaid(uint256 date, address user) external view returns (bool)',
+  'function hasClaimedFree(uint256 date, address user) external view returns (bool)',
+  'function hasMintedPaid(uint256 date, address user) external view returns (bool)',
+  // ERC-1155
+  'function balanceOf(address account, uint256 id) public view returns (uint256)',
+  'function uri(uint256 id) public view returns (string)',
+  // Admin
+  'function setDailyActive(uint256 date, bool active) external',
+  'function pause() external',
+  'function unpause() external',
+  // Events
+  'event DailyConfigSet(uint256 indexed date, string metadataURI, uint256 participantCount)',
+  'event StandardMinted(uint256 indexed date, address indexed minter, bool isFree, uint256 price)',
+];
+
 // ============================================================
 // Chain Configuration
 // ============================================================
