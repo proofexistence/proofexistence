@@ -668,14 +668,13 @@ export function DailyArtCanvas({
           </div>
         )}
 
+        {/* Show subtle message for days with no sessions, but still show background flowers */}
         {!isLoading &&
           sortedSessions.length === 0 &&
-          phase !== 'filling' &&
-          phase !== 'complete' && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-zinc-500 text-sm text-center">
-                <div>No proofs on this day</div>
-                <div className="text-xs mt-1 opacity-60">Try another date</div>
+          phase === 'complete' && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+              <div className="text-zinc-500 text-xs text-center bg-black/50 px-3 py-1 rounded-full">
+                A quiet day - only background blooms
               </div>
             </div>
           )}

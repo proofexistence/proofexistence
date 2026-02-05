@@ -856,12 +856,12 @@ async function generateDaisyNFT(
         )
       );
 
+    // Even with no sessions, we generate a background-only Daisy
     if (sessionsData.length === 0) {
-      console.log('[Daisy] No sessions for', yesterday);
-      return { success: true };
+      console.log('[Daisy] No sessions for', yesterday, '- generating background-only Daisy');
     }
 
-    // Get unique participants
+    // Get unique participants (empty array if no sessions)
     const uniqueParticipants = [
       ...new Set(
         sessionsData
@@ -972,11 +972,20 @@ async function generateDaisyNFT(
       },
     };
 
+    // Description varies based on participation
+    const hasParticipants = uniqueParticipants.length > 0;
+    const standardDescription = hasParticipants
+      ? `A collective artwork created by ${uniqueParticipants.length} participants on ${yesterday}. This Standard Edition captures the community's creative energy in a vibrant daisy garden.`
+      : `A serene daisy garden from ${yesterday}. This quiet day features only background blooms, awaiting future creators to add their trails.`;
+    const genesisDescription = hasParticipants
+      ? `The unique Genesis Edition of ${yesterday}'s collective artwork. Created by ${uniqueParticipants.length} participants, this 1/1 piece features a dark background with golden glowing strokes, symbolizing the rarity and prestige of this collector's item.`
+      : `The unique Genesis Edition from ${yesterday}. A tranquil garden of golden-stroked daisies on a dark canvas, marking a day of peaceful silence before the next wave of creativity.`;
+
     // Standard Edition metadata
     const standardMetadata = {
       ...baseMetadata,
       name: `Daisy ${yesterday} - Standard Edition`,
-      description: `A collective artwork created by ${uniqueParticipants.length} participants on ${yesterday}. This Standard Edition captures the community's creative energy in a vibrant daisy garden.`,
+      description: standardDescription,
       image: `https://ar-io.net/${standardImageTxId}`,
       attributes: [
         ...baseMetadata.attributes,
@@ -988,7 +997,7 @@ async function generateDaisyNFT(
     const genesisMetadata = {
       ...baseMetadata,
       name: `Daisy ${yesterday} - Genesis Edition`,
-      description: `The unique Genesis Edition of ${yesterday}'s collective artwork. Created by ${uniqueParticipants.length} participants, this 1/1 piece features a dark background with golden glowing strokes, symbolizing the rarity and prestige of this collector's item.`,
+      description: genesisDescription,
       image: `https://ar-io.net/${genesisImageTxId}`,
       attributes: [
         ...baseMetadata.attributes,
