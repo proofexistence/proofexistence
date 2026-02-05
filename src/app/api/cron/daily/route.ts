@@ -43,7 +43,12 @@ import {
   TIME26_ABI,
   PROOF_RECORDER_ADDRESS,
   PROOF_RECORDER_ABI,
+  DAISY_GENESIS_ADDRESS,
+  DAISY_GENESIS_ABI,
+  DAISY_STANDARD_ADDRESS,
+  DAISY_STANDARD_ABI,
 } from '@/lib/contracts';
+import { getQuarter } from '@/lib/daisy/special-days';
 import {
   createAmoyProvider,
   createPolygonProvider,
@@ -942,6 +947,79 @@ async function generateDaisyNFT(
       standardPreview: standardPreviewUrl,
       genesisPreview: genesisPreviewUrl,
     });
+
+    // ============================================
+    // Set up on-chain configurations
+    // ============================================
+    console.log('[Daisy] Setting up on-chain configurations...');
+
+    const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true';
+    const provider = isTestnet ? createAmoyProvider() : createPolygonProvider();
+    const operatorKey = process.env.PRIVATE_KEY;
+
+    if (!operatorKey) {
+      console.error('[Daisy] PRIVATE_KEY not configured, skipping on-chain setup');
+      return { success: true };
+    }
+
+    const signer = new ethers.Wallet(operatorKey, provider);
+    const dateNumber = parseInt(yesterday.replace(/-/g, '')); // YYYYMMDD as number
+
+    // 1. Set up Standard contract daily config
+    try {
+      console.log('[Daisy] Setting Standard daily config...');
+      const standardContract = new ethers.Contract(
+        DAISY_STANDARD_ADDRESS,
+        DAISY_STANDARD_ABI,
+        signer
+      );
+
+      const quarter = getQuarter(yesterday);
+      const dateMultiplierBps = Math.round(dateMultiplier * 10000); // Convert to basis points
+
+      const standardTx = await standardContract.setDailyConfig(
+        dateNumber,
+        `https://ar-io.net/${standardMetadataTxId}`,
+        participantsMerkleRoot,
+        uniqueParticipants.length,
+        quarter,
+        dateMultiplierBps,
+        0, // startTime (Phase 1: no limit)
+        0  // endTime (Phase 1: no limit)
+      );
+      await standardTx.wait();
+      console.log('[Daisy] Standard config set, tx:', standardTx.hash);
+    } catch (error) {
+      console.error('[Daisy] Failed to set Standard config:', error);
+      // Continue - don't fail the whole process
+    }
+
+    // 2. Create Genesis auction
+    try {
+      console.log('[Daisy] Creating Genesis auction...');
+      const genesisContract = new ethers.Contract(
+        DAISY_GENESIS_ADDRESS,
+        DAISY_GENESIS_ABI,
+        signer
+      );
+
+      const startPriceWei = ethers.parseEther(GENESIS_AUCTION.START_PRICE.toString());
+
+      const genesisTx = await genesisContract.createAuction(
+        dateNumber,
+        startPriceWei,
+        `https://ar-io.net/${genesisMetadataTxId}`,
+        uniqueParticipants.length,
+        sessionsData.length
+      );
+      await genesisTx.wait();
+      console.log('[Daisy] Genesis auction created, tx:', genesisTx.hash);
+    } catch (error) {
+      console.error('[Daisy] Failed to create Genesis auction:', error);
+      // Continue - don't fail the whole process
+    }
+
+    console.log('[Daisy] On-chain setup complete!');
 
     return { success: true };
   } catch (error) {
