@@ -132,12 +132,12 @@ export const SNAPSHOT_NFT_ABI = [
 
 // DaisyChronicles Genesis (ERC-721, 1/1 Auctions)
 export const DAISY_GENESIS_ADDRESS = isTestnet
-  ? '0x0000000000000000000000000000000000000000' // TODO: Deploy to Amoy
+  ? '0x3cE4838b41A95292954836B31435836F1c994FC7' // Amoy testnet
   : '0x0000000000000000000000000000000000000000'; // TODO: Deploy to mainnet
 
 // DaisyChronicles Standard (ERC-1155, Unlimited Editions)
 export const DAISY_STANDARD_ADDRESS = isTestnet
-  ? '0x0000000000000000000000000000000000000000' // TODO: Deploy to Amoy
+  ? '0xa5aaf62952ECfB6cDe729b81b37c8BE826a811B4' // Amoy testnet
   : '0x0000000000000000000000000000000000000000'; // TODO: Deploy to mainnet
 
 export const DAISY_GENESIS_ABI = [
