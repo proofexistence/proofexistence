@@ -14,7 +14,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "test:contracts": "hardhat test --config hardhat.config.cjs"
+    "test:contracts": "hardhat test --config hardhat.config.cjs",
+    "test:daisy": "bun run scripts/test-daisy-generation.ts",
+    "test:daisy:animation": "bun run scripts/test-daisy-animation.ts",
+    "generate:daisy-mp4": "bun run scripts/generate-daisy-mp4.ts",
+    "generate:daisy": "bun run scripts/generate-daisy-final.ts"
   },
   "dependencies": {
     "@ardrive/turbo-sdk": "^1.39.2",

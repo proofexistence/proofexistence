@@ -1,4 +1,5 @@
-// src/lib/daisy/render-daisy.ts
+// src/lib/daisy/render-animation.ts
+// Genesis Edition: 60-second bloom animation
 
 import { createCanvas, loadImage, type CanvasRenderingContext2D } from 'canvas';
 import {
@@ -13,22 +14,25 @@ import sharp from 'sharp';
 
 const CANVAS_SIZE = 2048;
 const DAISY_COUNT = 12;
+const ANIMATION_DURATION = 30; // 30 seconds
+const FPS = 30; // 30 frames per second
+const TOTAL_FRAMES = ANIMATION_DURATION * FPS; // 900 frames
 
-interface RenderResult {
-  staticImage: Buffer; // Optimized PNG
-  animationFrames?: Buffer[]; // For Genesis MP4
-}
-
-export type EditionType = 'genesis' | 'standard';
-
-interface RenderOptions {
-  edition?: EditionType;
-  strokeColor?: string; // Custom stroke color for testing
-  useGlow?: boolean; // Enable glow effect
+interface DaisyPosition {
+  x: number;
+  y: number;
+  size: number;
+  rotation: number;
+  colorIndex: number;
+  svgIndex: number;
+  petalColors: string[];
+  centerColor: string;
+  spawnFrame: number; // When this daisy appears
+  growthDuration: number; // How many frames to fully bloom
 }
 
 /**
- * Load all daisy SVG files (server-side)
+ * Load all daisy SVG files
  */
 function loadDaisySVGs(): string[] {
   const svgs: string[] = [];
@@ -45,22 +49,17 @@ function loadDaisySVGs(): string[] {
 }
 
 /**
- * Modify SVG to apply candy colors to petals with outline
- * Genesis Edition uses golden stroke, Standard uses black
+ * Colorize SVG - Genesis Edition uses golden stroke
  */
 function colorizeSVG(
   svgString: string,
   petalColors: string[],
   centerColor: string,
-  strokeColor: string = '#1a1a1a' // Default black, can override for Genesis
+  strokeColor: string = '#FFD700' // Golden stroke for Genesis Edition
 ): string {
-  // Remove background rect
   let svg = svgString.replace(/<rect[^>]*fill="#C0C0C0"[^>]*\/>/, '');
-
-  // Ensure SVG has width and height for node-canvas
   svg = svg.replace(/<svg([^>]*)>/, '<svg$1 width="200" height="200">');
 
-  // Find all petal elements (ellipse or rect with white fill) and add stroke
   const petalRegex = /(<(?:ellipse|rect)[^>]*)(fill="#FFFFFF")([^>]*)(\/?>)/g;
   let petalIndex = 0;
 
@@ -70,13 +69,11 @@ function colorizeSVG(
     return `${before}fill="${color}" stroke="${strokeColor}" stroke-width="1.5"${after}${closing}`;
   });
 
-  // Replace center color (orange #F5A623) with stroke
   svg = svg.replace(
     /(<(?:ellipse|circle)[^>]*)(fill="#F5A623")([^>]*)(\/?>)/g,
     `$1fill="${centerColor}" stroke="${strokeColor}" stroke-width="1.5"$3$4`
   );
 
-  // Replace gray circles (#C0C0C0) with darker center color and stroke
   svg = svg.replace(
     /(<(?:ellipse|circle)[^>]*)(fill="#C0C0C0")([^>]*)(\/?>)/g,
     `$1fill="${darkenColor(centerColor, 0.2)}" stroke="${strokeColor}" stroke-width="1"$3$4`
@@ -85,9 +82,6 @@ function colorizeSVG(
   return svg;
 }
 
-/**
- * Darken a hex color
- */
 function darkenColor(hex: string, amount: number): string {
   const num = parseInt(hex.slice(1), 16);
   const r = Math.max(0, Math.floor(((num >> 16) & 0xff) * (1 - amount)));
@@ -106,10 +100,6 @@ function getDayOfYear(date: Date): number {
   return Math.floor(diff / oneDay);
 }
 
-/**
- * Get the theme for a specific date string (YYYY-MM-DD format)
- * Uses a deterministic selection based on day of year
- */
 function getDailyTheme(dateString: string): DailyTheme {
   const date = new Date(dateString + 'T00:00:00Z');
   const dayOfYear = getDayOfYear(date);
@@ -128,102 +118,35 @@ function calculateDaySeed(dateString: string): number {
   return (year * 1000 + dayOfYear) * 12345;
 }
 
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
 /**
- * Render a Daisy visualization for a specific date
- * Server-side version using node-canvas with SVG images
+ * Calculate daisy positions with spawn timing
+ * This generates the same final positions as the static image,
+ * but adds animation timing information.
  */
-export async function renderDaisyVisualization(
-  sessions: DailyArtSession[],
-  date: string,
-  options: RenderOptions = {}
-): Promise<RenderResult> {
-  const {
-    edition = 'standard',
-    strokeColor: customStrokeColor,
-    useGlow: customGlow,
-  } = options;
-  const canvas = createCanvas(CANVAS_SIZE, CANVAS_SIZE);
-  const ctx = canvas.getContext('2d');
-
-  // Get theme for the date
-  const theme = getDailyTheme(date);
-
-  // Draw background - use dark background for Genesis
-  if (edition === 'genesis') {
-    // Dark gradient background for Genesis
-    const bgGradient = ctx.createRadialGradient(
-      CANVAS_SIZE / 2,
-      CANVAS_SIZE / 2,
-      0,
-      CANVAS_SIZE / 2,
-      CANVAS_SIZE / 2,
-      CANVAS_SIZE * 0.8
-    );
-    bgGradient.addColorStop(0, '#1a1a2e'); // Dark blue center
-    bgGradient.addColorStop(1, '#0f0f1e'); // Darker edges
-    ctx.fillStyle = bgGradient;
-  } else {
-    ctx.fillStyle = theme.background;
-  }
-  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-
-  // Load SVG files
-  const svgs = loadDaisySVGs();
-
-  // Calculate positions for all daisies
-  const allPositions = calculateDaisyPositions(sessions, CANVAS_SIZE, date);
-
-  // Determine stroke color - allow custom override for testing
-  const strokeColor =
-    customStrokeColor || (edition === 'genesis' ? '#FFD700' : '#1a1a1a');
-  const useGlow = customGlow !== undefined ? customGlow : edition === 'genesis';
-
-  // Render all daisies
-  for (const pos of allPositions) {
-    await renderDaisy(ctx, pos, theme, svgs, strokeColor, useGlow);
-  }
-
-  // Get raw PNG buffer
-  const rawPng = canvas.toBuffer('image/png');
-
-  // Optimize PNG with sharp (reduce file size by ~60-70%)
-  const optimizedPng = await sharp(rawPng)
-    .png({
-      compressionLevel: 9, // Maximum compression
-      quality: 90, // High quality
-      effort: 10, // Maximum effort
-    })
-    .toBuffer();
-
-  return { staticImage: optimizedPng };
-}
-
-interface DaisyPosition {
-  x: number;
-  y: number;
-  size: number;
-  rotation: number;
-  colorIndex: number;
-  svgIndex: number;
-  petalColors: string[];
-  centerColor: string;
-}
-
-function calculateDaisyPositions(
+function calculateAnimatedDaisyPositions(
   sessions: DailyArtSession[],
   canvasSize: number,
   date: string
 ): DaisyPosition[] {
-  const positions: DaisyPosition[] = [];
   const theme = getDailyTheme(date);
   const candyPalette = theme.petalColors;
   const centerColors = theme.centerColors;
-  const daySeed = calculateDaySeed(date); // Match frontend seed calculation
+  const daySeed = calculateDaySeed(date);
 
   // Track existing positions for collision detection
   const existingPositions: { x: number; y: number; size: number }[] = [];
 
-  // Sort sessions by createdAt (with stable secondary sort by id) - match frontend
+  // Sort sessions by createdAt (match frontend and static render)
   const sortedSessions = [...sessions].sort((a, b) => {
     const timeDiff =
       new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -231,15 +154,19 @@ function calculateDaisyPositions(
     return a.id.localeCompare(b.id);
   });
 
-  // STEP 1: Pre-calculate ALL trail flowers first to ensure they get priority
-  const allSessionTrails: DaisyPosition[][] = [];
+  // STEP 1: Pre-calculate ALL trail flowers (same as static render)
+  const allSessionTrails: {
+    positions: Omit<DaisyPosition, 'spawnFrame' | 'growthDuration'>[];
+    session: DailyArtSession;
+  }[] = [];
+
   for (const session of sortedSessions) {
     if (!session.trailData || session.trailData.length < 2) {
-      allSessionTrails.push([]);
+      allSessionTrails.push({ positions: [], session });
       continue;
     }
 
-    const trailPositions = calculateTrailPositions(
+    const trailPositions = calculateTrailPositionsStatic(
       session,
       canvasSize,
       candyPalette,
@@ -247,37 +174,31 @@ function calculateDaisyPositions(
       existingPositions
     );
 
-    // Add trail positions to existingPositions immediately
     for (const pos of trailPositions) {
-      existingPositions.push({
-        x: pos.x,
-        y: pos.y,
-        size: pos.size,
-      });
+      existingPositions.push({ x: pos.x, y: pos.y, size: pos.size });
     }
 
-    allSessionTrails.push(trailPositions);
+    allSessionTrails.push({ positions: trailPositions, session });
   }
 
-  // STEP 2: Generate background fill positions
+  // STEP 2: Generate background fill positions (same as static render)
   const FILL_FLOWER_COUNT = 500;
   const POSITION_SPACING = 70;
 
   const bgPositions = generateBackgroundPositions(
-    CANVAS_SIZE,
+    canvasSize,
     FILL_FLOWER_COUNT,
     POSITION_SPACING,
     daySeed + 9999
   );
 
-  // Filter valid fill positions and pre-calculate sizes
-  const fillBaseSize = CANVAS_SIZE * 0.07;
+  // Filter valid positions (same collision detection as static)
+  const fillBaseSize = canvasSize * 0.07;
   const FILL_COLLISION_THRESHOLD = 0.75;
   const validFillPositions: { x: number; y: number; size: number }[] = [];
 
   let fillIdx = 0;
   for (const pos of bgPositions) {
-    // More uniform sizes for Murakami style (0.7 to 1.2x)
     const sizeCategory = (fillIdx * 777) % 100;
     let sizeMult: number;
     if (sizeCategory < 40) {
@@ -290,7 +211,6 @@ function calculateDaisyPositions(
     const flowerSize = fillBaseSize * sizeMult;
     const radius = flowerSize / 2;
 
-    // Check collision with existing flowers (trails)
     let tooClose = false;
     for (const existing of existingPositions) {
       const dx = pos.x - existing.x;
@@ -310,10 +230,12 @@ function calculateDaisyPositions(
     fillIdx++;
   }
 
-  // STEP 3: Build the queue matching frontend order
-  // Interleave trails with background fills
+  // STEP 3: Build queue and assign spawn timing
   type QueueItem =
-    | { type: 'trail'; data: DaisyPosition }
+    | {
+        type: 'trail';
+        data: Omit<DaisyPosition, 'spawnFrame' | 'growthDuration'>;
+      }
     | { type: 'fill'; data: { x: number; y: number; size: number } };
   const flowerQueue: QueueItem[] = [];
 
@@ -322,29 +244,22 @@ function calculateDaisyPositions(
   );
   let validFillIdx = 0;
 
-  // Add initial batch of background flowers
+  // Initial batch of background
   for (
     let i = 0;
     i < fillPerSession && validFillIdx < validFillPositions.length;
     i++
   ) {
-    flowerQueue.push({
-      type: 'fill',
-      data: validFillPositions[validFillIdx],
-    });
+    flowerQueue.push({ type: 'fill', data: validFillPositions[validFillIdx] });
     validFillIdx++;
   }
 
-  // Process each session
-  sortedSessions.forEach((_, idx) => {
-    const sessionTrails = allSessionTrails[idx] || [];
-
-    // Add all trail flowers for this session
-    for (const trail of sessionTrails) {
+  // Interleave trails and fills
+  allSessionTrails.forEach((sessionData) => {
+    for (const trail of sessionData.positions) {
       flowerQueue.push({ type: 'trail', data: trail });
     }
 
-    // Add batch of background flowers
     for (
       let i = 0;
       i < fillPerSession && validFillIdx < validFillPositions.length;
@@ -358,33 +273,37 @@ function calculateDaisyPositions(
     }
   });
 
-  // Add remaining background flowers
+  // Remaining fills
   while (validFillIdx < validFillPositions.length) {
-    flowerQueue.push({
-      type: 'fill',
-      data: validFillPositions[validFillIdx],
-    });
+    flowerQueue.push({ type: 'fill', data: validFillPositions[validFillIdx] });
     validFillIdx++;
   }
 
-  // STEP 4: Process queue and create final positions with correct seeds
+  // STEP 4: Assign spawn timing and create final positions
+  const positions: DaisyPosition[] = [];
+  const spawnInterval = TOTAL_FRAMES / Math.max(1, flowerQueue.length);
+
   for (let queueIdx = 0; queueIdx < flowerQueue.length; queueIdx++) {
     const item = flowerQueue[queueIdx];
+    const spawnFrame = Math.floor(queueIdx * spawnInterval);
+    const growthDuration = 20 + Math.floor(Math.random() * 40); // 0.7-2s
 
     if (item.type === 'trail') {
-      // Trail flower - already has correct properties
-      positions.push(item.data);
+      positions.push({
+        ...item.data,
+        spawnFrame,
+        growthDuration,
+      });
     } else {
-      // Fill flower - generate properties using queue index
+      // Generate fill properties using queue index
       const pos = item.data;
-      const seedVal = daySeed + queueIdx * 777; // Use queue index, not fill index
+      const seedVal = daySeed + queueIdx * 777;
       const localRandom = createRandom(seedVal);
 
       const centerColor =
         centerColors[Math.floor(localRandom() * centerColors.length)];
       const svgIndex = Math.floor(localRandom() * DAISY_COUNT);
 
-      // Generate petal colors
       const useMultiColor = localRandom() > 0.3;
       const petalCount = 16;
       const petalColors: string[] = [];
@@ -411,6 +330,8 @@ function calculateDaisyPositions(
         svgIndex,
         petalColors,
         centerColor,
+        spawnFrame,
+        growthDuration,
       });
     }
   }
@@ -418,238 +339,8 @@ function calculateDaisyPositions(
   return positions;
 }
 
-function calculateTrailPositions(
-  session: DailyArtSession,
-  canvasSize: number,
-  candyPalette: readonly string[],
-  centerColors: readonly string[],
-  existingPositions: { x: number; y: number; size: number }[]
-): DaisyPosition[] {
-  const positions: DaisyPosition[] = [];
-  const { trailData, duration } = session;
-
-  if (!trailData || trailData.length < 2) return [];
-
-  // Use session ID hash for deterministic random - same session always gets same flowers
-  const sessionSeed = hashString(session.id);
-  const sessionRandom = createRandom(sessionSeed);
-
-  // Session-wide consistent center color
-  const sessionCenterColor =
-    centerColors[Math.floor(sessionRandom() * centerColors.length)];
-
-  // Single consistent petal color for the whole trail (makes sessions distinguishable)
-  const colorIdx = Math.floor(sessionRandom() * candyPalette.length);
-  const sessionColor = candyPalette[colorIdx];
-
-  // Find bounds
-  let minX = Infinity,
-    maxX = -Infinity,
-    minY = Infinity,
-    maxY = -Infinity;
-  for (const p of trailData) {
-    minX = Math.min(minX, p.x);
-    maxX = Math.max(maxX, p.x);
-    minY = Math.min(minY, p.y);
-    maxY = Math.max(maxY, p.y);
-  }
-
-  const rangeX = maxX - minX || 1;
-  const rangeY = maxY - minY || 1;
-  const margin = canvasSize * 0.06;
-  const usableSize = canvasSize - margin * 2;
-  const baseSize = canvasSize * 0.1; // Trail flowers are larger (0.1 vs 0.07)
-
-  // Calculate total path length for even distribution
-  let totalLength = 0;
-  const segmentLengths: number[] = [0];
-
-  for (let i = 1; i < trailData.length; i++) {
-    const dx = trailData[i].x - trailData[i - 1].x;
-    const dy = trailData[i].y - trailData[i - 1].y;
-    totalLength += Math.sqrt(dx * dx + dy * dy);
-    segmentLengths.push(totalLength);
-  }
-
-  // Local positions for this session
-  const localPositions: { x: number; y: number; size: number }[] = [];
-
-  const SAME_SESSION_THRESHOLD = 0.6; // 40% overlap within session
-  const OTHER_SESSION_THRESHOLD = 0.8; // 20% overlap between sessions
-
-  // Moderate flower count
-  const daisyCount = Math.min(120, Math.max(25, Math.floor(duration * 2.5)));
-
-  // Place flowers evenly along the path
-  for (let i = 0; i < daisyCount; i++) {
-    const targetDist = (i / Math.max(1, daisyCount - 1)) * totalLength;
-
-    // Find the segment containing this distance
-    let segIdx = 0;
-    for (let j = 1; j < segmentLengths.length; j++) {
-      if (segmentLengths[j] >= targetDist) {
-        segIdx = j - 1;
-        break;
-      }
-      segIdx = j - 1;
-    }
-
-    // Interpolate position within segment
-    const segStart = segmentLengths[segIdx];
-    const segEnd = segmentLengths[segIdx + 1] || segStart;
-    const segLength = segEnd - segStart;
-    const t = segLength > 0 ? (targetDist - segStart) / segLength : 0;
-
-    const p0 = trailData[segIdx];
-    const p1 = trailData[Math.min(segIdx + 1, trailData.length - 1)];
-
-    const rawX = p0.x + (p1.x - p0.x) * t;
-    const rawY = p0.y + (p1.y - p0.y) * t;
-
-    // Normalize to canvas
-    let x = margin + ((rawX - minX) / rangeX) * usableSize;
-    let y = margin + ((rawY - minY) / rangeY) * usableSize;
-
-    // Small random offset for natural look
-    x += (sessionRandom() - 0.5) * baseSize * 0.1;
-    y += (sessionRandom() - 0.5) * baseSize * 0.1;
-
-    // Size variation: more uniform (0.85 to 1.15x) for Murakami look
-    const sizeVar = 0.85 + sessionRandom() * 0.3;
-    const maxSize = baseSize * sizeVar;
-    const radius = maxSize / 2;
-
-    const svgIndex = Math.floor(sessionRandom() * DAISY_COUNT);
-
-    // Check collision against OTHER sessions (existingPositions) - stricter
-    let tooCloseToOther = false;
-    for (const pos of existingPositions) {
-      const dx = x - pos.x;
-      const dy = y - pos.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const minDist = radius + pos.size / 2;
-
-      if (dist < minDist * OTHER_SESSION_THRESHOLD) {
-        tooCloseToOther = true;
-        break;
-      }
-    }
-
-    // Check collision within THIS session - more lenient for continuous line
-    let tooCloseToLocal = false;
-    for (const pos of localPositions) {
-      const dx = x - pos.x;
-      const dy = y - pos.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const minDist = radius + pos.size / 2;
-
-      if (dist < minDist * SAME_SESSION_THRESHOLD) {
-        tooCloseToLocal = true;
-        break;
-      }
-    }
-
-    if (tooCloseToOther || tooCloseToLocal) {
-      continue;
-    }
-
-    // Add to local positions for subsequent collision checks
-    localPositions.push({ x, y, size: maxSize });
-
-    // Single color for session - fill all petals with same color
-    const petalColors: string[] = [];
-    for (let j = 0; j < 16; j++) {
-      petalColors.push(sessionColor);
-    }
-
-    positions.push({
-      x,
-      y,
-      size: maxSize,
-      rotation: sessionRandom() * Math.PI * 2,
-      colorIndex: Math.floor(sessionRandom() * 8),
-      svgIndex,
-      petalColors,
-      centerColor: sessionCenterColor,
-    });
-  }
-
-  return positions;
-}
-
-async function renderDaisy(
-  ctx: CanvasRenderingContext2D,
-  pos: DaisyPosition,
-  theme: DailyTheme,
-  svgs: string[],
-  strokeColor: string = '#1a1a1a',
-  useGlow: boolean = false
-): Promise<void> {
-  const { x, y, size, rotation, svgIndex, petalColors, centerColor } = pos;
-
-  // Get and colorize SVG
-  const svg = svgs[svgIndex % svgs.length];
-  const colorizedSvg = colorizeSVG(svg, petalColors, centerColor, strokeColor);
-
-  // Convert SVG to data URL for node-canvas
-  const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(colorizedSvg).toString('base64')}`;
-
-  try {
-    const image = await loadImage(svgDataUrl);
-
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
-
-    // Add glow effect for Genesis Edition
-    if (useGlow) {
-      ctx.shadowColor = '#FFD700'; // Gold glow
-      ctx.shadowBlur = 20; // Glow intensity
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-    }
-
-    // Draw image centered
-    const halfSize = size / 2;
-    ctx.drawImage(image, -halfSize, -halfSize, size, size);
-
-    ctx.restore();
-  } catch (error) {
-    console.error('Error loading SVG:', error);
-  }
-}
-
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash);
-}
-
 /**
- * Check if position is too close to existing positions (Poisson disk sampling)
- */
-function isTooClose(
-  x: number,
-  y: number,
-  existingPositions: { x: number; y: number }[],
-  minDistance: number
-): boolean {
-  for (const pos of existingPositions) {
-    const dx = x - pos.x;
-    const dy = y - pos.y;
-    if (dx * dx + dy * dy < minDistance * minDistance) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Generate background positions using Poisson disk sampling (same as frontend)
+ * Generate background positions using Poisson disk sampling
  */
 function generateBackgroundPositions(
   canvasSize: number,
@@ -674,4 +365,274 @@ function generateBackgroundPositions(
   }
 
   return positions;
+}
+
+function isTooClose(
+  x: number,
+  y: number,
+  existingPositions: { x: number; y: number }[],
+  minDistance: number
+): boolean {
+  for (const pos of existingPositions) {
+    const dx = x - pos.x;
+    const dy = y - pos.y;
+    if (dx * dx + dy * dy < minDistance * minDistance) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Calculate trail positions (without animation timing)
+ */
+function calculateTrailPositionsStatic(
+  session: DailyArtSession,
+  canvasSize: number,
+  candyPalette: readonly string[],
+  centerColors: readonly string[],
+  existingPositions: { x: number; y: number; size: number }[]
+): Omit<DaisyPosition, 'spawnFrame' | 'growthDuration'>[] {
+  const positions: Omit<DaisyPosition, 'spawnFrame' | 'growthDuration'>[] = [];
+  const { trailData, duration } = session;
+
+  if (!trailData || trailData.length < 2) return [];
+
+  const sessionSeed = hashString(session.id);
+  const sessionRandom = createRandom(sessionSeed);
+
+  const sessionCenterColor =
+    centerColors[Math.floor(sessionRandom() * centerColors.length)];
+
+  const colorIdx = Math.floor(sessionRandom() * candyPalette.length);
+  const sessionColor = candyPalette[colorIdx];
+
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
+  for (const p of trailData) {
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y);
+  }
+
+  const rangeX = maxX - minX || 1;
+  const rangeY = maxY - minY || 1;
+  const margin = canvasSize * 0.06;
+  const usableSize = canvasSize - margin * 2;
+  const baseSize = canvasSize * 0.1;
+
+  let totalLength = 0;
+  const segmentLengths: number[] = [0];
+
+  for (let i = 1; i < trailData.length; i++) {
+    const dx = trailData[i].x - trailData[i - 1].x;
+    const dy = trailData[i].y - trailData[i - 1].y;
+    totalLength += Math.sqrt(dx * dx + dy * dy);
+    segmentLengths.push(totalLength);
+  }
+
+  const localPositions: { x: number; y: number; size: number }[] = [];
+  const SAME_SESSION_THRESHOLD = 0.6;
+  const OTHER_SESSION_THRESHOLD = 0.8;
+  const daisyCount = Math.min(120, Math.max(25, Math.floor(duration * 2.5)));
+
+  for (let i = 0; i < daisyCount; i++) {
+    const targetDist = (i / Math.max(1, daisyCount - 1)) * totalLength;
+
+    let segIdx = 0;
+    for (let j = 1; j < segmentLengths.length; j++) {
+      if (segmentLengths[j] >= targetDist) {
+        segIdx = j - 1;
+        break;
+      }
+      segIdx = j - 1;
+    }
+
+    const segStart = segmentLengths[segIdx];
+    const segEnd = segmentLengths[segIdx + 1] || segStart;
+    const segLength = segEnd - segStart;
+    const t = segLength > 0 ? (targetDist - segStart) / segLength : 0;
+
+    const p0 = trailData[segIdx];
+    const p1 = trailData[Math.min(segIdx + 1, trailData.length - 1)];
+
+    const rawX = p0.x + (p1.x - p0.x) * t;
+    const rawY = p0.y + (p1.y - p0.y) * t;
+
+    let x = margin + ((rawX - minX) / rangeX) * usableSize;
+    let y = margin + ((rawY - minY) / rangeY) * usableSize;
+
+    x += (sessionRandom() - 0.5) * baseSize * 0.1;
+    y += (sessionRandom() - 0.5) * baseSize * 0.1;
+
+    const sizeVar = 0.85 + sessionRandom() * 0.3;
+    const maxSize = baseSize * sizeVar;
+    const radius = maxSize / 2;
+
+    const svgIndex = Math.floor(sessionRandom() * DAISY_COUNT);
+
+    let tooCloseToOther = false;
+    for (const pos of existingPositions) {
+      const dx = x - pos.x;
+      const dy = y - pos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const minDist = radius + pos.size / 2;
+
+      if (dist < minDist * OTHER_SESSION_THRESHOLD) {
+        tooCloseToOther = true;
+        break;
+      }
+    }
+
+    let tooCloseToLocal = false;
+    for (const pos of localPositions) {
+      const dx = x - pos.x;
+      const dy = y - pos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const minDist = radius + pos.size / 2;
+
+      if (dist < minDist * SAME_SESSION_THRESHOLD) {
+        tooCloseToLocal = true;
+        break;
+      }
+    }
+
+    if (tooCloseToOther || tooCloseToLocal) {
+      continue;
+    }
+
+    localPositions.push({ x, y, size: maxSize });
+
+    const petalColors: string[] = [];
+    for (let j = 0; j < 16; j++) {
+      petalColors.push(sessionColor);
+    }
+
+    positions.push({
+      x,
+      y,
+      size: maxSize,
+      rotation: sessionRandom() * Math.PI * 2,
+      colorIndex: Math.floor(sessionRandom() * 8),
+      svgIndex,
+      petalColors,
+      centerColor: sessionCenterColor,
+    });
+  }
+
+  return positions;
+}
+
+/**
+ * Render a single frame of the animation
+ */
+async function renderAnimationFrame(
+  frameNumber: number,
+  allPositions: DaisyPosition[],
+  theme: DailyTheme,
+  svgs: string[]
+): Promise<Buffer> {
+  const canvas = createCanvas(CANVAS_SIZE, CANVAS_SIZE);
+  const ctx = canvas.getContext('2d');
+
+  // Draw background
+  ctx.fillStyle = theme.background;
+  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+  // Render visible daisies with growth animation
+  for (const pos of allPositions) {
+    if (frameNumber < pos.spawnFrame) continue; // Not spawned yet
+
+    const age = frameNumber - pos.spawnFrame;
+    const growthProgress = Math.min(1, age / pos.growthDuration);
+
+    // Eased growth (ease-out cubic)
+    const easedProgress = 1 - Math.pow(1 - growthProgress, 3);
+
+    // Calculate current size and opacity
+    const currentSize = pos.size * easedProgress;
+    const currentOpacity = Math.min(1, growthProgress * 2); // Fade in quickly
+
+    if (currentSize > 0 && currentOpacity > 0) {
+      await renderDaisy(ctx, pos, currentSize, currentOpacity, svgs);
+    }
+  }
+
+  // Optimize PNG
+  const rawPng = canvas.toBuffer('image/png');
+  const optimizedPng = await sharp(rawPng)
+    .png({ compressionLevel: 9, quality: 85, effort: 5 })
+    .toBuffer();
+
+  return optimizedPng;
+}
+
+async function renderDaisy(
+  ctx: CanvasRenderingContext2D,
+  pos: DaisyPosition,
+  size: number,
+  opacity: number,
+  svgs: string[]
+): Promise<void> {
+  const { x, y, rotation, svgIndex, petalColors, centerColor } = pos;
+
+  const svg = svgs[svgIndex % svgs.length];
+  const colorizedSvg = colorizeSVG(svg, petalColors, centerColor);
+  const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(colorizedSvg).toString('base64')}`;
+
+  try {
+    const image = await loadImage(svgDataUrl);
+
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+
+    const halfSize = size / 2;
+    ctx.drawImage(image, -halfSize, -halfSize, size, size);
+
+    ctx.restore();
+  } catch {
+    // Silently skip on error
+  }
+}
+
+/**
+ * Generate all frames for Genesis animation
+ * Returns all frames for 30-second animation at 30fps = 900 frames
+ */
+export async function generateGenesisAnimation(
+  sessions: DailyArtSession[],
+  date: string,
+  onProgress?: (frame: number, total: number) => void
+): Promise<Buffer[]> {
+  const theme = getDailyTheme(date);
+  const svgs = loadDaisySVGs();
+  const allPositions = calculateAnimatedDaisyPositions(
+    sessions,
+    CANVAS_SIZE,
+    date
+  );
+
+  // 30 seconds @ 30fps = 900 frames
+  const frames: Buffer[] = [];
+
+  for (let i = 0; i < TOTAL_FRAMES; i++) {
+    const frameBuffer = await renderAnimationFrame(
+      i,
+      allPositions,
+      theme,
+      svgs
+    );
+    frames.push(frameBuffer);
+
+    if (onProgress) {
+      onProgress(i, TOTAL_FRAMES);
+    }
+  }
+
+  return frames;
 }

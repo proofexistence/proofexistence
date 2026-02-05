@@ -787,30 +787,133 @@ async function generateDaisyNFT(
     ];
     const themeName = themeNames[themeIndex];
 
-    // Render static image
-    const { staticImage } = await renderDaisyVisualization(
-      sessionsData.map((s) => ({
-        id: s.id,
-        trailData: s.trailData as { x: number; y: number }[],
-        color: s.color || '#FFFFFF',
-        duration: s.duration,
-        createdAt: s.createdAt?.toISOString() || new Date().toISOString(),
-        userName: s.userName || undefined,
-      })),
-      yesterday
+    // Prepare session data for rendering
+    const daisySessions = sessionsData.map((s) => ({
+      id: s.id,
+      trailData: s.trailData as { x: number; y: number }[],
+      color: s.color || '#FFFFFF',
+      duration: s.duration,
+      createdAt: s.createdAt?.toISOString() || new Date().toISOString(),
+      userName: s.userName || undefined,
+    }));
+
+    // Generate BOTH editions
+    console.log('[Daisy] Rendering Standard edition...');
+    const { staticImage: standardImage } = await renderDaisyVisualization(
+      daisySessions,
+      yesterday,
+      { edition: 'standard' }
     );
 
-    // Upload preview to R2
-    const previewKey = `daisy/${yesterday}/preview.png`;
-    const previewUrl = await uploadToR2(staticImage, previewKey, 'image/png');
+    console.log('[Daisy] Rendering Genesis edition...');
+    const { staticImage: genesisImage } = await renderDaisyVisualization(
+      daisySessions,
+      yesterday,
+      { edition: 'genesis' }
+    );
 
-    // TODO: Upload metadata to Arweave (requires funded Irys wallet)
-    // For now, just store preview URL
+    // Upload images to R2 (for preview)
+    const standardPreviewKey = `daisy/${yesterday}/standard.png`;
+    const genesisPreviewKey = `daisy/${yesterday}/genesis.png`;
+    const standardPreviewUrl = await uploadToR2(
+      standardImage,
+      standardPreviewKey,
+      'image/png'
+    );
+    const genesisPreviewUrl = await uploadToR2(
+      genesisImage,
+      genesisPreviewKey,
+      'image/png'
+    );
+
+    // Upload images to Arweave (permanent storage for NFT)
+    console.log('[Daisy] Uploading images to Arweave...');
+    const standardImageTxId = await uploadToArweave(standardImage, [
+      { name: 'Content-Type', value: 'image/png' },
+      { name: 'Type', value: 'daisy-image' },
+      { name: 'Edition', value: 'standard' },
+      { name: 'Date', value: yesterday },
+    ]);
+
+    const genesisImageTxId = await uploadToArweave(genesisImage, [
+      { name: 'Content-Type', value: 'image/png' },
+      { name: 'Type', value: 'daisy-image' },
+      { name: 'Edition', value: 'genesis' },
+      { name: 'Date', value: yesterday },
+    ]);
+
+    // Create NFT metadata (OpenSea standard)
+    const baseMetadata = {
+      external_url: `https://proofofexistence.com/poe/daisy?date=${yesterday}`,
+      attributes: [
+        { trait_type: 'Date', value: yesterday },
+        { trait_type: 'Theme', value: themeName },
+        { trait_type: 'Participants', value: uniqueParticipants.length },
+        { trait_type: 'Sessions', value: sessionsData.length },
+        ...(specialDay
+          ? [{ trait_type: 'Special Day', value: specialDay.name }]
+          : []),
+      ],
+      properties: {
+        date: yesterday,
+        theme: themeName,
+        participantCount: uniqueParticipants.length,
+        sessionCount: sessionsData.length,
+        participantsMerkleRoot,
+      },
+    };
+
+    // Standard Edition metadata
+    const standardMetadata = {
+      ...baseMetadata,
+      name: `Daisy ${yesterday} - Standard Edition`,
+      description: `A collective artwork created by ${uniqueParticipants.length} participants on ${yesterday}. This Standard Edition captures the community's creative energy in a vibrant daisy garden.`,
+      image: `https://ar-io.net/${standardImageTxId}`,
+      attributes: [
+        ...baseMetadata.attributes,
+        { trait_type: 'Edition', value: 'Standard' },
+      ],
+    };
+
+    // Genesis Edition metadata (1/1)
+    const genesisMetadata = {
+      ...baseMetadata,
+      name: `Daisy ${yesterday} - Genesis Edition`,
+      description: `The unique Genesis Edition of ${yesterday}'s collective artwork. Created by ${uniqueParticipants.length} participants, this 1/1 piece features a dark background with golden glowing strokes, symbolizing the rarity and prestige of this collector's item.`,
+      image: `https://ar-io.net/${genesisImageTxId}`,
+      attributes: [
+        ...baseMetadata.attributes,
+        { trait_type: 'Edition', value: 'Genesis' },
+        { trait_type: 'Rarity', value: '1/1' },
+      ],
+    };
+
+    // Upload metadata to Arweave
+    console.log('[Daisy] Uploading metadata to Arweave...');
+    const standardMetadataTxId = await uploadToArweave(
+      JSON.stringify(standardMetadata),
+      [
+        { name: 'Content-Type', value: 'application/json' },
+        { name: 'Type', value: 'daisy-metadata' },
+        { name: 'Edition', value: 'standard' },
+        { name: 'Date', value: yesterday },
+      ]
+    );
+
+    const genesisMetadataTxId = await uploadToArweave(
+      JSON.stringify(genesisMetadata),
+      [
+        { name: 'Content-Type', value: 'application/json' },
+        { name: 'Type', value: 'daisy-metadata' },
+        { name: 'Edition', value: 'genesis' },
+        { name: 'Date', value: yesterday },
+      ]
+    );
 
     // Calculate auction end time (24 hours from now)
     const auctionEndTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    // Store in database
+    // Store in database with Arweave hashes
     await db.insert(daisyMints).values({
       date: yesterday,
       participantCount: uniqueParticipants.length,
@@ -820,8 +923,12 @@ async function generateDaisyNFT(
       specialDayName: specialDay?.name || null,
       specialDayMultiplier: dateMultiplier.toString(),
       theme: themeName,
-      dominantColor: '#FF69B4', // TODO: Calculate from theme
-      previewUrl,
+      dominantColor: '#FF69B4',
+      previewUrl: standardPreviewUrl,
+      // Standard Edition
+      standardArweaveHash: standardMetadataTxId,
+      // Genesis Edition
+      genesisArweaveHash: genesisMetadataTxId,
       auctionStartPrice: GENESIS_AUCTION.START_PRICE.toString(),
       auctionEndTime,
       status: 'active',
@@ -830,7 +937,10 @@ async function generateDaisyNFT(
     console.log('[Daisy] Successfully generated for', yesterday, {
       participants: uniqueParticipants.length,
       sessions: sessionsData.length,
-      previewUrl,
+      standardArweave: standardMetadataTxId,
+      genesisArweave: genesisMetadataTxId,
+      standardPreview: standardPreviewUrl,
+      genesisPreview: genesisPreviewUrl,
     });
 
     return { success: true };
