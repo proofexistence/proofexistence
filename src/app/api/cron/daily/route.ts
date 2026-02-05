@@ -709,7 +709,111 @@ async function runQuestRewards(): Promise<{
 }
 
 // ============================================================
-// Task 5: Generate Daily Daisy NFT
+// Task 5: Settle Expired Genesis Auctions
+// ============================================================
+async function settleExpiredAuctions(): Promise<{
+  success: boolean;
+  settledCount: number;
+  error?: string;
+}> {
+  try {
+    console.log('[Daisy] Checking for expired auctions to settle...');
+
+    const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true';
+    const provider = isTestnet ? createAmoyProvider() : createPolygonProvider();
+    const operatorKey = process.env.PRIVATE_KEY;
+
+    if (!operatorKey) {
+      console.log('[Daisy] PRIVATE_KEY not configured, skipping auction settlement');
+      return { success: true, settledCount: 0 };
+    }
+
+    const signer = new ethers.Wallet(operatorKey, provider);
+    const genesisContract = new ethers.Contract(
+      DAISY_GENESIS_ADDRESS,
+      DAISY_GENESIS_ABI,
+      signer
+    );
+
+    // Find all active auctions that have ended but not settled
+    const expiredAuctions = await db
+      .select()
+      .from(daisyMints)
+      .where(
+        and(
+          eq(daisyMints.status, 'active'),
+          eq(daisyMints.auctionSettled, false),
+          lte(daisyMints.auctionEndTime, new Date())
+        )
+      );
+
+    console.log(`[Daisy] Found ${expiredAuctions.length} expired auctions`);
+
+    let settledCount = 0;
+    for (const auction of expiredAuctions) {
+      try {
+        const dateNumber = parseInt(auction.date.replace(/-/g, ''));
+        console.log(`[Daisy] Settling auction for ${auction.date}...`);
+
+        // Check on-chain if already settled
+        const auctionInfo = await genesisContract.getAuctionInfo(dateNumber);
+        if (auctionInfo[4]) { // settled = true
+          console.log(`[Daisy] Auction ${auction.date} already settled on-chain`);
+          // Update database
+          await db
+            .update(daisyMints)
+            .set({
+              auctionSettled: true,
+              status: 'completed',
+              updatedAt: new Date(),
+            })
+            .where(eq(daisyMints.id, auction.id));
+          settledCount++;
+          continue;
+        }
+
+        // Settle on-chain
+        const tx = await genesisContract.settleAuction(dateNumber);
+        const receipt = await tx.wait();
+        console.log(`[Daisy] Settled auction ${auction.date}, tx: ${tx.hash}`);
+
+        // Get winner info from event or contract
+        const updatedInfo = await genesisContract.getAuctionInfo(dateNumber);
+        const winner = updatedInfo[2]; // highestBidder
+        const finalBid = updatedInfo[1]; // currentBid
+
+        // Update database
+        await db
+          .update(daisyMints)
+          .set({
+            auctionSettled: true,
+            auctionCurrentBid: ethers.formatEther(finalBid),
+            auctionHighestBidder: winner,
+            genesisMintedTo: winner,
+            genesisTxHash: tx.hash,
+            genesisMintedAt: new Date(),
+            status: 'completed',
+            updatedAt: new Date(),
+          })
+          .where(eq(daisyMints.id, auction.id));
+
+        settledCount++;
+      } catch (error) {
+        console.error(`[Daisy] Failed to settle auction ${auction.date}:`, error);
+        // Continue with other auctions
+      }
+    }
+
+    console.log(`[Daisy] Settled ${settledCount} auctions`);
+    return { success: true, settledCount };
+  } catch (error) {
+    console.error('[Daisy] Auction settlement error:', error);
+    return { success: false, settledCount: 0, error: String(error) };
+  }
+}
+
+// ============================================================
+// Task 6: Generate Daily Daisy NFT
 // ============================================================
 async function generateDaisyNFT(
   yesterday: string
@@ -1109,7 +1213,13 @@ export async function GET(req: NextRequest) {
     burnMerkleResult = await runBurnAndMerkle();
   }
 
-  // Task 5: Generate Daisy NFT for yesterday
+  // Task 5: Settle expired Genesis auctions
+  const auctionSettleResult = await settleExpiredAuctions();
+  if (!auctionSettleResult.success) {
+    console.error('[Cron] Auction settlement failed:', auctionSettleResult.error);
+  }
+
+  // Task 6: Generate Daisy NFT for yesterday
   const yesterday = getYesterdayDayId();
   const daisyResult = await generateDaisyNFT(yesterday);
   if (!daisyResult.success) {
@@ -1121,11 +1231,15 @@ export async function GET(req: NextRequest) {
     settleResult.success &&
     allRewardsSucceeded &&
     questRewardsResult.success &&
-    burnMerkleResult.success;
+    burnMerkleResult.success &&
+    auctionSettleResult.success &&
+    daisyResult.success;
 
   return NextResponse.json({
     success,
     settle: settleResult,
+    auctionSettle: auctionSettleResult,
+    daisy: daisyResult,
     rewards: {
       processedDays: missingDays,
       results: rewardsResults,
