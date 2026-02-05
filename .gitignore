@@ -78,3 +78,7 @@ docs/
 
 # Git worktrees
 .worktrees/
+
+# Temp files
+temp/
+nul
