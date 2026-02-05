@@ -8,8 +8,14 @@ const hre = require('hardhat');
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
 
-  console.log('Deploying DaisyChronicles contracts with account:', deployer.address);
-  console.log('Account balance:', (await hre.ethers.provider.getBalance(deployer.address)).toString());
+  console.log(
+    'Deploying DaisyChronicles contracts with account:',
+    deployer.address
+  );
+  console.log(
+    'Account balance:',
+    (await hre.ethers.provider.getBalance(deployer.address)).toString()
+  );
 
   // Use deployer as operator, treasury, royaltyReceiver, and owner for testnet
   // In production, these should be different addresses
@@ -29,15 +35,29 @@ async function main() {
   // Deploy Genesis (ERC-721)
   console.log('\n[1/2] Deploying DaisyChroniclesGenesis...');
   const Genesis = await hre.ethers.getContractFactory('DaisyChroniclesGenesis');
-  const genesis = await Genesis.deploy(operator, treasury, royaltyReceiver, royaltyBps, owner);
+  const genesis = await Genesis.deploy(
+    operator,
+    treasury,
+    royaltyReceiver,
+    royaltyBps,
+    owner
+  );
   await genesis.waitForDeployment();
   const genesisAddress = await genesis.getAddress();
   console.log('DaisyChroniclesGenesis deployed to:', genesisAddress);
 
   // Deploy Standard (ERC-1155)
   console.log('\n[2/2] Deploying DaisyChroniclesStandard...');
-  const Standard = await hre.ethers.getContractFactory('DaisyChroniclesStandard');
-  const standard = await Standard.deploy(operator, treasury, royaltyReceiver, royaltyBps, owner);
+  const Standard = await hre.ethers.getContractFactory(
+    'DaisyChroniclesStandard'
+  );
+  const standard = await Standard.deploy(
+    operator,
+    treasury,
+    royaltyReceiver,
+    royaltyBps,
+    owner
+  );
   await standard.waitForDeployment();
   const standardAddress = await standard.getAddress();
   console.log('DaisyChroniclesStandard deployed to:', standardAddress);
@@ -65,7 +85,13 @@ export const DAISY_STANDARD_ADDRESS = isTestnet
     try {
       await hre.run('verify:verify', {
         address: genesisAddress,
-        constructorArguments: [operator, treasury, royaltyReceiver, royaltyBps, owner],
+        constructorArguments: [
+          operator,
+          treasury,
+          royaltyReceiver,
+          royaltyBps,
+          owner,
+        ],
       });
       console.log('Genesis verified!');
     } catch (e) {
@@ -75,7 +101,13 @@ export const DAISY_STANDARD_ADDRESS = isTestnet
     try {
       await hre.run('verify:verify', {
         address: standardAddress,
-        constructorArguments: [operator, treasury, royaltyReceiver, royaltyBps, owner],
+        constructorArguments: [
+          operator,
+          treasury,
+          royaltyReceiver,
+          royaltyBps,
+          owner,
+        ],
       });
       console.log('Standard verified!');
     } catch (e) {

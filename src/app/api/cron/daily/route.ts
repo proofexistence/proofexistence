@@ -724,7 +724,9 @@ async function settleExpiredAuctions(): Promise<{
     const operatorKey = process.env.PRIVATE_KEY;
 
     if (!operatorKey) {
-      console.log('[Daisy] PRIVATE_KEY not configured, skipping auction settlement');
+      console.log(
+        '[Daisy] PRIVATE_KEY not configured, skipping auction settlement'
+      );
       return { success: true, settledCount: 0 };
     }
 
@@ -757,8 +759,11 @@ async function settleExpiredAuctions(): Promise<{
 
         // Check on-chain if already settled
         const auctionInfo = await genesisContract.getAuctionInfo(dateNumber);
-        if (auctionInfo[4]) { // settled = true
-          console.log(`[Daisy] Auction ${auction.date} already settled on-chain`);
+        if (auctionInfo[4]) {
+          // settled = true
+          console.log(
+            `[Daisy] Auction ${auction.date} already settled on-chain`
+          );
           // Update database
           await db
             .update(daisyMints)
@@ -799,7 +804,10 @@ async function settleExpiredAuctions(): Promise<{
 
         settledCount++;
       } catch (error) {
-        console.error(`[Daisy] Failed to settle auction ${auction.date}:`, error);
+        console.error(
+          `[Daisy] Failed to settle auction ${auction.date}:`,
+          error
+        );
         // Continue with other auctions
       }
     }
@@ -858,7 +866,11 @@ async function generateDaisyNFT(
 
     // Even with no sessions, we generate a background-only Daisy
     if (sessionsData.length === 0) {
-      console.log('[Daisy] No sessions for', yesterday, '- generating background-only Daisy');
+      console.log(
+        '[Daisy] No sessions for',
+        yesterday,
+        '- generating background-only Daisy'
+      );
     }
 
     // Get unique participants (empty array if no sessions)
@@ -1071,7 +1083,9 @@ async function generateDaisyNFT(
     const operatorKey = process.env.PRIVATE_KEY;
 
     if (!operatorKey) {
-      console.error('[Daisy] PRIVATE_KEY not configured, skipping on-chain setup');
+      console.error(
+        '[Daisy] PRIVATE_KEY not configured, skipping on-chain setup'
+      );
       return { success: true };
     }
 
@@ -1098,7 +1112,7 @@ async function generateDaisyNFT(
         quarter,
         dateMultiplierBps,
         0, // startTime (Phase 1: no limit)
-        0  // endTime (Phase 1: no limit)
+        0 // endTime (Phase 1: no limit)
       );
       await standardTx.wait();
       console.log('[Daisy] Standard config set, tx:', standardTx.hash);
@@ -1116,7 +1130,9 @@ async function generateDaisyNFT(
         signer
       );
 
-      const startPriceWei = ethers.parseEther(GENESIS_AUCTION.START_PRICE.toString());
+      const startPriceWei = ethers.parseEther(
+        GENESIS_AUCTION.START_PRICE.toString()
+      );
 
       const genesisTx = await genesisContract.createAuction(
         dateNumber,
@@ -1225,7 +1241,10 @@ export async function GET(req: NextRequest) {
   // Task 5: Settle expired Genesis auctions
   const auctionSettleResult = await settleExpiredAuctions();
   if (!auctionSettleResult.success) {
-    console.error('[Cron] Auction settlement failed:', auctionSettleResult.error);
+    console.error(
+      '[Cron] Auction settlement failed:',
+      auctionSettleResult.error
+    );
   }
 
   // Task 6: Generate Daisy NFT for yesterday
@@ -1255,6 +1274,5 @@ export async function GET(req: NextRequest) {
     },
     questRewards: questRewardsResult,
     burnMerkle: burnMerkleResult,
-    daisy: daisyResult,
   });
 }
