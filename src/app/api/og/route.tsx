@@ -95,8 +95,20 @@ export async function GET(req: NextRequest) {
         const message = session.message || '';
         const previewUrl = session.previewUrl;
 
-        // Collect all text that will be rendered, load CJK font if needed
-        const allText = [displayTitle, authorName, message, date].join('');
+        // Collect ALL text rendered in the image (including static text and special chars)
+        // When custom fonts are provided, Satori replaces default fonts entirely
+        const allText = [
+          displayTitle,
+          authorName,
+          message,
+          date,
+          duration,
+          'by',
+          'POE 2026',
+          'NFT MINTED',
+          'proofexistence.com',
+          '\u201C\u201D\u2022',
+        ].join('');
         const cjkFont = await loadCJKFont(allText);
         const fonts = cjkFont
           ? [{ name: 'Noto Sans SC', data: cjkFont, style: 'normal' as const }]
@@ -370,7 +382,8 @@ export async function GET(req: NextRequest) {
     const title = searchParams.get('title') || 'Proof of Existence';
     const date = searchParams.get('date') || '2026';
 
-    const fallbackCjkFont = await loadCJKFont(title);
+    const fallbackAllText = [title, date, id || '', 'POE 2026', 'proofexistence.com', '\u2022'].join('');
+    const fallbackCjkFont = await loadCJKFont(fallbackAllText);
     const fallbackFonts = fallbackCjkFont
       ? [
           {
