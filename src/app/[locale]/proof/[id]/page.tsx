@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ProofViewer } from '@/components/proof/proof-viewer';
 import { normalizeArweaveUrl, getArweaveUrl } from '@/lib/arweave-gateway';
+import { locales, defaultLocale } from '@/i18n/config';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -127,12 +128,29 @@ export async function generateMetadata({
       session.description ||
       `Verified immutable proof stored on Arweave. Created at ${dateStr}.`;
     const title = `${displayTitle} | Proof of Existence`;
-    // Use the current locale URL as canonical
-    const proofUrl = `https://www.proofexistence.com/${resolvedParams.locale}/proof/${session.id}`;
+    const baseUrl = 'https://www.proofexistence.com';
+    const proofPath = `/proof/${session.id}`;
+    const proofUrl =
+      resolvedParams.locale === defaultLocale
+        ? `${baseUrl}${proofPath}`
+        : `${baseUrl}/${resolvedParams.locale}${proofPath}`;
+
+    const languages: Record<string, string> = {};
+    for (const l of locales) {
+      languages[l] =
+        l === defaultLocale
+          ? `${baseUrl}${proofPath}`
+          : `${baseUrl}/${l}${proofPath}`;
+    }
+    languages['x-default'] = `${baseUrl}${proofPath}`;
 
     return {
       title: title,
       description: description,
+      alternates: {
+        canonical: proofUrl,
+        languages,
+      },
       openGraph: {
         title: displayTitle,
         description: description,
@@ -173,6 +191,33 @@ export async function generateMetadata({
       },
     };
   }
+}
+
+function getCreativeWorkJsonLd(
+  session: NonNullable<Awaited<ReturnType<typeof getSession>>>
+) {
+  const authorName =
+    session.user?.name || session.user?.username || 'Anonymous';
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: session.title || `Proof #${session.id.slice(0, 8)}`,
+    description:
+      session.description ||
+      `An immutable proof of existence on the blockchain.`,
+    creator: {
+      '@type': 'Person',
+      name: authorName,
+    },
+    dateCreated: new Date(session.createdAt).toISOString(),
+    provider: {
+      '@type': 'Organization',
+      name: 'Proof of Existence',
+      url: 'https://www.proofexistence.com',
+    },
+    ...(session.previewUrl && { image: session.previewUrl }),
+    url: `https://www.proofexistence.com/proof/${session.id}`,
+  };
 }
 
 export default async function ProofPage({ params }: PageProps) {
@@ -224,11 +269,19 @@ export default async function ProofPage({ params }: PageProps) {
     }
   }
 
+  const jsonLd = getCreativeWorkJsonLd(session);
+
   return (
-    <ProofViewer
-      session={{ ...session, color: session.color || undefined }}
-      nftImage={nftImage}
-      isSyncing={isSyncing}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProofViewer
+        session={{ ...session, color: session.color || undefined }}
+        nftImage={nftImage}
+        isSyncing={isSyncing}
+      />
+    </>
   );
 }

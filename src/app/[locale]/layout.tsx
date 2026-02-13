@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title: 'Proof of Existence | A Year-Long Collective Art Experiment',
     description:
       'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
-    url: 'https://www.proofexistence.com/',
+    url: 'https://www.proofexistence.com',
     locale: 'en_US',
   },
   twitter: {
@@ -48,6 +48,39 @@ export const metadata: Metadata = {
 type Props = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': 'https://www.proofexistence.com/#website',
+      url: 'https://www.proofexistence.com',
+      name: 'Proof of Existence',
+      alternateName: [
+        'POE 2026',
+        'ProofExistence',
+        'Proof Existence',
+        'proofexistence',
+      ],
+      description:
+        'A year-long collective art experiment where every participant co-creates an immutable digital monument on the blockchain.',
+      inLanguage: ['en', 'zh-Hant', 'zh-Hans', 'es', 'ja', 'fr'],
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://www.proofexistence.com/#organization',
+      name: 'Proof of Existence',
+      alternateName: ['POE 2026', 'POE Team'],
+      url: 'https://www.proofexistence.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.proofexistence.com/favicon-96x96.png',
+      },
+      sameAs: ['https://x.com/Proofexist2006'],
+    },
+  ],
 };
 
 export default async function LocaleLayout({ children, params }: Props) {
@@ -66,6 +99,10 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-SVQWPRD6ER"
         strategy="afterInteractive"
