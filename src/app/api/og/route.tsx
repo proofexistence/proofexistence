@@ -106,8 +106,9 @@ export async function GET(req: NextRequest) {
           'by',
           'POE 2026',
           'NFT MINTED',
+          'Come see my light trail',
           'proofexistence.com',
-          '\u201C\u201D\u2022',
+          '\u201C\u201D\u2022\u2192',
         ].join('');
         const cjkFont = await loadCJKFont(allText);
         const fonts = cjkFont
@@ -355,16 +356,41 @@ export async function GET(req: NextRequest) {
                   )}
                 </div>
 
-                {/* URL */}
+                {/* CTA + URL */}
                 <div
                   style={{
-                    fontSize: '18px',
-                    color: 'rgba(255,255,255,0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
                     marginTop: '12px',
-                    fontFamily: 'monospace',
                   }}
                 >
-                  proofexistence.com
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 16px',
+                      background:
+                        'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(236,72,153,0.3))',
+                      borderRadius: '20px',
+                      border: '1px solid rgba(168,85,247,0.4)',
+                      fontSize: '16px',
+                      color: '#e9d5ff',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Come see my light trail →
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '16px',
+                      color: 'rgba(255,255,255,0.35)',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    proofexistence.com
+                  </span>
                 </div>
               </div>
             </div>
