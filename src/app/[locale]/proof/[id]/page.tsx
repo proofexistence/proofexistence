@@ -106,9 +106,13 @@ export async function generateMetadata({
       }
     }
 
-    // Fall back to dynamic OG image if no direct image, or if legacy .webp URL
-    // (old uploads stored JPEG data with wrong .webp extension/content-type, breaking social previews)
-    if (!imageUrl || imageUrl.endsWith('.webp')) {
+    // Proxy legacy .webp URLs to fix content-type mismatch (JPEG data served as image/webp)
+    if (imageUrl && imageUrl.endsWith('.webp')) {
+      imageUrl = `https://www.proofexistence.com/api/image/proxy?url=${encodeURIComponent(imageUrl)}`;
+    }
+
+    // Fall back to dynamic OG image only when no preview image exists at all
+    if (!imageUrl) {
       const ogUrl = new URL('https://www.proofexistence.com/api/og');
       ogUrl.searchParams.set('title', displayTitle);
       ogUrl.searchParams.set('date', dateStr);
