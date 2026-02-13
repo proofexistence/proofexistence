@@ -3,6 +3,32 @@ import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
+// Load CJK font subset from Google Fonts (only characters actually used)
+async function loadCJKFont(text: string): Promise<ArrayBuffer | null> {
+  // Only fetch if text contains non-ASCII characters
+  if (/^[\x00-\x7F]*$/.test(text)) return null;
+
+  try {
+    const api = `https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700&text=${encodeURIComponent(text)}&display=swap`;
+    const css = await fetch(api, {
+      headers: {
+        // Request truetype format (not woff2) for Satori compatibility
+        'User-Agent':
+          'Mozilla/5.0 (BB10; Touch) AppleWebKit/537.10+ (KHTML, like Gecko) Version/10.0.9.2372 Mobile Safari/537.10+',
+      },
+    }).then((res) => res.text());
+
+    const fontUrl = css.match(
+      /src: url\((.+?)\) format\('(opentype|truetype)'\)/
+    )?.[1];
+    if (!fontUrl) return null;
+
+    return fetch(fontUrl).then((res) => res.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
 // Fetch session data for dynamic OG images
 async function getSessionData(id: string) {
   try {
@@ -68,6 +94,13 @@ export async function GET(req: NextRequest) {
         const duration = session.duration ? `${session.duration}s` : '';
         const message = session.message || '';
         const previewUrl = session.previewUrl;
+
+        // Collect all text that will be rendered, load CJK font if needed
+        const allText = [displayTitle, authorName, message, date].join('');
+        const cjkFont = await loadCJKFont(allText);
+        const fonts = cjkFont
+          ? [{ name: 'Noto Sans SC', data: cjkFont, style: 'normal' as const }]
+          : undefined;
 
         return new ImageResponse(
           <div
@@ -327,6 +360,7 @@ export async function GET(req: NextRequest) {
           {
             width: 1200,
             height: 630,
+            ...(fonts && { fonts }),
           }
         );
       }
@@ -335,6 +369,17 @@ export async function GET(req: NextRequest) {
     // Fallback: Generic POE image
     const title = searchParams.get('title') || 'Proof of Existence';
     const date = searchParams.get('date') || '2026';
+
+    const fallbackCjkFont = await loadCJKFont(title);
+    const fallbackFonts = fallbackCjkFont
+      ? [
+          {
+            name: 'Noto Sans SC',
+            data: fallbackCjkFont,
+            style: 'normal' as const,
+          },
+        ]
+      : undefined;
 
     return new ImageResponse(
       <div
@@ -430,6 +475,7 @@ export async function GET(req: NextRequest) {
       {
         width: 1200,
         height: 630,
+        ...(fallbackFonts && { fonts: fallbackFonts }),
       }
     );
   } catch (error) {
