@@ -50,25 +50,30 @@ async function getSession(id: string) {
   });
 
   // Check if this session is marked as today's theme by its owner
-  const today = getTodayDateString();
-  const [ownerQuest] = await db
-    .select({ themeSessionId: userDailyQuests.themeSessionId })
-    .from(userDailyQuests)
-    .where(
-      and(
-        eq(userDailyQuests.userId, session.userId),
-        eq(userDailyQuests.date, today)
-      )
-    )
-    .limit(1);
-
-  const isMarkedAsTheme = ownerQuest?.themeSessionId === session.id;
-
-  // Get today's theme name if marked
+  // Wrapped in try/catch so quest/theme failures don't break metadata generation
+  let isMarkedAsTheme = false;
   let themeName: string | null = null;
-  if (isMarkedAsTheme) {
-    const theme = await getTodayTheme();
-    themeName = theme?.theme || null;
+  try {
+    const today = getTodayDateString();
+    const [ownerQuest] = await db
+      .select({ themeSessionId: userDailyQuests.themeSessionId })
+      .from(userDailyQuests)
+      .where(
+        and(
+          eq(userDailyQuests.userId, session.userId),
+          eq(userDailyQuests.date, today)
+        )
+      )
+      .limit(1);
+
+    isMarkedAsTheme = ownerQuest?.themeSessionId === session.id;
+
+    if (isMarkedAsTheme) {
+      const theme = await getTodayTheme();
+      themeName = theme?.theme || null;
+    }
+  } catch (e) {
+    console.warn('[getSession] Failed to fetch quest/theme info:', e);
   }
 
   return { ...session, user, themeInfo: { isMarkedAsTheme, themeName } };
@@ -85,6 +90,16 @@ export async function generateMetadata({
       return {
         title: 'Proof Not Found',
         description: 'The requested proof of existence could not be found.',
+        openGraph: {
+          title: 'Proof Not Found',
+          description: 'The requested proof of existence could not be found.',
+          images: [{ url: '/og-v2.png', width: 1200, height: 630 }],
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: 'Proof Not Found',
+          images: ['/og-v2.png'],
+        },
       };
     }
 
@@ -95,38 +110,33 @@ export async function generateMetadata({
     const authorName =
       session.user?.name || session.user?.username || 'Anonymous';
 
-    // Build OG image URL with parameters
-    const ogUrl = new URL('https://www.proofexistence.com/api/og');
-    ogUrl.searchParams.set('title', displayTitle);
-    ogUrl.searchParams.set('date', dateStr);
-    ogUrl.searchParams.set('id', session.id);
-    ogUrl.searchParams.set('author', authorName);
-
-    if (session.duration) {
-      ogUrl.searchParams.set('duration', session.duration.toString());
-    }
-    if (session.message) {
-      ogUrl.searchParams.set('message', session.message.slice(0, 100));
-    }
-    if (session.status) {
-      ogUrl.searchParams.set('status', session.status);
-    }
-
-    // Try to get Arweave image if available
-    let finalImage = session.previewUrl;
+    // Try to get Arweave image, fall back to previewUrl, then /api/og
+    let imageUrl = session.previewUrl;
     if (session.ipfsHash) {
       const metadata = await fetchArweaveMetadata(session.ipfsHash, 2000);
       if (metadata?.image) {
-        finalImage = metadata.image;
+        imageUrl = metadata.image;
       }
     }
 
-    // Add image to OG URL if available
-    if (finalImage) {
-      ogUrl.searchParams.set('image', finalImage);
+    // Fall back to dynamic OG image if no direct image available
+    if (!imageUrl) {
+      const ogUrl = new URL('https://www.proofexistence.com/api/og');
+      ogUrl.searchParams.set('title', displayTitle);
+      ogUrl.searchParams.set('date', dateStr);
+      ogUrl.searchParams.set('id', session.id);
+      ogUrl.searchParams.set('author', authorName);
+      if (session.duration) {
+        ogUrl.searchParams.set('duration', session.duration.toString());
+      }
+      if (session.message) {
+        ogUrl.searchParams.set('message', session.message.slice(0, 100));
+      }
+      if (session.status) {
+        ogUrl.searchParams.set('status', session.status);
+      }
+      imageUrl = ogUrl.toString();
     }
-
-    const imageUrl = ogUrl.toString();
     const description =
       session.description ||
       `Verified immutable proof stored on Arweave. Created at ${dateStr}.`;
@@ -161,10 +171,19 @@ export async function generateMetadata({
     };
   } catch (error) {
     console.error('[generateMetadata] Error:', error);
-    // Return fallback metadata on error
     return {
       title: 'Proof of Existence',
       description: 'A Year-Long Collective Art Experiment',
+      openGraph: {
+        title: 'Proof of Existence',
+        description: 'A Year-Long Collective Art Experiment',
+        images: [{ url: '/og-v2.png', width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Proof of Existence',
+        images: ['/og-v2.png'],
+      },
     };
   }
 }

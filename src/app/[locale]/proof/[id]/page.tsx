@@ -60,6 +60,16 @@ export async function generateMetadata({
       return {
         title: 'Proof Not Found',
         description: 'The requested proof of existence could not be found.',
+        openGraph: {
+          title: 'Proof Not Found',
+          description: 'The requested proof of existence could not be found.',
+          images: [{ url: '/og-v2.png', width: 1200, height: 630 }],
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: 'Proof Not Found',
+          images: ['/og-v2.png'],
+        },
       };
     }
 
@@ -70,25 +80,8 @@ export async function generateMetadata({
     const authorName =
       session.user?.name || session.user?.username || 'Anonymous';
 
-    // Build OG image URL with parameters
-    const ogUrl = new URL('https://www.proofexistence.com/api/og');
-    ogUrl.searchParams.set('title', displayTitle);
-    ogUrl.searchParams.set('date', dateStr);
-    ogUrl.searchParams.set('id', session.id);
-    ogUrl.searchParams.set('author', authorName);
-
-    if (session.duration) {
-      ogUrl.searchParams.set('duration', session.duration.toString());
-    }
-    if (session.message) {
-      ogUrl.searchParams.set('message', session.message.slice(0, 100));
-    }
-    if (session.status) {
-      ogUrl.searchParams.set('status', session.status);
-    }
-
-    // Try to get Arweave image if available
-    let finalImage = session.previewUrl;
+    // Try to get Arweave image, fall back to previewUrl, then /api/og
+    let imageUrl = session.previewUrl;
     if (session.ipfsHash) {
       try {
         const metadataUrl = getArweaveUrl(session.ipfsHash);
@@ -104,7 +97,7 @@ export async function generateMetadata({
         if (res.ok) {
           const metadata = await res.json();
           if (metadata.image) {
-            finalImage = normalizeArweaveUrl(metadata.image);
+            imageUrl = normalizeArweaveUrl(metadata.image);
           }
         }
       } catch (e) {
@@ -112,11 +105,24 @@ export async function generateMetadata({
       }
     }
 
-    if (finalImage) {
-      ogUrl.searchParams.set('image', finalImage);
+    // Fall back to dynamic OG image if no direct image available
+    if (!imageUrl) {
+      const ogUrl = new URL('https://www.proofexistence.com/api/og');
+      ogUrl.searchParams.set('title', displayTitle);
+      ogUrl.searchParams.set('date', dateStr);
+      ogUrl.searchParams.set('id', session.id);
+      ogUrl.searchParams.set('author', authorName);
+      if (session.duration) {
+        ogUrl.searchParams.set('duration', session.duration.toString());
+      }
+      if (session.message) {
+        ogUrl.searchParams.set('message', session.message.slice(0, 100));
+      }
+      if (session.status) {
+        ogUrl.searchParams.set('status', session.status);
+      }
+      imageUrl = ogUrl.toString();
     }
-
-    const imageUrl = ogUrl.toString();
     const description =
       session.description ||
       `Verified immutable proof stored on Arweave. Created at ${dateStr}.`;
@@ -155,6 +161,16 @@ export async function generateMetadata({
     return {
       title: 'Proof of Existence',
       description: 'A Year-Long Collective Art Experiment',
+      openGraph: {
+        title: 'Proof of Existence',
+        description: 'A Year-Long Collective Art Experiment',
+        images: [{ url: '/og-v2.png', width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Proof of Existence',
+        images: ['/og-v2.png'],
+      },
     };
   }
 }
