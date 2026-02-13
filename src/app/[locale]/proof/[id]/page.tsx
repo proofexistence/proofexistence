@@ -106,8 +106,9 @@ export async function generateMetadata({
       }
     }
 
-    // Fall back to dynamic OG image if no direct image available
-    if (!imageUrl) {
+    // Fall back to dynamic OG image if no direct image, or if legacy .webp URL
+    // (old uploads stored JPEG data with wrong .webp extension/content-type, breaking social previews)
+    if (!imageUrl || imageUrl.endsWith('.webp')) {
       const ogUrl = new URL('https://www.proofexistence.com/api/og');
       ogUrl.searchParams.set('title', displayTitle);
       ogUrl.searchParams.set('date', dateStr);

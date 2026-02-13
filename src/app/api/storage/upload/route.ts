@@ -30,13 +30,15 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // Generate a unique key for the file
-    // Structure: proofs/{sessionId}/preview.webp or just proofs/{sessionId}.webp
     // Using timestamp to avoid caching issues if re-uploaded
+    // Store with correct content-type matching the actual file format (client sends JPEG)
     const timestamp = Date.now();
-    const key = `proofs/${sessionId}/preview-${timestamp}.webp`;
+    const ext = file.type === 'image/png' ? 'png' : 'jpg';
+    const contentType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+    const key = `proofs/${sessionId}/preview-${timestamp}.${ext}`;
 
     // Upload to R2
-    const publicUrl = await uploadToR2(key, buffer, 'image/webp');
+    const publicUrl = await uploadToR2(key, buffer, contentType);
 
     // Update the database
     await db
