@@ -120,30 +120,28 @@ export async function generateMetadata({
     }
 
     // Proxy legacy .webp URLs to fix content-type mismatch (JPEG data served as image/webp)
-    const bgImage =
-      imageUrl && imageUrl.endsWith('.webp')
-        ? `https://www.proofexistence.com/api/image/proxy?url=${encodeURIComponent(imageUrl)}`
-        : imageUrl;
+    if (imageUrl && imageUrl.endsWith('.webp')) {
+      imageUrl = `https://www.proofexistence.com/api/image/proxy?url=${encodeURIComponent(imageUrl)}`;
+    }
 
-    // Always use /api/og for branded OG image (artwork background + title + branding)
-    const ogUrl = new URL('https://www.proofexistence.com/api/og');
-    ogUrl.searchParams.set('title', displayTitle);
-    ogUrl.searchParams.set('date', dateStr);
-    ogUrl.searchParams.set('id', session.id);
-    ogUrl.searchParams.set('author', authorName);
-    if (session.duration) {
-      ogUrl.searchParams.set('duration', session.duration.toString());
+    // Fall back to dynamic OG image only when no preview image exists at all
+    if (!imageUrl) {
+      const ogUrl = new URL('https://www.proofexistence.com/api/og');
+      ogUrl.searchParams.set('title', displayTitle);
+      ogUrl.searchParams.set('date', dateStr);
+      ogUrl.searchParams.set('id', session.id);
+      ogUrl.searchParams.set('author', authorName);
+      if (session.duration) {
+        ogUrl.searchParams.set('duration', session.duration.toString());
+      }
+      if (session.message) {
+        ogUrl.searchParams.set('message', session.message.slice(0, 100));
+      }
+      if (session.status) {
+        ogUrl.searchParams.set('status', session.status);
+      }
+      imageUrl = ogUrl.toString();
     }
-    if (session.message) {
-      ogUrl.searchParams.set('message', session.message.slice(0, 100));
-    }
-    if (session.status) {
-      ogUrl.searchParams.set('status', session.status);
-    }
-    if (bgImage) {
-      ogUrl.searchParams.set('image', bgImage);
-    }
-    imageUrl = ogUrl.toString();
     const description =
       session.description ||
       `Verified immutable proof stored on Arweave. Created at ${dateStr}.`;
