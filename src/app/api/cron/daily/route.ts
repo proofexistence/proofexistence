@@ -779,7 +779,7 @@ async function settleExpiredAuctions(): Promise<{
 
         // Settle on-chain
         const tx = await genesisContract.settleAuction(dateNumber);
-        const receipt = await tx.wait();
+        await tx.wait();
         console.log(`[Daisy] Settled auction ${auction.date}, tx: ${tx.hash}`);
 
         // Get winner info from event or contract
