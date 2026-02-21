@@ -131,7 +131,9 @@
       "techDesc2": "最后，我们将这些证明批量处理成区块链上的单一可验证交易。这确保你的作品在数学上被证明存在于这个特定时间，并具有整个网络的安全性。",
       "markAsTheme": "标记为今日主题",
       "themeAlreadyMarked": "你今天已经标记过主题作品了",
-      "themeReward": "创作主题作品可获得 TIME26 奖励"
+      "themeReward": "创作主题作品可获得 TIME26 奖励",
+      "notKidFriendly": "非儿童友善",
+      "notKidFriendlyDesc": "此作品可能包含不适合儿童观看的内容。"
     },
     "clearConfirm": {
       "title": "开始新绘画？",

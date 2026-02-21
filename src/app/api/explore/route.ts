@@ -63,10 +63,7 @@ export async function GET(req: NextRequest) {
       if (walletAddress) {
         // Show non-NSFW + user's own NSFW content
         conditions.push(
-          or(
-            eq(sessions.nsfw, false),
-            eq(users.walletAddress, walletAddress)
-          )!
+          or(eq(sessions.nsfw, false), eq(users.walletAddress, walletAddress))!
         );
       } else {
         // Not logged in: hide all NSFW

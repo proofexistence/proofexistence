@@ -13,6 +13,7 @@ import {
   EyeOff,
   Link2,
   Palette,
+  ShieldAlert,
 } from 'lucide-react';
 import { NFTThumbnail } from './nft-thumbnail';
 import { useState, useRef, useEffect } from 'react';
@@ -20,6 +21,8 @@ import { useProfile } from '@/hooks/use-profile';
 import { useSavedProofs } from '@/hooks/use-saved-proofs';
 import { useLikes } from '@/hooks/use-likes';
 import { useVisibility } from '@/hooks/use-visibility';
+import { useNsfwToggle } from '@/hooks/use-nsfw-toggle';
+import { useNsfwPreference } from '@/hooks/use-nsfw-preference';
 import { useMarkTheme } from '@/hooks/use-mark-theme';
 import { useWeb3Auth } from '@/lib/web3auth';
 import { useTranslations } from 'next-intl';
@@ -43,6 +46,8 @@ interface ProofCardProps {
   themeName?: string | null;
   onThemeChange?: () => void;
   isThemeMarked?: boolean;
+  nsfw?: boolean;
+  isAdmin?: boolean;
 }
 
 export function ProofCard({
@@ -64,6 +69,8 @@ export function ProofCard({
   themeName,
   onThemeChange,
   isThemeMarked = false,
+  nsfw = false,
+  isAdmin = false,
 }: ProofCardProps) {
   const router = useRouter();
   const t = useTranslations('explore');
@@ -120,6 +127,48 @@ export function ProofCard({
   const { likedIds, toggleLike } = useLikes();
   const isLiked = likedIds.has(id);
   const { toggleVisibility } = useVisibility();
+
+  const { toggleNsfw } = useNsfwToggle();
+  const { showNsfw } = useNsfwPreference();
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  // Should this card's content be blurred?
+  const shouldBlur = nsfw && !showNsfw && !isOwner;
+
+  // Close context menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowContextMenu(false);
+      }
+    };
+    if (showContextMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showContextMenu]);
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (!isAdmin) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenuPos({ x: e.clientX, y: e.clientY });
+    setShowContextMenu(true);
+  };
+
+  const handleToggleNsfw = async () => {
+    setShowContextMenu(false);
+    try {
+      await toggleNsfw.mutateAsync({ sessionId: id, nsfw: !nsfw });
+    } catch (error) {
+      console.error('Failed to toggle NSFW:', error);
+    }
+  };
 
   // Theme marking
   const {
@@ -332,6 +381,7 @@ export function ProofCard({
 
   return (
     <div
+      onContextMenu={handleContextMenu}
       className={`group relative flex flex-col aspect-[4/5] rounded-2xl bg-zinc-900/20 border overflow-hidden transition-colors ${
         isHidden
           ? 'border-yellow-500/30 opacity-60'
@@ -410,6 +460,18 @@ export function ProofCard({
           </div>
         )}
 
+        {/* NSFW Blur Overlay */}
+        {shouldBlur && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-xl bg-black/40">
+            <div className="flex flex-col items-center gap-2">
+              <ShieldAlert className="w-8 h-8 text-red-400/80" />
+              <span className="text-xs font-bold text-red-400/80 tracking-wider uppercase">
+                NSFW
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Overlay Infobadge */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 via-black/60 to-transparent">
           <div className="flex justify-between items-start">
@@ -449,6 +511,16 @@ export function ProofCard({
           <span className="text-[10px] font-medium text-yellow-400">
             Hidden
           </span>
+        </div>
+      )}
+
+      {/* NSFW Badge */}
+      {nsfw && (
+        <div
+          className={`absolute ${isOwner && isHidden ? 'top-12' : 'top-3'} right-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-red-500/20 border border-red-500/30`}
+        >
+          <ShieldAlert className="w-3 h-3 text-red-400" />
+          <span className="text-[10px] font-medium text-red-400">NSFW</span>
         </div>
       )}
 
@@ -573,6 +645,23 @@ export function ProofCard({
           </button>
         )}
       </div>
+
+      {/* Admin Context Menu */}
+      {showContextMenu && isAdmin && (
+        <div
+          ref={contextMenuRef}
+          className="fixed z-[100] w-48 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-200"
+          style={{ left: contextMenuPos.x, top: contextMenuPos.y }}
+        >
+          <button
+            onClick={handleToggleNsfw}
+            className="w-full text-left px-3 py-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5"
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            {nsfw ? 'Remove NSFW Mark' : 'Mark as NSFW'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -131,7 +131,9 @@
       "techDesc2": "Finalmente, agrupamos estas pruebas en una sola transacción verificable en la blockchain. Esto asegura que tu trabajo está matemáticamente probado de existir en este momento específico, con la seguridad de toda la red.",
       "markAsTheme": "Marcar como Tema del Día",
       "themeAlreadyMarked": "Ya has marcado una obra para el tema de hoy",
-      "themeReward": "Gana recompensas TIME26 creando obras temáticas"
+      "themeReward": "Gana recompensas TIME26 creando obras temáticas",
+      "notKidFriendly": "No apto para niños",
+      "notKidFriendlyDesc": "Esta obra puede contener contenido no apto para niños."
     },
     "clearConfirm": {
       "title": "¿Comenzar Nuevo Dibujo?",

@@ -45,10 +45,7 @@ export async function PATCH(
       .returning({ id: sessions.id, nsfw: sessions.nsfw });
 
     if (!updated) {
-      return NextResponse.json(
-        { error: 'Session not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, session: updated });

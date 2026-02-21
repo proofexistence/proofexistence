@@ -131,7 +131,9 @@
       "techDesc2": "Enfin, nous regroupons ces preuves en une seule transaction vérifiable sur la blockchain. Cela garantit que votre œuvre est mathématiquement prouvée d'exister à ce moment précis, avec la sécurité de l'ensemble du réseau.",
       "markAsTheme": "Marquer comme Thème du Jour",
       "themeAlreadyMarked": "Vous avez déjà marqué une œuvre pour le thème d'aujourd'hui",
-      "themeReward": "Gagnez des récompenses TIME26 en créant des œuvres thématiques"
+      "themeReward": "Gagnez des récompenses TIME26 en créant des œuvres thématiques",
+      "notKidFriendly": "Contenu adulte",
+      "notKidFriendlyDesc": "Cette oeuvre peut contenir du contenu inapproprié pour les enfants."
     },
     "clearConfirm": {
       "title": "Commencer un Nouveau Dessin ?",

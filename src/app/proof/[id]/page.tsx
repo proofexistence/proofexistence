@@ -33,6 +33,7 @@ async function getSession(id: string) {
       message: true,
       views: true,
       likes: true,
+      nsfw: true,
     },
   });
 

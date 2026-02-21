@@ -132,6 +132,8 @@
       "markAsTheme": "標記為今日主題",
       "themeAlreadyMarked": "你今天已經標記過主題作品了",
       "themeReward": "創作主題作品可獲得 TIME26 獎勵",
+      "notKidFriendly": "非兒童友善",
+      "notKidFriendlyDesc": "此作品可能包含不適合兒童觀看的內容。",
       "supportsCreators": "支持創作者",
       "insufficientBalance": "餘額不足",
       "chooseSubmission": "選擇一種"

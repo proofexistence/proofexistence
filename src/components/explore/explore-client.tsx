@@ -14,6 +14,9 @@ import {
 } from '@/components/ui/select';
 import { Search, Filter, Loader2 } from 'lucide-react';
 import { useExplore } from '@/hooks/use-explore';
+import { useNsfwPreference } from '@/hooks/use-nsfw-preference';
+import { useProfile } from '@/hooks/use-profile';
+import { useWeb3Auth } from '@/lib/web3auth';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 
@@ -30,6 +33,7 @@ interface Proof {
   walletAddress?: string | null;
   previewUrl?: string | null;
   isThemeMarked?: boolean;
+  nsfw?: boolean;
 }
 
 interface ExploreClientProps {
@@ -50,6 +54,10 @@ export function ExploreClient({
   const [sortBy, setSortBy] = useState('recent');
   const [timeframe, setTimeframe] = useState('all');
   const [themeOnly, setThemeOnly] = useState(false);
+
+  const { showNsfw } = useNsfwPreference();
+  const { profile } = useProfile();
+  const { user } = useWeb3Auth();
 
   // Fetch today's theme info (public endpoint)
   const { data: themeData } = useQuery<{
@@ -73,10 +81,13 @@ export function ExploreClient({
       sortBy,
       timeframe,
       themeOnly,
+      showNsfw,
+      walletAddress: user?.walletAddress,
     });
 
   const proofs = data?.pages.flatMap((page) => page.proofs) || initialProofs;
   const total = data?.pages[0]?.pagination.total ?? initialTotal;
+  const isAdmin = profile?.isAdmin ?? false;
 
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -255,7 +266,11 @@ export function ExploreClient({
           </div>
         ) : (
           <>
-            <GalleryGrid proofs={proofs} themeName={todayTheme?.name} />
+            <GalleryGrid
+              proofs={proofs}
+              themeName={todayTheme?.name}
+              isAdmin={isAdmin}
+            />
 
             {/* Infinite Scroll Trigger */}
             {hasNextPage && (

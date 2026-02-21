@@ -132,6 +132,8 @@
       "markAsTheme": "Mark as Today's Theme",
       "themeAlreadyMarked": "You've already marked a work for today's theme",
       "themeReward": "Earn TIME26 rewards for creating themed works",
+      "notKidFriendly": "Not Kid Friendly",
+      "notKidFriendlyDesc": "This artwork may contain content not suitable for children.",
       "supportsCreators": "Supports Creators",
       "insufficientBalance": "Insufficient balance",
       "chooseSubmission": "Choose One"

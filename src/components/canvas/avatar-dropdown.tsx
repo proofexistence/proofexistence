@@ -3,10 +3,18 @@
 import { useWeb3Auth } from '@/lib/web3auth';
 import { useProfile } from '@/hooks/use-profile';
 import { useClaimTime26 } from '@/hooks/useClaimTime26';
+import { useNsfwPreference } from '@/hooks/use-nsfw-preference';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
-import { Settings, LogOut, User, Gift, Loader2 } from 'lucide-react';
+import {
+  Settings,
+  LogOut,
+  User,
+  Gift,
+  Loader2,
+  ShieldAlert,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
@@ -28,6 +36,7 @@ export function AvatarDropdown() {
     claimError,
   } = useClaimTime26();
   const [isOpen, setIsOpen] = useState(false);
+  const { showNsfw, toggleShowNsfw } = useNsfwPreference();
   const [claimSuccess, setClaimSuccess] = useState(false);
 
   const handleClaim = async () => {
@@ -152,6 +161,16 @@ export function AvatarDropdown() {
                   <Settings className="w-4 h-4" />
                   {t('settings')}
                 </Link>
+                <button
+                  onClick={toggleShowNsfw}
+                  className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
+                >
+                  <ShieldAlert className="w-4 h-4" />
+                  {showNsfw ? 'Hide NSFW' : 'Show NSFW'}
+                  <span
+                    className={`ml-auto w-2 h-2 rounded-full ${showNsfw ? 'bg-red-400' : 'bg-zinc-600'}`}
+                  />
+                </button>
                 <button
                   onClick={() => logout()}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2.5"

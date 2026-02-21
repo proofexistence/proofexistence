@@ -764,6 +764,7 @@ export function POECanvas() {
         description: string;
         paymentMethod?: PaymentMethod;
         markAsTheme?: boolean;
+        nsfw?: boolean;
       }
     ) => {
       // NOTE: We now create the session HERE, instead of before opening the modal.
@@ -824,6 +825,7 @@ export function POECanvas() {
             title: data.title,
             description: data.description,
             color: trailColor,
+            nsfw: data.nsfw,
           });
 
           // Mark as today's theme if requested
@@ -872,6 +874,7 @@ export function POECanvas() {
             color: trailColor,
             username: data.username,
             existingArweaveTxId: existingArweaveTxId || undefined,
+            nsfw: data.nsfw,
           });
 
           setExistingArweaveTxId(dataRes.arweaveTxId); // Save for retry optimization

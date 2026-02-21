@@ -570,6 +570,7 @@ interface SubmissionModalProps {
     title: string;
     description: string;
     markAsTheme?: boolean;
+    nsfw?: boolean;
   }) => void;
   onSelectInstant: (data: {
     message: string;
@@ -578,6 +579,7 @@ interface SubmissionModalProps {
     description: string;
     paymentMethod?: PaymentMethod;
     markAsTheme?: boolean;
+    nsfw?: boolean;
   }) => void;
   isSubmitting: boolean;
   profileName?: string;
@@ -630,6 +632,7 @@ export function SubmissionModal({
   const [isSavingDisplayName, setIsSavingDisplayName] = useState(false);
   const [displayNameSaved, setDisplayNameSaved] = useState(false);
   const [markAsTheme, setMarkAsTheme] = useState(false);
+  const [nsfw, setNsfw] = useState(false);
 
   // Sync username with profile name when modal opens
   useEffect(() => {
@@ -637,6 +640,7 @@ export function SubmissionModal({
       setUsername(profileName || profileUsername || '');
       // Reset markAsTheme to false (user must opt-in)
       setMarkAsTheme(false);
+      setNsfw(false);
     }
   }, [isOpen, profileName, profileUsername]);
 
@@ -883,6 +887,51 @@ export function SubmissionModal({
             </div>
           )}
 
+          {/* NSFW Content Label */}
+          <div className="px-1 mb-2">
+            <label className="flex items-center gap-3 cursor-pointer group py-2">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={nsfw}
+                  onChange={(e) => setNsfw(e.target.checked)}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${
+                    nsfw
+                      ? 'bg-red-500 border-red-500'
+                      : 'border-red-400/50 group-hover:border-red-400'
+                  }`}
+                >
+                  {nsfw && (
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="3"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <div className="flex-1">
+                <span className="text-sm font-medium text-white">
+                  {t('modal.notKidFriendly')}
+                </span>
+                <p className="text-[10px] text-zinc-500 mt-0.5">
+                  {t('modal.notKidFriendlyDesc')}
+                </p>
+              </div>
+            </label>
+          </div>
+
           {/* Payment Options Section */}
           <div className="space-y-3">
             {/* Section Header */}
@@ -907,6 +956,7 @@ export function SubmissionModal({
                   description,
                   paymentMethod: 'NATIVE',
                   markAsTheme,
+                  nsfw,
                 })
               }
             />
@@ -934,6 +984,7 @@ export function SubmissionModal({
                   paymentMethod:
                     time26CardState === 'gasless' ? 'TIME26_GASLESS' : 'TIME26',
                   markAsTheme,
+                  nsfw,
                 })
               }
             />
@@ -950,6 +1001,7 @@ export function SubmissionModal({
                   title,
                   description,
                   markAsTheme,
+                  nsfw,
                 })
               }
             />

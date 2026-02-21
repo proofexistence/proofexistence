@@ -26,9 +26,12 @@ import {
   Link2,
   Check,
   Film,
+  ShieldAlert,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useRecordView } from '@/hooks/use-record-view';
+import { useNsfwPreference } from '@/hooks/use-nsfw-preference';
+import { useWeb3Auth } from '@/lib/web3auth';
 
 const ReplayCanvas = dynamic(
   () =>
@@ -67,6 +70,7 @@ interface ProofViewerProps {
     message?: string | null;
     views?: number | null;
     likes?: number | null;
+    nsfw?: boolean;
     user?: {
       username: string | null;
       name: string | null;
@@ -96,6 +100,23 @@ export function ProofViewer({
   const [linkCopied, setLinkCopied] = useState(false);
   const [viewMode, setViewMode] = useState<'static' | 'playback'>('static');
   const { recordView } = useRecordView();
+
+  const { showNsfw } = useNsfwPreference();
+  const { user } = useWeb3Auth();
+  const [nsfwDismissed, setNsfwDismissed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(`nsfw-dismissed-${session.id}`) === 'true';
+  });
+
+  const isOwnWork =
+    user?.walletAddress && session.user?.walletAddress === user.walletAddress;
+  const showNsfwWarning =
+    session.nsfw && !showNsfw && !isOwnWork && !nsfwDismissed;
+
+  const handleDismissNsfw = () => {
+    setNsfwDismissed(true);
+    sessionStorage.setItem(`nsfw-dismissed-${session.id}`, 'true');
+  };
 
   // Share URL for this proof
   const shareUrl =
@@ -360,6 +381,37 @@ export function ProofViewer({
 
   return (
     <div className="w-full h-screen relative bg-transparent overflow-hidden flex flex-col">
+      {/* NSFW Warning Overlay */}
+      {showNsfwWarning && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl">
+          <div className="flex flex-col items-center gap-6 max-w-sm text-center p-8">
+            <ShieldAlert className="w-16 h-16 text-red-400" />
+            <div>
+              <h2 className="text-xl font-bold text-white mb-2">
+                Content Warning
+              </h2>
+              <p className="text-sm text-zinc-400">
+                This content has been marked as not suitable for all viewers.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.back()}
+                className="px-6 py-2.5 text-sm font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-colors"
+              >
+                Go Back
+              </button>
+              <button
+                onClick={handleDismissNsfw}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-xl transition-colors"
+              >
+                I&apos;m 18+, View Content
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Overlay */}
       <div className="absolute top-8 left-0 w-full p-6 z-10 flex justify-between items-start pointer-events-none">
         <div className="animate-in slide-in-from-top-4 fade-in duration-700 max-w-xl mr-12 md:mr-0">

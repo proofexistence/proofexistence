@@ -15,8 +15,10 @@ interface GalleryGridProps {
     previewUrl?: string | null;
     hidden?: number;
     isThemeMarked?: boolean;
+    nsfw?: boolean;
   }[];
   isOwner?: boolean;
+  isAdmin?: boolean;
   onVisibilityChange?: () => void;
   themeSessionId?: string | null;
   themeName?: string | null;
@@ -26,6 +28,7 @@ interface GalleryGridProps {
 export function GalleryGrid({
   proofs,
   isOwner,
+  isAdmin,
   onVisibilityChange,
   themeSessionId,
   themeName,
@@ -57,6 +60,8 @@ export function GalleryGrid({
           userName={proof.userName}
           walletAddress={proof.walletAddress}
           isOwner={isOwner}
+          isAdmin={isAdmin}
+          nsfw={proof.nsfw}
           hidden={proof.hidden}
           onVisibilityChange={onVisibilityChange}
           themeSessionId={themeSessionId}
