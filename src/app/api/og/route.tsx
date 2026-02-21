@@ -408,7 +408,14 @@ export async function GET(req: NextRequest) {
     const title = searchParams.get('title') || 'Proof of Existence';
     const date = searchParams.get('date') || '2026';
 
-    const fallbackAllText = [title, date, id || '', 'POE 2026', 'proofexistence.com', '\u2022'].join('');
+    const fallbackAllText = [
+      title,
+      date,
+      id || '',
+      'POE 2026',
+      'proofexistence.com',
+      '\u2022',
+    ].join('');
     const fallbackCjkFont = await loadCJKFont(fallbackAllText);
     const fallbackFonts = fallbackCjkFont
       ? [

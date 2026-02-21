@@ -45,7 +45,10 @@ function detectContentType(buffer: Uint8Array): string {
 export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url');
   if (!url) {
-    return NextResponse.json({ error: 'Missing url parameter' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing url parameter' },
+      { status: 400 }
+    );
   }
 
   // Only allow proxying from our own R2 storage
