@@ -36,8 +36,14 @@ interface ExploreFilters {
 }
 
 export function useExplore(filters: ExploreFilters) {
+  // Only include walletAddress in query key when showNsfw is false
+  // (it affects which NSFW content is visible: own vs others)
+  // When showNsfw is true, all NSFW content is shown regardless of wallet
+  const { walletAddress, ...filterKey } = filters;
+  const effectiveWallet = !filters.showNsfw ? walletAddress : undefined;
+
   return useInfiniteQuery({
-    queryKey: ['explore', filters],
+    queryKey: ['explore', { ...filterKey, walletAddress: effectiveWallet }],
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         page: pageParam.toString(),
@@ -48,7 +54,7 @@ export function useExplore(filters: ExploreFilters) {
         ...(filters.timeframe !== 'all' && { timeframe: filters.timeframe }),
         ...(filters.themeOnly && { themeOnly: 'true' }),
         ...(filters.showNsfw && { showNsfw: 'true' }),
-        ...(filters.walletAddress && { walletAddress: filters.walletAddress }),
+        ...(effectiveWallet && { walletAddress: effectiveWallet }),
       });
 
       const res = await fetch(`/api/explore?${params}`);

@@ -18,7 +18,7 @@ import { useNsfwPreference } from '@/hooks/use-nsfw-preference';
 import { useProfile } from '@/hooks/use-profile';
 import { useWeb3Auth } from '@/lib/web3auth';
 import { useTranslations } from 'next-intl';
-import { useQuery } from '@tanstack/react-query';
+import { useTodayTheme } from '@/hooks/use-today-quest';
 
 interface Proof {
   id: string;
@@ -59,19 +59,8 @@ export function ExploreClient({
   const { profile } = useProfile();
   const { user } = useWeb3Auth();
 
-  // Fetch today's theme info (public endpoint)
-  const { data: themeData } = useQuery<{
-    theme: { name: string; description: string } | null;
-  }>({
-    queryKey: ['theme', 'today'],
-    queryFn: async () => {
-      const res = await fetch('/api/quests/today');
-      if (!res.ok) throw new Error('Failed to fetch theme');
-      return res.json();
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-
+  // Reuse shared hook for today's theme (deduplicates with navbar)
+  const { data: themeData } = useTodayTheme();
   const todayTheme = themeData?.theme;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =

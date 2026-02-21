@@ -64,7 +64,7 @@ export function useTodayQuest() {
  */
 export function useTodayTheme() {
   return useQuery<{ theme: TodayTheme | null }>({
-    queryKey: ['quests', 'today', 'theme-only'],
+    queryKey: ['quests', 'today', 'public'],
     queryFn: async () => {
       const res = await fetch('/api/quests/today');
       if (!res.ok) throw new Error('Failed to fetch theme');

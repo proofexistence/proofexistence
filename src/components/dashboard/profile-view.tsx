@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import { useTodayQuest } from '@/hooks/use-today-quest';
 import { GalleryGrid } from '@/components/gallery/gallery-grid';
 import { BadgeDisplay } from '@/components/dashboard/badge-display';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -102,28 +103,8 @@ export function ProfileView({
     currentUser?.walletAddress?.toLowerCase() ===
     user.walletAddress.toLowerCase();
 
-  // Fetch quest data for theme marking (only for owner)
-  const { data: questData } = useQuery<{
-    theme: { name: string } | null;
-    tasks: {
-      dailyTheme: {
-        sessionId: string | null;
-      };
-    };
-  }>({
-    queryKey: ['quests', 'today'],
-    queryFn: async () => {
-      const headers: Record<string, string> = {};
-      if (currentUser?.walletAddress) {
-        headers['X-Wallet-Address'] = currentUser.walletAddress;
-      }
-      const res = await fetch('/api/quests/today', { headers });
-      if (!res.ok) throw new Error('Failed to fetch quests');
-      return res.json();
-    },
-    enabled: isOwner,
-    staleTime: 1000 * 60,
-  });
+  // Reuse shared hook for quest data (deduplicates with navbar)
+  const { data: questData } = useTodayQuest();
 
   const handleThemeChange = () => {
     queryClient.invalidateQueries({ queryKey: ['quests', 'today'] });

@@ -2,44 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTodayQuest } from '@/hooks/use-today-quest';
 import { Target, Pencil, Check, Sparkles, Heart, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface QuestData {
-  date: string;
-  theme: { name: string; description: string } | null;
-  tasks: {
-    dailyCreate: {
-      target: number;
-      current: number;
-      reward: string;
-      completed: boolean;
-    };
-    dailyLike: {
-      target: number;
-      current: number;
-      reward: string;
-      completed: boolean;
-    };
-    dailyTheme: {
-      reward: string;
-      completed: boolean;
-      sessionId: string | null;
-    };
-  };
-  streak: {
-    current: number;
-    todayClaimed: boolean;
-    dailyReward: string;
-    nextMilestone: {
-      day: number;
-      reward: string;
-      badgeId: string | null;
-    } | null;
-  };
-  totalEarned: string;
-}
 
 export function QuestDropdown({
   walletAddress,
@@ -65,20 +31,8 @@ export function QuestDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const { data, isLoading } = useQuery<QuestData>({
-    queryKey: ['quests', 'today'],
-    queryFn: async () => {
-      const headers: Record<string, string> = {};
-      if (walletAddress) {
-        headers['X-Wallet-Address'] = walletAddress;
-      }
-      const res = await fetch('/api/quests/today', { headers });
-      if (!res.ok) throw new Error('Failed to fetch quests');
-      return res.json();
-    },
-    staleTime: 1000 * 60, // 1 minute
-    enabled: isOpen && !!walletAddress,
-  });
+  // Reuse shared hook (deduplicates with navbar's useTodayQuest)
+  const { data, isLoading } = useTodayQuest();
 
   const claimStreakMutation = useMutation({
     mutationFn: async () => {
