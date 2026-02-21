@@ -19,13 +19,15 @@ export async function getRecentProofs(limit = 50) {
         walletAddress: users.walletAddress,
         title: sessions.title,
         previewUrl: sessions.previewUrl,
+        nsfw: sessions.nsfw,
       })
       .from(sessions)
       .leftJoin(users, eq(sessions.userId, users.id))
       .where(
         and(
           inArray(sessions.status, ['MINTED', 'SETTLED', 'PENDING']),
-          eq(sessions.hidden, 0)
+          eq(sessions.hidden, 0),
+          eq(sessions.nsfw, false)
         )
       )
       .orderBy(desc(sessions.createdAt))
