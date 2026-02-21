@@ -12,6 +12,7 @@ interface StandardSubmissionParams {
   title: string;
   description: string;
   color: string;
+  nsfw?: boolean;
 }
 
 interface InstantSubmissionParams {
@@ -23,6 +24,7 @@ interface InstantSubmissionParams {
   color: string;
   username: string;
   existingArweaveTxId?: string;
+  nsfw?: boolean;
 }
 
 interface InstantSubmissionResponse {

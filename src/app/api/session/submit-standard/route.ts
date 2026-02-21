@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Parse Body
-    const { sessionId, message, title, description } = await req.json();
+    const { sessionId, message, title, description, nsfw } = await req.json();
     if (!sessionId) {
       return NextResponse.json(
         { error: 'Missing session ID' },
@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
         message: message || null,
         title: title || null,
         description: description || null,
+        nsfw: nsfw === true,
+        nsfwMarkedBy: nsfw === true ? user.id : null,
+        nsfwMarkedAt: nsfw === true ? new Date() : null,
       })
       .where(
         and(

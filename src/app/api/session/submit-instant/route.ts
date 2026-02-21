@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       title,
       description,
       existingArweaveTxId,
+      nsfw,
     } = body;
 
     if (!sessionId) {
@@ -175,6 +176,9 @@ export async function POST(req: NextRequest) {
         title: title || null,
         description: description || null,
         color: color || null,
+        nsfw: nsfw === true,
+        nsfwMarkedBy: nsfw === true ? userId : null,
+        nsfwMarkedAt: nsfw === true ? new Date() : null,
       })
       .where(eq(sessions.id, sessionId));
 

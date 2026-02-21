@@ -33,6 +33,8 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'recent'; // 'recent', 'popular', 'trending'
     const timeframe = searchParams.get('timeframe'); // '24h', '7d', '30d', 'all'
     const themeOnly = searchParams.get('themeOnly') === 'true'; // Filter for today's theme works
+    const showNsfw = searchParams.get('showNsfw') === 'true';
+    const walletAddress = searchParams.get('walletAddress');
 
     // Get today's theme session IDs (for filtering and badge display)
     const today = getTodayDateString();
@@ -55,6 +57,22 @@ export async function GET(req: NextRequest) {
 
     // Always exclude hidden sessions from explore
     conditions.push(eq(sessions.hidden, 0));
+
+    // NSFW filtering: hide NSFW unless user opted in
+    if (!showNsfw) {
+      if (walletAddress) {
+        // Show non-NSFW + user's own NSFW content
+        conditions.push(
+          or(
+            eq(sessions.nsfw, false),
+            eq(users.walletAddress, walletAddress)
+          )!
+        );
+      } else {
+        // Not logged in: hide all NSFW
+        conditions.push(eq(sessions.nsfw, false));
+      }
+    }
 
     // Status filter
     if (status && status !== 'all') {
@@ -152,6 +170,7 @@ export async function GET(req: NextRequest) {
         walletAddress: users.walletAddress,
         title: sessions.title,
         previewUrl: sessions.previewUrl,
+        nsfw: sessions.nsfw,
       })
       .from(sessions)
       .leftJoin(users, eq(sessions.userId, users.id))

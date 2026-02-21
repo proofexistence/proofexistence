@@ -12,6 +12,7 @@ interface Proof {
   userName?: string | null;
   walletAddress?: string | null;
   previewUrl?: string | null;
+  nsfw?: boolean;
 }
 
 interface ExploreData {
@@ -30,6 +31,8 @@ interface ExploreFilters {
   sortBy?: string;
   timeframe?: string;
   themeOnly?: boolean;
+  showNsfw?: boolean;
+  walletAddress?: string;
 }
 
 export function useExplore(filters: ExploreFilters) {
@@ -44,6 +47,8 @@ export function useExplore(filters: ExploreFilters) {
         ...(filters.sortBy && { sortBy: filters.sortBy }),
         ...(filters.timeframe !== 'all' && { timeframe: filters.timeframe }),
         ...(filters.themeOnly && { themeOnly: 'true' }),
+        ...(filters.showNsfw && { showNsfw: 'true' }),
+        ...(filters.walletAddress && { walletAddress: filters.walletAddress }),
       });
 
       const res = await fetch(`/api/explore?${params}`);
