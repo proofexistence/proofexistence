@@ -14,6 +14,7 @@ import {
   Copy,
   Check,
   ShieldCheck,
+  ShieldAlert,
   BarChart3,
   Crown,
   Gift,
@@ -24,6 +25,7 @@ import { WalletHeader } from './wallet-header';
 import { WalletBalances } from './wallet-balances';
 import { WalletPendingRewards } from './wallet-pending-rewards';
 import { ExportKeyDialog } from './export-key-dialog';
+import { useNsfwPreference } from '@/hooks/use-nsfw-preference';
 import { useTranslations } from 'next-intl';
 
 export function WalletDropdown() {
@@ -40,6 +42,7 @@ export function WalletDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [referralCopied, setReferralCopied] = useState(false);
+  const { showNsfw, toggleShowNsfw } = useNsfwPreference();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Only use DB profile data - no fallback to Web3Auth to avoid flickering
@@ -195,6 +198,18 @@ export function WalletDropdown() {
                       <Settings className="w-4 h-4" />
                       {t('settings')}
                     </Link>
+
+                    {/* NSFW Toggle */}
+                    <button
+                      onClick={toggleShowNsfw}
+                      className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
+                    >
+                      <ShieldAlert className="w-4 h-4" />
+                      {showNsfw ? t('hideNsfw') : t('showNsfw')}
+                      <span
+                        className={`ml-auto w-2 h-2 rounded-full ${showNsfw ? 'bg-red-400' : 'bg-zinc-600'}`}
+                      />
+                    </button>
 
                     {/* Admin Section */}
                     {profile?.isAdmin && (
