@@ -93,6 +93,11 @@ export const sessions = pgTable(
     // Visibility
     hidden: integer('hidden').default(0).notNull(), // 0 = visible, 1 = hidden from explore/public profile
 
+    // NSFW Content Moderation
+    nsfw: boolean('nsfw').default(false).notNull(),
+    nsfwMarkedBy: uuid('nsfw_marked_by').references(() => users.id),
+    nsfwMarkedAt: timestamp('nsfw_marked_at', { withTimezone: true }),
+
     status: varchar('status', { length: 20 }).default('PENDING').notNull(), // PENDING | SETTLED | MINTED
     txHash: varchar('tx_hash', { length: 66 }), // Populated if Instant Proof (minted)
     ipfsHash: varchar('ipfs_hash', { length: 255 }), // IPFS CID for NFT metadata
