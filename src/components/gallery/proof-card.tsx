@@ -428,6 +428,7 @@ export function ProofCard({
       <Link
         href={`/proof/${id}`}
         className="relative flex-1 w-full overflow-hidden"
+        onContextMenu={handleContextMenu}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black to-zinc-900/50" />
 
