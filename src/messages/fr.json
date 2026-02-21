@@ -24,6 +24,8 @@
     "viewProfile": "Voir le Profil",
     "exportPrivateKey": "Exporter la Clé Privée",
     "settings": "Paramètres",
+    "hideNsfw": "Masquer NSFW",
+    "showNsfw": "Afficher NSFW",
     "logOut": "Déconnexion",
     "balances": "Soldes",
     "pendingRewards": "Récompenses en Attente",
@@ -172,7 +174,13 @@
     "verifiedOn": "Vérifié sur Polygon",
     "arweaveMetadata": "Métadonnées Arweave",
     "rawArtFile": "Fichier Art Original",
-    "syncingStorage": "Synchronisation du Stockage..."
+    "syncingStorage": "Synchronisation du Stockage...",
+    "nsfw": {
+      "contentWarning": "Avertissement de Contenu",
+      "contentWarningDescription": "Ce contenu a été signalé comme pouvant ne pas convenir à tous les spectateurs.",
+      "goBack": "Retour",
+      "viewContent18Plus": "J'ai 18 ans ou plus, Voir le Contenu"
+    }
   },
   "explore": {
     "title": "Galerie Mondiale",
@@ -196,7 +204,9 @@
     "todayTheme": "Thème du Jour",
     "addTheme": "+ Thème du Jour",
     "viewThemeWorks": "Voir les Œuvres du Thème",
-    "showingThemeWorks": "Affichage des Œuvres du Thème"
+    "showingThemeWorks": "Affichage des Œuvres du Thème",
+    "removeNsfwMark": "Retirer le Marquage NSFW",
+    "markAsNsfw": "Marquer comme NSFW"
   },
   "referral": {
     "title": "Inviter des Amis",

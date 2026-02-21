@@ -53,6 +53,7 @@ export function ProfilePageContent({ username }: ProfilePageContentProps) {
             ...p,
             createdAt: new Date(p.createdAt),
             hidden: p.hidden,
+            nsfw: p.nsfw,
           }))}
         onVisibilityChange={refetch}
         hasMoreProofs={hasNextPage}
@@ -65,6 +66,7 @@ export function ProfilePageContent({ username }: ProfilePageContentProps) {
             id: s.id!,
             createdAt: new Date(s.createdAt!),
             status: s.status!,
+            nsfw: s.nsfw ?? undefined,
           }))}
         badges={profile.badges
           .filter((b) => b.id !== null)

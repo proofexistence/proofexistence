@@ -658,7 +658,7 @@ export function ProofCard({
             className="w-full text-left px-3 py-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2.5"
           >
             <ShieldAlert className="w-3.5 h-3.5" />
-            {nsfw ? 'Remove NSFW Mark' : 'Mark as NSFW'}
+            {nsfw ? t('removeNsfwMark') : t('markAsNsfw')}
           </button>
         </div>
       )}

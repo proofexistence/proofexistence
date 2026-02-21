@@ -24,6 +24,8 @@
     "viewProfile": "View Profile",
     "exportPrivateKey": "Export Private Key",
     "settings": "Settings",
+    "hideNsfw": "Hide NSFW",
+    "showNsfw": "Show NSFW",
     "logOut": "Log Out",
     "balances": "Balances",
     "pendingRewards": "Pending Rewards",
@@ -175,7 +177,13 @@
     "verifiedOn": "Verified on Polygon",
     "arweaveMetadata": "Arweave Metadata",
     "rawArtFile": "Raw Art File",
-    "syncingStorage": "Syncing Storage..."
+    "syncingStorage": "Syncing Storage...",
+    "nsfw": {
+      "contentWarning": "Content Warning",
+      "contentWarningDescription": "This content has been marked as not suitable for all viewers.",
+      "goBack": "Go Back",
+      "viewContent18Plus": "I'm 18+, View Content"
+    }
   },
   "explore": {
     "title": "Global Gallery",
@@ -199,7 +207,9 @@
     "todayTheme": "Today's Theme",
     "addTheme": "+ Today's Theme",
     "viewThemeWorks": "View Theme Works",
-    "showingThemeWorks": "Showing Theme Works"
+    "showingThemeWorks": "Showing Theme Works",
+    "removeNsfwMark": "Remove NSFW Mark",
+    "markAsNsfw": "Mark as NSFW"
   },
   "referral": {
     "title": "Invite Friends",

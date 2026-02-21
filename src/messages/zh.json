@@ -24,6 +24,8 @@
     "viewProfile": "查看資料",
     "exportPrivateKey": "導出私鑰",
     "settings": "設定",
+    "hideNsfw": "隱藏 NSFW",
+    "showNsfw": "顯示 NSFW",
     "logOut": "登出",
     "balances": "餘額",
     "pendingRewards": "待領獎勵",
@@ -175,7 +177,13 @@
     "verifiedOn": "在Polygon上驗證",
     "arweaveMetadata": "Arweave元數據",
     "rawArtFile": "原始藝術文件",
-    "syncingStorage": "同步存儲中..."
+    "syncingStorage": "同步存儲中...",
+    "nsfw": {
+      "contentWarning": "內容警告",
+      "contentWarningDescription": "此內容已被標記為不適合所有觀看者。",
+      "goBack": "返回",
+      "viewContent18Plus": "我已滿 18 歲，查看內容"
+    }
   },
   "explore": {
     "title": "全球畫廊",
@@ -199,7 +207,9 @@
     "todayTheme": "今日主題",
     "addTheme": "+ 今日主題",
     "viewThemeWorks": "查看主題作品",
-    "showingThemeWorks": "顯示主題作品中"
+    "showingThemeWorks": "顯示主題作品中",
+    "removeNsfwMark": "移除 NSFW 標記",
+    "markAsNsfw": "標記為 NSFW"
   },
   "referral": {
     "title": "邀請好友",

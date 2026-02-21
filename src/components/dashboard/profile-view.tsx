@@ -6,6 +6,7 @@ import { GalleryGrid } from '@/components/gallery/gallery-grid';
 import { BadgeDisplay } from '@/components/dashboard/badge-display';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWeb3Auth } from '@/lib/web3auth';
+import { useProfile } from '@/hooks/use-profile';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -32,6 +33,7 @@ type ProofItem = {
   walletAddress?: string | null;
   previewUrl?: string | null;
   hidden?: number;
+  nsfw?: boolean;
 };
 
 type BadgeItem = {
@@ -85,11 +87,14 @@ export function ProfileView({
       likes: p.likes || 0,
       previewUrl: p.previewUrl,
       hidden: p.hidden || 0,
+      nsfw: p.nsfw,
       userName: p.userName || user.name, // Fallback to profile user if null
       walletAddress: p.walletAddress || user.walletAddress,
     }));
 
   const { user: currentUser } = useWeb3Auth();
+  const { profile: currentProfile } = useProfile();
+  const isAdmin = currentProfile?.isAdmin ?? false;
   const queryClient = useQueryClient();
 
   // Check if the current logged-in user is the owner of this profile
@@ -212,6 +217,7 @@ export function ProfileView({
               <GalleryGrid
                 proofs={formatProofs(createdProofs)}
                 isOwner={isOwner}
+                isAdmin={isAdmin}
                 onVisibilityChange={onVisibilityChange}
                 themeSessionId={questData?.tasks.dailyTheme.sessionId}
                 themeName={questData?.theme?.name}
@@ -238,7 +244,11 @@ export function ProfileView({
             </>
           )}
           {activeTab === 'saved' && (
-            <GalleryGrid proofs={formatProofs(savedProofs)} isOwner={false} />
+            <GalleryGrid
+              proofs={formatProofs(savedProofs)}
+              isOwner={false}
+              isAdmin={isAdmin}
+            />
           )}
           {activeTab === 'badges' && <BadgeDisplay badgesList={badges} />}
         </motion.div>

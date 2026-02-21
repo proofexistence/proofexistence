@@ -29,6 +29,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { useRecordView } from '@/hooks/use-record-view';
 import { useNsfwPreference } from '@/hooks/use-nsfw-preference';
 import { useWeb3Auth } from '@/lib/web3auth';
@@ -93,6 +94,7 @@ export function ProofViewer({
   themeInfo,
 }: ProofViewerProps) {
   const router = useRouter();
+  const t = useTranslations('proof');
   const canvasRef = useRef<ReplayCanvasRef>(null);
   const [isSpinning, setIsSpinning] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
@@ -388,10 +390,10 @@ export function ProofViewer({
             <ShieldAlert className="w-16 h-16 text-red-400" />
             <div>
               <h2 className="text-xl font-bold text-white mb-2">
-                Content Warning
+                {t('nsfw.contentWarning')}
               </h2>
               <p className="text-sm text-zinc-400">
-                This content has been marked as not suitable for all viewers.
+                {t('nsfw.contentWarningDescription')}
               </p>
             </div>
             <div className="flex gap-3">
@@ -399,13 +401,13 @@ export function ProofViewer({
                 onClick={() => router.back()}
                 className="px-6 py-2.5 text-sm font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-colors"
               >
-                Go Back
+                {t('nsfw.goBack')}
               </button>
               <button
                 onClick={handleDismissNsfw}
                 className="px-6 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-xl transition-colors"
               >
-                I&apos;m 18+, View Content
+                {t('nsfw.viewContent18Plus')}
               </button>
             </div>
           </div>

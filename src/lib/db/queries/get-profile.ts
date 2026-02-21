@@ -64,6 +64,7 @@ export async function getProfile(
         title: sessions.title,
         previewUrl: sessions.previewUrl,
         hidden: sessions.hidden,
+        nsfw: sessions.nsfw,
         // Join user data for card standard props, though we know the user
         userName: sql<string>`${user.name}`,
         walletAddress: sql<string>`${user.walletAddress}`,
@@ -87,6 +88,7 @@ export async function getProfile(
         likes: sessions.likes,
         title: sessions.title,
         previewUrl: sessions.previewUrl,
+        nsfw: sessions.nsfw,
         userName: users.name,
         walletAddress: users.walletAddress,
       })

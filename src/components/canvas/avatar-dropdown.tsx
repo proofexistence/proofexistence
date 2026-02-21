@@ -166,7 +166,7 @@ export function AvatarDropdown() {
                   className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2.5"
                 >
                   <ShieldAlert className="w-4 h-4" />
-                  {showNsfw ? 'Hide NSFW' : 'Show NSFW'}
+                  {showNsfw ? t('hideNsfw') : t('showNsfw')}
                   <span
                     className={`ml-auto w-2 h-2 rounded-full ${showNsfw ? 'bg-red-400' : 'bg-zinc-600'}`}
                   />

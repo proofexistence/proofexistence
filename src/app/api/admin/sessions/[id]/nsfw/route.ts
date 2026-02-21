@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/get-user';
+import { checkRateLimit } from '@/lib/ratelimit';
 import { db } from '@/db';
 import { sessions, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -22,6 +23,12 @@ export async function PATCH(
 
     if (!dbUser?.isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Rate limit
+    const { success } = await checkRateLimit(currentUser.walletAddress);
+    if (!success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
     const { id } = await params;

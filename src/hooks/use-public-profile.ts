@@ -23,6 +23,7 @@ export interface PublicProfile {
     title: string | null;
     previewUrl: string | null;
     hidden: number;
+    nsfw: boolean;
     userName: string | null;
     walletAddress: string | null;
   }>;
@@ -36,6 +37,7 @@ export interface PublicProfile {
     likes: number | null;
     title: string | null;
     previewUrl: string | null;
+    nsfw: boolean | null;
     userName: string | null;
     walletAddress: string | null;
   }>;

@@ -24,6 +24,8 @@
     "viewProfile": "プロフィール表示",
     "exportPrivateKey": "秘密鍵をエクスポート",
     "settings": "設定",
+    "hideNsfw": "NSFW を非表示",
+    "showNsfw": "NSFW を表示",
     "logOut": "ログアウト",
     "balances": "残高",
     "pendingRewards": "保留中の報酬",
@@ -172,7 +174,13 @@
     "verifiedOn": "Polygonで検証済み",
     "arweaveMetadata": "Arweaveメタデータ",
     "rawArtFile": "オリジナルアートファイル",
-    "syncingStorage": "ストレージ同期中..."
+    "syncingStorage": "ストレージ同期中...",
+    "nsfw": {
+      "contentWarning": "コンテンツ警告",
+      "contentWarningDescription": "このコンテンツはすべての閲覧者に適さないと判断されています。",
+      "goBack": "戻る",
+      "viewContent18Plus": "18歳以上です、コンテンツを表示"
+    }
   },
   "explore": {
     "title": "グローバルギャラリー",
@@ -196,7 +204,9 @@
     "todayTheme": "今日のテーマ",
     "addTheme": "+ 今日のテーマ",
     "viewThemeWorks": "テーマ作品を見る",
-    "showingThemeWorks": "テーマ作品を表示中"
+    "showingThemeWorks": "テーマ作品を表示中",
+    "removeNsfwMark": "NSFW マークを解除",
+    "markAsNsfw": "NSFW としてマーク"
   },
   "referral": {
     "title": "友達を招待",

@@ -24,6 +24,8 @@
     "viewProfile": "Ver Perfil",
     "exportPrivateKey": "Exportar Clave Privada",
     "settings": "Configuración",
+    "hideNsfw": "Ocultar NSFW",
+    "showNsfw": "Mostrar NSFW",
     "logOut": "Cerrar Sesión",
     "balances": "Saldos",
     "pendingRewards": "Recompensas Pendientes",
@@ -172,7 +174,13 @@
     "verifiedOn": "Verificado en Polygon",
     "arweaveMetadata": "Metadatos de Arweave",
     "rawArtFile": "Archivo de Arte Original",
-    "syncingStorage": "Sincronizando Almacenamiento..."
+    "syncingStorage": "Sincronizando Almacenamiento...",
+    "nsfw": {
+      "contentWarning": "Advertencia de Contenido",
+      "contentWarningDescription": "Este contenido ha sido marcado como no apto para todos los espectadores.",
+      "goBack": "Volver",
+      "viewContent18Plus": "Tengo 18+, Ver Contenido"
+    }
   },
   "explore": {
     "title": "Galería Global",
@@ -196,7 +204,9 @@
     "todayTheme": "Tema del Día",
     "addTheme": "+ Tema de Hoy",
     "viewThemeWorks": "Ver Obras del Tema",
-    "showingThemeWorks": "Mostrando Obras del Tema"
+    "showingThemeWorks": "Mostrando Obras del Tema",
+    "removeNsfwMark": "Quitar Marca NSFW",
+    "markAsNsfw": "Marcar como NSFW"
   },
   "referral": {
     "title": "Invitar Amigos",
