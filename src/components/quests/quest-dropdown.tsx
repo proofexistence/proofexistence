@@ -55,15 +55,19 @@ export function QuestDropdown({
     },
   });
 
+  const tasks = data?.tasks;
+  const streak = data?.streak;
+
   // Count incomplete tasks
-  const incompleteCount = data
-    ? [
-        !data.tasks.dailyCreate.completed,
-        !data.tasks.dailyLike.completed,
-        !data.tasks.dailyTheme.completed,
-        !data.streak.todayClaimed,
-      ].filter(Boolean).length
-    : 0;
+  const incompleteCount =
+    tasks && streak
+      ? [
+          !tasks.dailyCreate.completed,
+          !tasks.dailyLike.completed,
+          !tasks.dailyTheme.completed,
+          !streak.todayClaimed,
+        ].filter(Boolean).length
+      : 0;
 
   if (!walletAddress) {
     return null;
@@ -87,37 +91,32 @@ export function QuestDropdown({
         <div className="absolute right-0 top-full mt-2 w-72 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-50">
           {isLoading ? (
             <div className="p-4 text-center text-zinc-500">Loading...</div>
-          ) : data ? (
+          ) : tasks && streak ? (
             <div className="divide-y divide-white/10">
               {/* Tasks */}
               <div className="p-3 space-y-2">
-                {/* Daily Create */}
                 <TaskItem
                   icon={<Sparkles className="w-4 h-4" />}
                   label={t('tasks.dailyCreate', {
-                    current: data.tasks.dailyCreate.current,
-                    target: data.tasks.dailyCreate.target,
+                    current: tasks!.dailyCreate.current ?? 0,
+                    target: tasks!.dailyCreate.target ?? 1,
                   })}
-                  reward={data.tasks.dailyCreate.reward}
-                  completed={data.tasks.dailyCreate.completed}
+                  reward={tasks!.dailyCreate.reward}
+                  completed={tasks!.dailyCreate.completed}
                 />
-
-                {/* Daily Like */}
                 <TaskItem
                   icon={<Heart className="w-4 h-4" />}
                   label={t('tasks.dailyLike', {
-                    current: data.tasks.dailyLike.current,
-                    target: data.tasks.dailyLike.target,
+                    current: tasks!.dailyLike.current ?? 0,
+                    target: tasks!.dailyLike.target ?? 3,
                   })}
-                  reward={data.tasks.dailyLike.reward}
-                  completed={data.tasks.dailyLike.completed}
+                  reward={tasks!.dailyLike.reward}
+                  completed={tasks!.dailyLike.completed}
                 />
-
-                {/* Daily Theme - with theme info */}
                 <ThemeTaskItem
-                  theme={data.theme}
-                  reward={data.tasks.dailyTheme.reward}
-                  completed={data.tasks.dailyTheme.completed}
+                  theme={data?.theme ?? null}
+                  reward={tasks!.dailyTheme.reward}
+                  completed={tasks!.dailyTheme.completed}
                 />
               </div>
 
@@ -127,10 +126,10 @@ export function QuestDropdown({
                   <div className="flex items-center gap-2">
                     <Pencil className="w-4 h-4 text-purple-400" />
                     <span className="text-sm font-medium text-white">
-                      {t('streak.days', { count: data.streak.current })}
+                      {t('streak.days', { count: streak!.current })}
                     </span>
                   </div>
-                  {!data.streak.todayClaimed && (
+                  {!streak!.todayClaimed && (
                     <button
                       onClick={() => claimStreakMutation.mutate()}
                       disabled={claimStreakMutation.isPending}
@@ -139,29 +138,29 @@ export function QuestDropdown({
                       {claimStreakMutation.isPending
                         ? '...'
                         : t('streak.claim', {
-                            amount: data.streak.dailyReward,
+                            amount: streak!.dailyReward,
                           })}
                     </button>
                   )}
-                  {data.streak.todayClaimed && (
+                  {streak!.todayClaimed && (
                     <Check className="w-4 h-4 text-green-400" />
                   )}
                 </div>
-                {data.streak.nextMilestone && (
+                {streak!.nextMilestone && (
                   <div className="text-xs text-zinc-500">
                     {t('streak.nextMilestone', {
-                      day: data.streak.nextMilestone.day,
+                      day: streak!.nextMilestone.day,
                     })}
                     {' → '}
                     <span className="text-amber-400">
-                      +{data.streak.nextMilestone.reward}
+                      +{streak!.nextMilestone.reward}
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* Total Earned - only show if > 0 */}
-              {parseInt(data.totalEarned) > 0 && (
+              {/* Total Earned */}
+              {data && parseInt(data.totalEarned) > 0 && (
                 <div className="p-3 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-zinc-400">
@@ -229,7 +228,7 @@ function ThemeTaskItem({
   reward,
   completed,
 }: {
-  theme: { name: string; description: string } | null;
+  theme: { name: string; description?: string } | null;
   reward: string;
   completed: boolean;
 }) {
@@ -253,7 +252,7 @@ function ThemeTaskItem({
 
   // Use raw() to check if translation exists, fallback to original
   let translatedName: string;
-  let translatedDesc: string | null;
+  let translatedDesc: string | null | undefined;
 
   try {
     const rawName = t.raw(nameKey);

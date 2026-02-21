@@ -200,7 +200,7 @@ export function ProfileView({
                 isOwner={isOwner}
                 isAdmin={isAdmin}
                 onVisibilityChange={onVisibilityChange}
-                themeSessionId={questData?.tasks.dailyTheme.sessionId}
+                themeSessionId={questData?.tasks?.dailyTheme.sessionId}
                 themeName={questData?.theme?.name}
                 onThemeChange={handleThemeChange}
               />
