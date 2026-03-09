@@ -82,3 +82,6 @@ docs/
 # Temp files
 temp/
 nul
+
+# Remotion (separate sub-project, not part of Next.js build)
+remotion/
