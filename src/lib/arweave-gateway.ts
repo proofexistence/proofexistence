@@ -8,14 +8,14 @@
 export const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true';
 
 // Gateway URLs
-// - Primary: ar-io.net for instant access with Turbo (ArDrive uploads)
+// - Primary: arweave.net (official Arweave gateway, most reliable)
 // - Fallback: devnet.irys.xyz for legacy Irys devnet uploads (testnet only)
-export const ARWEAVE_GATEWAY = 'https://ar-io.net';
+export const ARWEAVE_GATEWAY = 'https://arweave.net';
 export const IRYS_DEVNET_GATEWAY = 'https://devnet.irys.xyz';
 
 /**
  * Get the full URL for an Arweave transaction ID
- * Uses the primary gateway (ar-io.net)
+ * Uses the primary gateway (arweave.net)
  */
 export function getArweaveUrl(txId: string): string {
   return `${ARWEAVE_GATEWAY}/${txId}`;

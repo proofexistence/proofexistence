@@ -246,7 +246,7 @@ export default async function ProofPage({ params }: PageProps) {
 
   // Fetch Arweave Metadata if available
   let nftImage: string | null = null;
-  let isSyncing = false;
+  const isSyncing = false;
 
   if (session.ipfsHash) {
     try {
@@ -265,12 +265,10 @@ export default async function ProofPage({ params }: PageProps) {
         if (metadata.image) {
           nftImage = normalizeArweaveUrl(metadata.image);
         }
-      } else {
-        isSyncing = true;
       }
     } catch (error) {
       console.warn('Failed to fetch Arweave metadata:', error);
-      isSyncing = true;
+      // Gateway may be temporarily unreachable - don't show syncing state
     }
   }
 

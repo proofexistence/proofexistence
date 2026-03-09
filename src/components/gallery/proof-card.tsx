@@ -432,10 +432,8 @@ export function ProofCard({
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black to-zinc-900/50" />
 
-        {/* Image / Content */}
-        {ipfsHash ? (
-          <NFTThumbnail ipfsHash={ipfsHash} alt={`Proof #${shortId}`} />
-        ) : previewUrl ? (
+        {/* Image / Content - prefer previewUrl (R2) over Arweave */}
+        {previewUrl ? (
           <div className="absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -445,6 +443,8 @@ export function ProofCard({
               loading="lazy"
             />
           </div>
+        ) : ipfsHash ? (
+          <NFTThumbnail ipfsHash={ipfsHash} alt={`Proof #${shortId}`} />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-purple-500/10 transition-colors">

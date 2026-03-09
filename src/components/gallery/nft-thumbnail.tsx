@@ -1,11 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getArweaveUrls, normalizeArweaveUrl } from '@/lib/arweave-gateway';
 
 interface NFTThumbnailProps {
   ipfsHash: string;
   alt: string;
+}
+
+/**
+ * Extract Arweave transaction ID from various URL formats
+ */
+function extractTxId(url: string): string | null {
+  // Already a bare txId
+  if (/^[a-zA-Z0-9_-]{43}$/.test(url)) return url;
+  // ar://txId
+  if (url.startsWith('ar://')) return url.slice(5);
+  // https://gateway.example.com/txId
+  const match = url.match(/\/([a-zA-Z0-9_-]{43})$/);
+  return match ? match[1] : null;
 }
 
 export function NFTThumbnail({ ipfsHash, alt }: NFTThumbnailProps) {
@@ -14,22 +26,23 @@ export function NFTThumbnail({ ipfsHash, alt }: NFTThumbnailProps) {
   useEffect(() => {
     let mounted = true;
     const fetchImage = async () => {
-      // Try each gateway in order (primary + fallbacks)
-      const urls = getArweaveUrls(ipfsHash);
-      for (const metadataUrl of urls) {
-        try {
-          const res = await fetch(metadataUrl, { next: { revalidate: 86400 } }); // Cache 1 day
-          if (!res.ok) continue;
+      try {
+        // Fetch metadata through server-side proxy (avoids client DNS issues with Arweave gateways)
+        const res = await fetch(`/api/arweave/${ipfsHash}`);
+        if (!res.ok) return;
 
-          const data = await res.json();
-          if (data.image && mounted) {
-            setSrc(normalizeArweaveUrl(data.image));
-            return; // Success, stop trying
+        const data = await res.json();
+        if (data.image && mounted) {
+          // Extract txId from image URL and proxy it too
+          const imageTxId = extractTxId(data.image);
+          if (imageTxId) {
+            setSrc(`/api/arweave/${imageTxId}`);
+          } else {
+            setSrc(data.image);
           }
-        } catch {
-          // Try next gateway
-          continue;
         }
+      } catch {
+        // Failed to fetch metadata
       }
     };
 
@@ -40,13 +53,11 @@ export function NFTThumbnail({ ipfsHash, alt }: NFTThumbnailProps) {
   }, [ipfsHash]);
 
   if (!src) {
-    // Placeholder while loading or error
     return <div className="absolute inset-0 bg-white/5 animate-pulse" />;
   }
 
   return (
     <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-110">
-      {/* Use standard img tag for external URLs to avoid Next.js Image config requirement for every gateway */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}

@@ -215,17 +215,14 @@ export default async function ProofPage({ params }: PageProps) {
 
   // Fetch Arweave Metadata if available
   let nftImage: string | null = null;
-  let isSyncing = false;
+  const isSyncing = false;
 
   if (session.ipfsHash) {
     const metadata = await fetchArweaveMetadata(session.ipfsHash);
-    if (metadata) {
-      if (metadata.image) {
-        nftImage = metadata.image;
-      }
-    } else {
-      isSyncing = true;
+    if (metadata?.image) {
+      nftImage = metadata.image;
     }
+    // Gateway may be temporarily unreachable - don't show syncing state
   }
 
   return (

@@ -4,6 +4,7 @@ import { users, sessions, badges, userBadges } from '@/db/schema';
 import { eq, sql, inArray } from 'drizzle-orm';
 import { uploadToArweave } from '@/lib/arweave-upload';
 import { getArweaveUrl } from '@/lib/arweave-gateway';
+import { uploadToR2 } from '@/lib/storage/r2';
 import { checkRateLimit } from '@/lib/ratelimit';
 import { getCurrentUser } from '@/lib/auth/get-user';
 
@@ -107,7 +108,7 @@ export async function POST(req: NextRequest) {
         const base64Data = imageData.split(',')[1];
         const buffer = Buffer.from(base64Data, 'base64');
 
-        // A. Upload Image (Required)
+        // A. Upload Image to Arweave (Required)
         try {
           imageTxId = await uploadToArweave(buffer, [
             { name: 'Content-Type', value: 'image/jpeg' },
@@ -119,6 +120,20 @@ export async function POST(req: NextRequest) {
               imgError instanceof Error ? imgError.message : String(imgError)
             }`
           );
+        }
+
+        // A2. Also upload preview to R2 for fast loading (required)
+        try {
+          const timestamp = Date.now();
+          const key = `proofs/${sessionId}/preview-${timestamp}.jpg`;
+          const previewPublicUrl = await uploadToR2(key, buffer, 'image/jpeg');
+          await db
+            .update(sessions)
+            .set({ previewUrl: previewPublicUrl })
+            .where(eq(sessions.id, sessionId));
+        } catch (r2Error) {
+          console.error('R2 preview upload failed:', r2Error);
+          // Don't block the instant proof flow, but log for monitoring
         }
 
         // B. Construct Metadata (Standard NFT)

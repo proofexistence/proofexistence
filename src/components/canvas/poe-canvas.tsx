@@ -814,7 +814,8 @@ export function POECanvas() {
                 imageBlob: blob,
               });
             } catch (uploadErr) {
-              console.warn('Preview upload failed (non-critical):', uploadErr);
+              console.error('Preview upload failed:', uploadErr);
+              throw new Error('Failed to upload preview image. Please try again.');
             }
           }
 

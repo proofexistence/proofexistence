@@ -998,7 +998,7 @@ async function generateDaisyNFT(
       ...baseMetadata,
       name: `Daisy ${yesterday} - Standard Edition`,
       description: standardDescription,
-      image: `https://ar-io.net/${standardImageTxId}`,
+      image: `https://arweave.net/${standardImageTxId}`,
       attributes: [
         ...baseMetadata.attributes,
         { trait_type: 'Edition', value: 'Standard' },
@@ -1010,7 +1010,7 @@ async function generateDaisyNFT(
       ...baseMetadata,
       name: `Daisy ${yesterday} - Genesis Edition`,
       description: genesisDescription,
-      image: `https://ar-io.net/${genesisImageTxId}`,
+      image: `https://arweave.net/${genesisImageTxId}`,
       attributes: [
         ...baseMetadata.attributes,
         { trait_type: 'Edition', value: 'Genesis' },
@@ -1106,7 +1106,7 @@ async function generateDaisyNFT(
 
       const standardTx = await standardContract.setDailyConfig(
         dateNumber,
-        `https://ar-io.net/${standardMetadataTxId}`,
+        `https://arweave.net/${standardMetadataTxId}`,
         participantsMerkleRoot,
         uniqueParticipants.length,
         quarter,
@@ -1137,7 +1137,7 @@ async function generateDaisyNFT(
       const genesisTx = await genesisContract.createAuction(
         dateNumber,
         startPriceWei,
-        `https://ar-io.net/${genesisMetadataTxId}`,
+        `https://arweave.net/${genesisMetadataTxId}`,
         uniqueParticipants.length,
         sessionsData.length
       );
