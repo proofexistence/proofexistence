@@ -4,10 +4,21 @@ import { db } from '@/db';
 import { sessions } from '@/db/schema';
 import { inArray, sql, and, eq } from 'drizzle-orm';
 
-export const metadata = {
-  title: 'Explore | Proof of Existence',
-  description: 'Discover the latest verified proofs from around the world.',
+import { getTranslations } from 'next-intl/server';
+
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.explore' });
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic';
