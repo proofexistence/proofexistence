@@ -18,7 +18,7 @@ export function generateStaticParams() {
 export const metadata: Metadata = {
   title: 'Proof of Existence | A Year-Long Collective Art Experiment',
   description:
-    'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
+    'Join the movement. Leave your immutable trace on the blockchain. A collective art project where every participant co-creates the final digital monument.',
   keywords: [
     'POE2026',
     'blockchain',
@@ -32,16 +32,29 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'POE Team' }],
   openGraph: {
+    siteName: 'POE 2026',
     title: 'Proof of Existence | A Year-Long Collective Art Experiment',
     description:
-      'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
+      'Join the movement. Leave your immutable trace on the blockchain. A collective art project where every participant co-creates the final digital monument.',
     url: 'https://www.proofexistence.com',
+    images: [
+      {
+        url: '/og-v2.png',
+        width: 1200,
+        height: 630,
+        alt: 'Proof of Existence',
+      },
+    ],
     locale: 'en_US',
+    type: 'website',
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Proof of Existence | A Year-Long Collective Art Experiment',
     description:
-      'Join the movement. Leave your immutable trace on the blockchain. A year-long collective art project where every participant co-creates the final digital monument.',
+      'Join the movement. Leave your immutable trace on the blockchain. A collective art project where every participant co-creates the final digital monument.',
+    images: ['/og-v2.png'],
+    creator: '@Proofexist2006',
   },
 };
 
