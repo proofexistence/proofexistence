@@ -85,3 +85,8 @@ nul
 
 # Remotion (separate sub-project, not part of Next.js build)
 remotion/
+
+# Data dumps and one-off scripts
+*.csv
+*.log
+designs/
