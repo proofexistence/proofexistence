@@ -121,9 +121,10 @@ const nextConfig: NextConfig = {
             request: string;
           }
         ) {
+          const ctx = resource.context.replace(/\\/g, '/');
           if (
-            resource.context.includes('ox') ||
-            resource.context.includes('@noble/curves')
+            ctx.includes('node_modules/ox/') ||
+            ctx.includes('node_modules/ox\\')
           ) {
             resource.request = resource.request.replace(
               '@noble/hashes',
