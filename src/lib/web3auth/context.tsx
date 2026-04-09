@@ -144,13 +144,13 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         const web3authInstance = new Web3Auth({
           clientId: web3AuthConfig.clientId,
           web3AuthNetwork: web3AuthConfig.web3AuthNetwork,
-          // @ts-expect-error - chainConfig exists in IWeb3AuthCoreOptions but not in modal's Web3AuthOptions
+          // @ts-ignore -- chainConfig removed from types but still accepted at runtime
           chainConfig,
           // Use redirect mode on mobile to avoid popup blockers
           // Note: redirect mode still won't work for OAuth in in-app browsers (Google blocks it)
           uxMode: isMobile ? 'redirect' : 'popup',
           uiConfig: {
-            theme: 'dark', // Force dark mode for login modal
+            theme: { primary: '#7c3aed' }, // Purple brand color for login modal
           },
           // Note: walletServicesConfig removed to avoid 403 on Base plan
           // (walletServicesConfig triggers wallet services check)

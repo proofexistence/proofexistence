@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { AlertTriangle, Github, Book } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Book } from 'lucide-react';
 
 export function BetaBanner() {
   return (
@@ -33,7 +33,7 @@ export function BetaBanner() {
           target="_blank"
           className="flex items-center gap-1 hover:text-white transition-colors group"
         >
-          <Github className="w-3 h-3 group-hover:scale-110 transition-transform" />
+          <ExternalLink className="w-3 h-3 group-hover:scale-110 transition-transform" />
           <span className="underline decoration-purple-500/30 group-hover:decoration-purple-500/80">
             Report Bugs
           </span>
