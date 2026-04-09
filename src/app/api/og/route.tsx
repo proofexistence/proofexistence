@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 // Load CJK font subset from Google Fonts (only characters actually used)
 async function loadCJKFont(text: string): Promise<ArrayBuffer | null> {
