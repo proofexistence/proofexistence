@@ -111,9 +111,13 @@
     "bun": ">=1.0.0"
   },
   "overrides": {
-    "ethers": "^6.13.0"
+    "ethers": "^6.13.0",
+    "@noble/hashes": "^1.8.0",
+    "@noble/curves": "^1.9.0"
   },
   "resolutions": {
-    "ethers": "^6.13.0"
+    "ethers": "^6.13.0",
+    "@noble/hashes": "^1.8.0",
+    "@noble/curves": "^1.9.0"
   }
 }

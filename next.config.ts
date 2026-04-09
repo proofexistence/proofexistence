@@ -110,32 +110,6 @@ const nextConfig: NextConfig = {
       ...config.resolve.alias,
       '@react-native-async-storage/async-storage': false,
     };
-    // Ensure ox resolves its own nested @noble/hashes (v1.8 with ./sha2 export)
-    // without breaking older packages that need @noble/hashes v1.3
-    config.plugins.push(
-      new (require('webpack').NormalModuleReplacementPlugin)(
-        /^@noble\/hashes/,
-        function (
-          /** @type {{ context: string; request: string }} */ resource: {
-            context: string;
-            request: string;
-          }
-        ) {
-          const ctx = resource.context.replace(/\\/g, '/');
-          if (
-            ctx.includes('node_modules/ox/') ||
-            ctx.includes('node_modules/ox\\')
-          ) {
-            resource.request = resource.request.replace(
-              '@noble/hashes',
-              path.resolve(
-                'node_modules/ox/node_modules/@noble/hashes'
-              )
-            );
-          }
-        }
-      )
-    );
     return config;
   },
 };
