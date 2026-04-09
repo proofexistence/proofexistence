@@ -1,183 +1,197 @@
-# PRUEBA DE EXISTENCIA: LA ÉPICA MODERNA
+---
+title: 'Proof of Existence: La Épica Moderna'
+description: 'Proof of Existence (POE) registra permanentemente tu presencia digital como un rastro de luz en la blockchain de Polygon y Arweave. La Prueba Estándar es gratuita. La acuñación instantánea de NFT cuesta $2–$20. El token nativo Time26 (suministro: 48,420,000) recompensa el tiempo invertido, no el capital.'
+lastUpdated: 2026-04-09
+---
 
-## 1. La Filosofía: Por Qué Estamos Aquí
+# Proof of Existence: La Épica Moderna
 
-### Lo Olvidado y Lo Eterno
-
-En los anales de la historia, la inmortalidad fue un privilegio reservado para muy pocos. Reyes tallaron sus nombres en piedra; conquistadores se inscribieron en epopeyas; poetas fueron inmortalizados en tinta.
-
-Pero para el resto de nosotros—los miles de millones que vivieron, amaron y lucharon—la historia guarda silencio. Somos fantasmas.
-
-En la era digital, esta impermanencia se ha acelerado. Un servidor falla, una plataforma cierra, una suscripción expira—y nuestras huellas digitales se desvanecen en el vacío. Pasamos miles de horas en línea, creando, interactuando, viviendo, pero cuando se corta la energía, todo vuelve a cero.
-
-**Proof of Existence (POE)** es una rebelión contra este silencio.
-Es un movimiento del "Nomadismo Digital" a la "Permanencia Digital". Es un mecanismo criptográfico para asegurar que tu presencia, tu tiempo y tu energía no sean fantasmas efímeros, sino historia permanentemente inscrita.
-
-### La Épica Moderna
-
-Estamos construyendo la **Épica Moderna**.
-A diferencia de las epopeyas de antaño, escritas por uno para la gloria de uno, esta es una obra maestra colectiva escrita por millones.
-
-- **Tú eres el Héroe:** Cada uno de tus movimientos es un verso.
-- **La Blockchain es la Piedra:** Un libro mayor inmutable que no puede ser borrado.
-- **El Archivo es Eterno:** Almacenado en Arweave, la permaweb, para ser presenciado por arqueólogos digitales dentro de siglos.
+> POE captura tu movimiento en un lienzo 3D compartido y lo registra permanentemente en Polygon y Arweave. La Prueba Estándar es gratuita — nosotros cubrimos el gas y el almacenamiento. La Prueba Perpetua cuesta $2–$20 y acuña un NFT de inmediato. El token nativo Time26 (suministro total: 48,420,000) recompensa el tiempo dedicado a dibujar, distribuido a razón de un token por segundo del año.
 
 ---
 
-## 2. El Mecanismo: Cómo Funciona
+## 1. La Filosofía: Por Qué Construimos Esto
 
-Esto no es solo un proyecto de arte; es un protocolo para capturar "Prueba de Vida".
+### El Problema con la Memoria Digital
+
+La historia recuerda a los reyes. Recuerda a los conquistadores. El resto desaparece.
+
+No es un patrón nuevo, pero internet lo empeoró. Un servidor se cae. Una plataforma cierra. Una suscripción expira. Miles de horas de presencia online, desaparecidas en una tarde. Estuviste aquí. Creaste cosas. Pero cuando la infraestructura se detiene, el registro se reinicia a cero.
+
+**Proof of Existence (POE)** es nuestra respuesta a eso. No con retórica — con permanencia criptográfica. Tu presencia, tu tiempo, tu movimiento: registrado en un libro mayor inmutable, almacenado en Arweave, legible por cualquiera siglos después.
+
+No estamos seguros de que "rebelión" sea la palabra correcta para lo que estamos construyendo. Es más bien que nos cansamos de construir sobre infraestructura prestada. Así que construimos algo que no necesita pedir permiso para sobrevivir.
+
+### Un Registro Colectivo
+
+Las viejas epopeyas fueron escritas por una persona, para el legado de una persona. Esto no es eso.
+
+Cada participante escribe un verso. Juntos forman algo que ninguno de nosotros podría producir solo:
+
+- **Tú eres el autor.** Tu movimiento genera los datos.
+- **La blockchain es el registro.** Nada se sobrescribe.
+- **Arweave es el archivo.** Paga una vez, almacena por 200+ años.
+
+---
+
+## 2. Cómo Funciona
+
+POE captura "Prueba de Vida" — un registro permanente de tu interacción con un lienzo compartido.
 
 ### Paso 1: Conectar
 
-Conectas tu Soulbound Wallet. Esta es tu identificación digital, tu identificador único en este metaverso.
+Conecta tu billetera. Se convierte en tu identificador único en el lienzo. Soportamos inicio de sesión social (Google, X, Facebook, Apple, Line) y billeteras externas como MetaMask — no se requiere experiencia en cripto.
 
-### Paso 2: Entrar al Vacío
+### Paso 2: Entrar al Lienzo
 
-Entras en un espacio 3D infinito y oscuro—nuestro "Lienzo Global". Aquí, el tiempo es la única métrica.
+Entras en un espacio 3D oscuro e infinito: el Lienzo Global. Aquí la dimensión principal es el tiempo, no los píxeles.
 
-### Paso 3: Inscribir
+### Paso 3: Dibuja tu Rastro
 
-Cuando mueves tu cursor, no solo estás dibujando líneas.
+Mueve tu cursor. El sistema registra:
 
-- El sistema captura tus vectores de posición `(x, y, z)` y marcas de tiempo `(t)` con precisión de milisegundos.
-- Cada vacilación, cada ráfaga de velocidad, cada círculo refleja tu estado subconsciente en ese momento.
-- Estos puntos de datos se transforman en un "Rastro de Luz" único.
+- Vectores de posición `(x, y, z)` con marcas de tiempo en milisegundos `(t)`
+- Cada pausa, aceleración y giro
+- Comprimidos en un "Rastro de Luz" único — tus datos, tu forma
 
-### Paso 4: Acuñar e Inmortalizar
+Cada vacilación es parte del registro. Eso es intencional.
 
-Ofrecemos un mecanismo de acuñación de "Doble Vía" para acomodar tanto al público general como a los coleccionistas:
+### Paso 4: Elige tu Tipo de Prueba
 
-**1. Prueba Estándar —— [Gratis]**
-Ideal para participantes generales.
+**Prueba Estándar — Gratuita**
 
-- **Mecanismo:** Tus datos se almacenan temporalmente en nuestros servidores y se agrupan en un Árbol de Merkle para su envío diario on-chain a las 00:00 UTC.
-  - **Almacenamiento:** El lote completo de datos se sube a **Arweave/IPFS** mediante el protocolo, asegurando un respaldo descentralizado.
-- **Recompensa:** Ganas tokens **Time26** como "Prueba de Tiempo".
-- **Costo:** **0 Gas**. Cubrimos todos los gastos de Gas y almacenamiento.
+Tu rastro se almacena temporalmente en nuestros servidores, luego se agrupa con otros en un Árbol de Merkle y se envía a la cadena diariamente a las UTC 00:00. El protocolo cubre todos los costos de gas y almacenamiento en Arweave. También ganas tokens Time26 como prueba de participación.
 
-**2. Prueba Perpetua —— [Pago]**
-Ideal para nativos cripto y coleccionistas.
+**Prueba Perpetua — De Pago**
 
-- **Mecanismo:** Tu rastro se escribe inmediatamente en **Arweave** y es verificado por el contrato inteligente de **Polygon** en tiempo real.
-- **Beneficios:**
-  - Acuña instantáneamente tu **NFT** de Rastro personal.
-  - Gana la insignia de "Acuñador Instantáneo".
-  - Propiedad de datos totalmente descentralizada, independiente de servidores oficiales.
-- **Costo:** Se requiere una pequeña tarifa (ver "Pagar para Existir" abajo).
+Tu rastro se escribe en Arweave de inmediato y es verificado por el contrato inteligente de Polygon en tiempo real. Recibes un NFT, una insignia de "Acuñador Instantáneo" y propiedad totalmente descentralizada — independiente de nuestros servidores.
+
+Costo: $2–$20 según la duración de la sesión, o el equivalente en Time26 con un 20% de descuento.
 
 ---
 
 ## 3. Arquitectura Técnica
 
-Para cumplir la promesa de "Durar por Eras", elegimos la pila tecnológica descentralizada más robusta.
+Elegimos esta pila tecnológica porque la permanencia no es una función que se añade después. Tiene que ser fundamental.
 
-| Capa               | Tecnología                | Rol                                                                                                 |
-| :----------------- | :------------------------ | :-------------------------------------------------------------------------------------------------- |
-| **Interfaz**       | **Next.js 16 + Three.js** | Proporciona interacción 3D inmersiva usando WebGL para renderizado de alto rendimiento.             |
-| **Consenso**       | **Polygon (PoS)**         | Asegura confirmación rápida y bajos costos, actuando como el árbitro final de propiedad.            |
-| **Almacenamiento** | **Arweave**               | La "Permaweb". Una vez subidos, los datos se almacenan permanentemente, teóricamente por 200+ años. |
-| **Identidad**      | **Clerk**                 | Experiencia de inicio de sesión Web3 fluida, uniendo los mundos tradicional y descentralizado.      |
+| Capa               | Tecnología            | Rol                                                          |
+| :----------------- | :-------------------- | :----------------------------------------------------------- |
+| **Interfaz**       | Next.js 16 + Three.js | Renderizado 3D WebGL para el lienzo                          |
+| **Consenso**       | Polygon (PoS)         | Confirmación rápida, bajo costo, registro final de propiedad |
+| **Almacenamiento** | Arweave               | Almacenamiento permanente basado en dotación                 |
+| **Identidad**      | Web3Auth              | Inicio de sesión social + soporte de billeteras externas     |
 
 **¿Por qué Arweave?**
-El almacenamiento en la nube tradicional (AWS, Google Cloud) se basa en "alquiler"—dejas de pagar y los datos se borran. Arweave se basa en "dotación"—pagas una vez, almacenas para siempre. Es la única opción para construir un legado digital.
+
+AWS y Google Cloud son almacenamiento por suscripción. Dejas de pagar, los datos desaparecen. Arweave usa un modelo de dotación: un pago único financia el almacenamiento perpetuo a través de rendimientos de inversión sobre el capital. Para un proyecto sobre permanencia, no hay alternativa real. La compensación es el costo — Arweave no es barato por carga. Por eso lo absorbemos para los participantes de la Prueba Estándar.
 
 ---
 
-## 4. La Economía: El Tiempo como Moneda (Tokenomics)
+## 4. La Economía: El Tiempo como Moneda
 
-### Token Time (Time26)
+### Time26 ($TIME26)
 
-**Time26** es el token nativo del ecosistema, representando el "tiempo de atención" contribuido por la comunidad.
+Time26 es el token nativo de POE. Representa atención — el tiempo que realmente dedicaste a crear, no el capital que invertiste.
 
 - **Símbolo:** $TIME26
 - **Suministro Total:** 48,420,000
-  - _Concepto:_ 2026 tiene 31,536,000 segundos. Extendimos este "año" para tener en cuenta la energía colectiva de la comunidad y el equipo comprometida durante el inicio (aprox. 1.54 años de tiempo).
 
-### ¿Por qué 48,420,000? (La Matemática del Tiempo)
+### ¿Por qué 48,420,000?
 
-Este número se compone del "Año Base" más la "Extensión del Ecosistema":
+El número corresponde directamente al tiempo. Aquí está el desglose:
 
-**1. El Año Base**
+**Recompensas de Usuarios (65%) — 31,536,000 tokens**
 
-- **31,536,000 (65%)** = **Recompensas de Usuarios**
-  - Iguala cada segundo de 2026 (365 Días). Esto es puramente para los creadores.
+Un token por segundo de 2026. 365 días × 86,400 segundos = 31,536,000. Cada segundo del año tiene un token correspondiente. Este suministro está reservado exclusivamente para los creadores.
 
-**2. La Extensión del Ecosistema**
-El "tiempo extra" agregado para apoyar la infraestructura del proyecto (Total 16,884,000):
+**Ecosistema (35%) — 16,884,000 tokens**
 
-- **10,000,000 (21%)** = **Fondo de Liquidez**
-  - Para Uniswap y mercados, asegurando que Time26 pueda ser comercializado.
-- **4,730,400 (10%)** = **Equipo**
-  - Incentivos para constructores y mantenimiento a largo plazo.
-- **2,153,600 (4%)** = **Reserva de Operaciones**
-  - Costos de servidor, recompensas de eventos y fondos de emergencia.
+- 10,000,000 (21%) — Fondo de Liquidez (Uniswap y mercados)
+- 4,730,400 (10%) — Equipo (incentivos a largo plazo)
+- 2,153,600 (4%) — Reserva de Operaciones (infraestructura, eventos, emergencias)
 
-**Total:** 31.5M (Usuarios) + 16.9M (Ecosistema) = **48,420,000**
+Total: 31.5M + 16.9M = **48,420,000**
 
-### ¿Cómo Ganar Time26? (Minería)
+### Cómo se Gana (Minería de Existencia)
 
-Puedes ganar tokens gratis a través de la **"Minería de Existencia"**.
-Tus ganancias dependen del tiempo que inviertas y la congestión del sector en el que te encuentres.
+Los participantes de la Prueba Estándar ganan Time26 mediante la Minería de Existencia:
 
-**Fórmula de Escasez:**
-`Recompensa de Usuario = Σ (1 Time26 / Número de personas en ese sector en ese segundo)`
+```
+Recompensa = Σ (1 TIME26 / número de personas en ese sector en ese segundo)
+```
 
-- Si dibujas en un área concurrida tipo "Times Square", ganas muy poco Time26.
-- Si dibujas en un desierto desolado, ganas el valor total de ese tiempo.
-- Esto incentiva la distribución uniforme de rastros de luz a través del lienzo.
+Dibuja en un sector concurrido: ganas una fracción. Dibuja en un área vacía: ganas el segundo completo. Esto distribuye la actividad por el lienzo sin forzar a nadie.
 
-### El Costo de la Eternidad
+### Precios (Prueba Perpetua)
 
-Elegir "Prueba Perpetua" requiere una tarifa para cubrir los costos reales de almacenamiento permanente en Arweave y verificación en Polygon. Esto es un **"Depósito de Tiempo"** para el futuro.
+| Duración            | USDC   | Time26 (20% descuento) |
+| :------------------ | :----- | :--------------------- |
+| Menos de 10 minutos | $2.00  | ~160 $TIME26           |
+| 10–30 minutos       | $5.00  | ~400 $TIME26           |
+| 30–60 minutos       | $10.00 | ~800 $TIME26           |
+| 1 hora+             | $20.00 | ~1,600 $TIME26         |
 
-Hemos establecido un nivel de precios basado en la duración:
-
-| Duración de Interacción | Precio USDC | Pago en Time26 (20% Descuento) |
-| :---------------------- | :---------- | :----------------------------- |
-| **< 10 Minutos**        | $2.00       | ~160 $TIME26                   |
-| **10 - 30 Minutos**     | $5.00       | ~400 $TIME26                   |
-| **30 - 60 Minutos**     | $10.00      | ~800 $TIME26                   |
-| **1 Hora +**            | $20.00      | ~1,600 $TIME26                 |
-
-_Nota: Los precios de Time26 se ajustan en tiempo real vía oráculo para mantener un descuento de aprox. 20%._
+Los precios de Time26 se ajustan mediante oráculo para mantener el 20% de descuento respecto al USD.
 
 ### La Válvula de Sostenibilidad
 
-Rechazamos los ciclos de "Pump and Dump" de las cripto tradicionales. Construimos una **Válvula Dinámica** en el corazón del protocolo.
+Los ingresos del protocolo provenientes de las tarifas de la Prueba Perpetua fluyen a través de un mecanismo dinámico:
 
-1.  **Modo Deflación (Fase A):**
-    - _Cuándo:_ Etapa temprana o suministro estable.
-    - _Mecanismo:_ 100% de los Ingresos del Protocolo (ej., las tarifas de $2-$20 mencionadas arriba) se usan para recomprar y **QUEMAR** $TIME26 del mercado abierto.
-    - _Resultado:_ La escasez aumenta. Tu "tiempo mantenido" se vuelve más valioso.
+**Fase A — Deflación**
 
-2.  **Modo Sostenibilidad (Fase B):**
-    - _Cuándo:_ El suministro cae demasiado bajo (<30M) o el precio sube insosteniblemente.
-    - _Mecanismo:_ 20% Quema / 80% Tesorería.
-    - _Resultado:_ La Tesorería gana fondos suficientes para prepararse para las **Exhibiciones Globales de 2027**, asegurando que el proyecto sobreviva más allá del ciclo de hype.
+Cuándo: etapa temprana, o suministro estable por encima de 30M tokens.
+
+El 100% de los ingresos se usa para recomprar y quemar $TIME26 del mercado abierto. El suministro disminuye. Los tokens retenidos ganan valor de escasez.
+
+**Fase B — Sostenibilidad**
+
+Cuándo: el suministro cae por debajo de 30M, o el precio se vuelve insostenible.
+
+20% quema, 80% a la Tesorería. La Tesorería financia operaciones después de 2026, incluyendo la fase de exhibición de 2027.
+
+Esto no es un diseño de mecanismo novedoso — es una respuesta práctica a la pregunta que todo proyecto cripto evita: ¿qué pasa después del hype? Preferimos responderla de antemano.
 
 ---
 
 ## 5. El Futuro: 2027 y Más Allá
 
-El proyecto no termina cuando termina 2026. Eso es simplemente la pausa después del primer movimiento.
-
 ### 2026: La Fase de Grabación
 
-- **Q1-Q2:** Lanzamiento del protocolo, dibujo de bloques Génesis.
-- **Q3-Q4:** Comienzan los eventos de "Campo de Gravedad", co-creación comunitaria de lienzos temáticos masivos.
+- **Q1–Q2:** Lanzamiento del protocolo. Primeros rastros dibujados. Bloques génesis establecidos.
+- **Q3–Q4:** Eventos "Campo de Gravedad" — co-creación comunitaria de grandes lienzos temáticos.
 
 ### 2027: La Fase de Exhibición
 
-El **1 de enero de 2027**, el lienzo será sellado.
+El lienzo se cierra el 1 de enero de 2027.
 
-- **Gira Global:** Tus rastros serán proyectados en galerías inmersivas en Nueva York, Tokio y Londres. Esta será la "Exhibición de Arte Generativo Descentralizado" más grande de la historia.
-- **Tótems Físicos:** Todo poseedor de una prueba será elegible para acuñar una "Cápsula del Tiempo" física, conteniendo una proyección holográfica de su rastro.
+Los rastros se mostrarán en exposiciones inmersivas en Nueva York, Tokio y Londres — la primera muestra de arte generativo descentralizado a esta escala. Cada poseedor de prueba podrá acuñar una Cápsula del Tiempo física con la proyección holográfica de su rastro.
 
-### 2028+: El Archivo Eterno
+Aún no sabemos exactamente cómo se verán. Esa incertidumbre es parte del concepto.
 
-Todos los datos permanecen en Arweave, convirtiéndose en el registro más grande de arte conductual en la historia humana.
-Futuras IAs e historiadores interpretarán las ansiedades, esperanzas y conciencia colectiva de nuestra era a través de estos rastros.
+### 2028+: El Archivo Permanente
 
-Únete a nosotros. Escribe tu verso en la Épica Moderna.
-**Prueba que exististe.**
+Todos los datos permanecen en Arweave. Futuros investigadores — humanos o IA — encontrarán en estos rastros un registro del comportamiento de 2026: qué hizo la gente, adónde fue, cuánto tiempo se quedó, qué formas dejó atrás.
+
+---
+
+## Preguntas Frecuentes
+
+**¿Cuánto cuesta participar?**
+
+La Prueba Estándar es gratuita. Cubrimos todos los costos de gas y almacenamiento en Arweave. La Prueba Perpetua (NFT inmediato) cuesta $2–$20 según la duración de la sesión.
+
+**¿Qué pasa con mis datos si POE cierra?**
+
+Los datos de la Prueba Estándar se cargan en lotes a Arweave diariamente por el protocolo. Los datos de la Prueba Perpetua se escriben en Arweave de inmediato al momento de acuñar. En ambos casos, los datos existen en Arweave independientemente de los servidores de POE.
+
+**¿Para qué se usa Time26?**
+
+Para pagar la Prueba Perpetua con un 20% de descuento vs. USD, y como registro de participación. El token está diseñado para reflejar el tiempo contribuido, no una posición especulativa.
+
+**¿Cuándo se cierra el lienzo?**
+
+El 1 de enero de 2027. Todo lo dibujado antes de esa fecha forma parte del registro permanente.
+
+**¿Necesito una billetera cripto o experiencia previa?**
+
+No. Web3Auth soporta inicio de sesión con Google, X, Facebook, Apple y Line — la billetera se crea automáticamente. Las billeteras externas (MetaMask, etc.) también funcionan si prefieres la autocustodia total.

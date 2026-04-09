@@ -1,183 +1,197 @@
-# PREUVE D'EXISTENCE : L'ÉPOPÉE MODERNE
+---
+title: "Proof of Existence : L'Épopée Moderne"
+description: 'Proof of Existence (POE) enregistre de manière permanente votre présence numérique sous forme de traînée lumineuse sur la blockchain Polygon et Arweave. La Preuve Standard est gratuite. Le mint instantané de NFT coûte 2 à 20 $. Le jeton natif Time26 (offre : 48 420 000) récompense le temps passé, pas le capital investi.'
+lastUpdated: 2026-04-09
+---
 
-## 1. La Philosophie : Pourquoi Sommes-Nous Ici
+# Proof of Existence : L'Épopée Moderne
 
-### L'Oublié et l'Éternel
-
-Dans les annales de l'histoire, l'immortalité était un privilège réservé à une infime minorité. Les rois gravaient leurs noms dans la pierre ; les conquérants s'inscrivaient dans des épopées ; les poètes étaient immortalisés à l'encre.
-
-Mais pour le reste d'entre nous — les milliards qui ont vécu, aimé et lutté — l'histoire est silencieuse. Nous sommes des fantômes.
-
-À l'ère numérique, cette impermanence s'est accélérée. Un serveur tombe en panne, une plateforme ferme, un abonnement expire — et nos empreintes numériques s'évanouissent dans le néant. Nous passons des milliers d'heures en ligne, à créer, à interagir, à vivre, mais quand le courant est coupé, tout revient à zéro.
-
-**Proof of Existence (POE)** est une rébellion contre ce silence.
-C'est un mouvement du "Nomadisme Numérique" vers la "Permanence Numérique". C'est un mécanisme cryptographique pour garantir que votre présence, votre temps et votre énergie ne sont pas des fantômes éphémères, mais une histoire inscrite de manière permanente.
-
-### L'Épopée Moderne
-
-Nous construisons **l'Épopée Moderne**.
-Contrairement aux épopées d'antan, écrites par un seul pour la gloire d'un seul, ceci est un chef-d'œuvre collectif écrit par des millions.
-
-- **Vous êtes le Héros :** Chacun de vos mouvements est un vers.
-- **La Blockchain est la Pierre :** Un grand livre immuable qui ne peut être effacé.
-- **L'Archive est Éternelle :** Stockée sur Arweave, le permaweb, pour être témoignée par des archéologues numériques dans des siècles.
+> POE capture vos mouvements sur un canevas 3D partagé et les enregistre de manière permanente sur Polygon et Arweave. La Preuve Standard est gratuite — nous prenons en charge le gas et le stockage. La Preuve Perpétuelle coûte 2 à 20 $ et mint un NFT immédiatement. Le jeton natif Time26 (offre totale : 48 420 000) récompense le temps passé à dessiner, distribué à raison d'un jeton par seconde de l'année.
 
 ---
 
-## 2. Le Mécanisme : Comment Ça Marche
+## 1. La Philosophie : Pourquoi Nous Avons Construit Ceci
 
-Ce n'est pas seulement un projet artistique ; c'est un protocole pour capturer la "Preuve de Vie".
+### Le Problème de la Mémoire Numérique
 
-### Étape 1 : Connexion
+L'histoire se souvient des rois. Des conquérants. Tous les autres disparaissent.
 
-Vous connectez votre Soulbound Wallet. C'est votre identité numérique, votre identifiant unique dans ce métavers.
+Ce n'est pas un schéma nouveau, mais Internet l'a aggravé. Un serveur tombe. Une plateforme ferme. Un abonnement expire. Des milliers d'heures de présence en ligne, disparues en un après-midi. Vous étiez là. Vous avez créé des choses. Mais quand l'infrastructure s'arrête, tout est remis à zéro.
 
-### Étape 2 : Entrer dans le Vide
+**Proof of Existence (POE)** est notre réponse. Pas par la rhétorique — par la permanence cryptographique. Votre présence, votre temps, votre mouvement : enregistrés sur un registre immuable, stockés sur Arweave, lisibles par n'importe qui dans des siècles.
 
-Vous entrez dans un espace 3D infini et sombre — notre "Toile Globale". Ici, le temps est la seule métrique.
+Nous ne sommes pas sûrs que « rébellion » soit le bon mot pour ce que nous construisons. C'est plutôt que nous en avions assez de construire sur des infrastructures empruntées. Alors nous avons construit quelque chose qui n'a pas besoin de demander la permission pour survivre.
 
-### Étape 3 : Inscrire
+### Un Registre Collectif
 
-Lorsque vous déplacez votre curseur, vous ne faites pas que tracer des lignes.
+Les anciennes épopées étaient écrites par une personne, pour la gloire d'une personne. Ce n'est pas ça.
 
-- Le système capture vos vecteurs de position `(x, y, z)` et vos horodatages `(t)` avec une précision à la milliseconde.
-- Chaque hésitation, chaque accélération, chaque cercle reflète votre état subconscient à ce moment-là.
-- Ces points de données sont transformés en une "Traînée de Lumière" unique.
+Chaque participant écrit un vers. Ensemble, ils forment quelque chose qu'aucun d'entre nous ne pourrait produire seul :
 
-### Étape 4 : Mint & Immortaliser
+- **Vous êtes l'auteur.** Votre mouvement génère les données.
+- **La blockchain est le registre.** Rien n'est écrasé.
+- **Arweave est l'archive.** Payez une fois, stockez pendant 200 ans et plus.
 
-Nous proposons un mécanisme de mint "Double Voie" pour accueillir à la fois le grand public et les collectionneurs :
+---
 
-**1. Preuve Standard —— [Gratuit]**
-Idéal pour les participants généraux.
+## 2. Comment Ça Fonctionne
 
-- **Mécanisme :** Vos données sont temporairement stockées sur nos serveurs et regroupées dans un Arbre de Merkle pour une soumission quotidienne on-chain à 00:00 UTC.
-  - **Stockage :** Le lot complet de données est téléchargé sur **Arweave/IPFS** par le protocole, assurant une sauvegarde décentralisée.
-- **Récompense :** Vous gagnez des jetons **Time26** comme "Preuve de Temps".
-- **Coût :** **0 Gas**. Nous couvrons tous les frais de Gas et de stockage.
+POE capture la « Preuve de Vie » — un enregistrement permanent de votre interaction avec un canevas partagé.
 
-**2. Preuve Perpétuelle —— [Payant]**
-Idéal pour les natifs de la crypto et les collectionneurs.
+### Étape 1 : Se Connecter
 
-- **Mécanisme :** Votre traînée est immédiatement écrite sur **Arweave** et vérifiée par le contrat intelligent **Polygon** en temps réel.
-- **Avantages :**
-  - Mintez instantanément votre **NFT** de Traînée personnel.
-  - Gagnez le badge "Minteur Instantané".
-  - Propriété des données entièrement décentralisée, indépendante des serveurs officiels.
-- **Coût :** Une somme modique est requise (voir "Payer pour Exister" ci-dessous).
+Connectez votre portefeuille. Il devient votre identifiant unique sur le canevas. Nous prenons en charge la connexion sociale (Google, X, Facebook, Apple, Line) et les portefeuilles externes comme MetaMask — aucune expérience crypto requise.
+
+### Étape 2 : Entrer dans le Canevas
+
+Vous entrez dans un espace 3D infini et sombre : le Canevas Global. Ici, la dimension principale est le temps, pas les pixels.
+
+### Étape 3 : Dessiner Votre Traînée
+
+Déplacez votre curseur. Le système enregistre :
+
+- Les vecteurs de position `(x, y, z)` avec des horodatages en millisecondes `(t)`
+- Chaque pause, accélération et virage
+- Le tout compressé en une « Traînée de Lumière » unique — vos données, votre forme
+
+Chaque hésitation fait partie de l'enregistrement. C'est intentionnel.
+
+### Étape 4 : Choisissez Votre Type de Preuve
+
+**Preuve Standard — Gratuite**
+
+Votre traînée est temporairement stockée sur nos serveurs, puis regroupée avec d'autres dans un Arbre de Merkle et soumise on-chain chaque jour à UTC 00:00. Le protocole couvre tous les frais de gas et de stockage Arweave. Vous gagnez également des jetons Time26 comme preuve de participation.
+
+**Preuve Perpétuelle — Payante**
+
+Votre traînée est écrite sur Arweave immédiatement et vérifiée par le contrat intelligent Polygon en temps réel. Vous recevez un NFT, un badge « Minteur Instantané » et une propriété entièrement décentralisée — indépendante de nos serveurs.
+
+Coût : 2 à 20 $ selon la durée de la session, ou l'équivalent en Time26 avec 20 % de réduction.
 
 ---
 
 ## 3. Architecture Technique
 
-Pour tenir la promesse de "Durer des Siècles", nous avons choisi la pile technologique décentralisée la plus robuste.
+Nous avons choisi cette pile technique parce que la permanence n'est pas une fonctionnalité qu'on ajoute après coup. Elle doit être fondamentale.
 
-| Couche        | Technologie               | Rôle                                                                                                              |
-| :------------ | :------------------------ | :---------------------------------------------------------------------------------------------------------------- |
-| **Interface** | **Next.js 16 + Three.js** | Fournit une interaction 3D immersive utilisant WebGL pour un rendu haute performance.                             |
-| **Consensus** | **Polygon (PoS)**         | Assure une confirmation rapide et des coûts faibles, agissant comme l'arbitre final de la propriété.              |
-| **Stockage**  | **Arweave**               | Le "Permaweb". Une fois téléchargées, les données sont stockées de façon permanente, théoriquement pour 200+ ans. |
-| **Identité**  | **Clerk**                 | Expérience de connexion Web3 fluide, faisant le pont entre les mondes traditionnel et décentralisé.               |
+| Couche        | Technologie           | Rôle                                                          |
+| :------------ | :-------------------- | :------------------------------------------------------------ |
+| **Interface** | Next.js 16 + Three.js | Rendu 3D WebGL pour le canevas                                |
+| **Consensus** | Polygon (PoS)         | Confirmation rapide, faible coût, registre final de propriété |
+| **Stockage**  | Arweave               | Stockage permanent basé sur la dotation                       |
+| **Identité**  | Web3Auth              | Connexion sociale + support portefeuilles externes            |
 
 **Pourquoi Arweave ?**
-Le stockage en nuage traditionnel (AWS, Google Cloud) est basé sur la "location" — arrêtez de payer, et les données sont supprimées. Arweave est basé sur la "dotation" — payez une fois, stockez pour toujours. C'est le seul choix pour construire un héritage numérique.
+
+AWS et Google Cloud sont du stockage par abonnement. Arrêtez de payer, les données disparaissent. Arweave utilise un modèle de dotation : un paiement unique finance le stockage perpétuel grâce aux rendements d'investissement sur le capital. Pour un projet sur la permanence, il n'y a pas d'alternative réelle. La contrepartie est le coût — Arweave n'est pas bon marché par upload. C'est pourquoi nous l'absorbons pour les participants de la Preuve Standard.
 
 ---
 
-## 4. L'Économie : Le Temps comme Monnaie (Tokenomics)
+## 4. L'Économie : Le Temps comme Monnaie
 
-### Jeton Time (Time26)
+### Time26 ($TIME26)
 
-**Time26** est le jeton natif de l'écosystème, représentant le "temps d'attention" contribué par la communauté.
+Time26 est le jeton natif de POE. Il représente l'attention — le temps que vous avez réellement passé à créer, pas le capital que vous avez investi.
 
 - **Symbole :** $TIME26
 - **Offre Totale :** 48 420 000
-  - _Concept :_ 2026 compte 31 536 000 secondes. Nous avons étendu cette "année" pour tenir compte de l'énergie collective de la communauté et de l'équipe engagée pendant la phase initiale (env. 1,54 an de temps).
 
-### Pourquoi 48 420 000 ? (Les Maths du Temps)
+### Pourquoi 48 420 000 ?
 
-Ce nombre est composé de l'"Année de Base" plus l'"Extension de l'Écosystème" :
+Le nombre correspond directement au temps. Voici la décomposition :
 
-**1. L'Année de Base**
+**Récompenses Utilisateurs (65 %) — 31 536 000 jetons**
 
-- **31 536 000 (65%)** = **Récompenses Utilisateurs**
-  - Correspond à chaque seconde de 2026 (365 Jours). Ceci est purement pour les créateurs.
+Un jeton par seconde de 2026. 365 jours × 86 400 secondes = 31 536 000. Chaque seconde de l'année a un jeton correspondant. Cette offre est entièrement réservée aux créateurs.
 
-**2. L'Extension de l'Écosystème**
-Le "temps supplémentaire" ajouté pour soutenir l'infrastructure du projet (Total 16 884 000) :
+**Écosystème (35 %) — 16 884 000 jetons**
 
-- **10 000 000 (21%)** = **Pool de Liquidité**
-  - Pour Uniswap et les marchés, assurant que le Time26 puisse être échangé.
-- **4 730 400 (10%)** = **Équipe**
-  - Incitations pour les bâtisseurs et maintenance à long terme.
-- **2 153 600 (4%)** = **Réserve d'Opérations**
-  - Coûts des serveurs, récompenses d'événements et fonds d'urgence.
+- 10 000 000 (21 %) — Pool de Liquidité (Uniswap et marchés)
+- 4 730 400 (10 %) — Équipe (incitations à long terme)
+- 2 153 600 (4 %) — Réserve d'Opérations (infrastructure, événements, urgences)
 
-**Total :** 31,5M (Utilisateurs) + 16,9M (Écosystème) = **48 420 000**
+Total : 31,5M + 16,9M = **48 420 000**
 
-### Comment Gagner du Time26 ? (Minage)
+### Comment Gagner (Minage d'Existence)
 
-Vous pouvez gagner des jetons gratuitement via le **"Minage d'Existence"**.
-Vos gains dépendent du temps que vous investissez et de la congestion du secteur dans lequel vous vous trouvez.
+Les participants de la Preuve Standard gagnent du Time26 via le Minage d'Existence :
 
-**Formule de Rareté :**
-`Récompense Utilisateur = Σ (1 Time26 / Nombre de personnes dans ce secteur à cette seconde)`
+```
+Récompense = Σ (1 TIME26 / nombre de personnes dans ce secteur à cette seconde)
+```
 
-- Si vous dessinez dans une zone bondée type "Times Square", vous gagnez très peu de Time26.
-- Si vous dessinez dans un désert désolé, vous gagnez la valeur totale de ce temps.
-- Cela incite à une distribution uniforme des traînées de lumière à travers la toile.
+Dessiner dans un secteur bondé : vous gagnez une fraction de la valeur de cette seconde. Dessiner dans une zone vide : vous gagnez la seconde entière. Cela distribue l'activité à travers le canevas sans forcer quiconque.
 
-### Le Coût de l'Éternité
+### Tarification (Preuve Perpétuelle)
 
-Choisir la "Preuve Perpétuelle" nécessite des frais pour couvrir les coûts réels de stockage permanent sur Arweave et de vérification sur Polygon. C'est un **"Dépôt de Temps"** pour l'avenir.
+| Durée de Session    | USDC    | Time26 (20 % de réduction) |
+| :------------------ | :------ | :------------------------- |
+| Moins de 10 minutes | 2,00 $  | ~160 $TIME26               |
+| 10–30 minutes       | 5,00 $  | ~400 $TIME26               |
+| 30–60 minutes       | 10,00 $ | ~800 $TIME26               |
+| 1 heure et plus     | 20,00 $ | ~1 600 $TIME26             |
 
-Nous avons établi une tarification basée sur la durée :
-
-| Durée d'Interaction | Prix USDC | Paiement Time26 (20% de Réduction) |
-| :------------------ | :-------- | :--------------------------------- |
-| **< 10 Minutes**    | $2.00     | ~160 $TIME26                       |
-| **10 - 30 Minutes** | $5.00     | ~400 $TIME26                       |
-| **30 - 60 Minutes** | $10.00    | ~800 $TIME26                       |
-| **1 Heure +**       | $20.00    | ~1 600 $TIME26                     |
-
-_Note : Les prix du Time26 sont ajustés en temps réel via oracle pour maintenir une réduction d'env. 20%._
+Les prix du Time26 s'ajustent via oracle pour maintenir la réduction de 20 % par rapport à l'USD.
 
 ### La Valve de Durabilité
 
-Nous rejetons les cycles de "Pump and Dump" de la crypto traditionnelle. Nous avons construit une **Valve Dynamique** au cœur du protocole.
+Les revenus du protocole provenant des frais de la Preuve Perpétuelle passent par un mécanisme dynamique :
 
-1.  **Mode Déflation (Phase A) :**
-    - _Quand :_ Stade précoce ou offre stable.
-    - _Mécanisme :_ 100% des Revenus du Protocole (ex : les frais de $2-$20 mentionnés ci-dessus) sont utilisés pour racheter et **BRÛLER** du $TIME26 sur le marché libre.
-    - _Résultat :_ La rareté augmente. Votre "temps détenu" devient plus précieux.
+**Phase A — Déflation**
 
-2.  **Mode Durabilité (Phase B) :**
-    - _Quand :_ L'offre chute trop bas (<30M) ou le prix grimpe de manière insoutenable.
-    - _Mécanisme :_ 20% Brûlage / 80% Trésorerie.
-    - _Résultat :_ La Trésorerie gagne suffisamment de fonds pour se préparer aux **Expositions Mondiales de 2027**, assurant que le projet survive au-delà du cycle de hype.
+Quand : phase initiale, ou offre stable au-dessus de 30M de jetons.
+
+100 % des revenus servent à racheter et brûler du $TIME26 sur le marché ouvert. L'offre diminue. Les jetons détenus gagnent en valeur de rareté.
+
+**Phase B — Durabilité**
+
+Quand : l'offre passe sous les 30M, ou le prix devient insoutenable.
+
+20 % brûlés, 80 % vers la Trésorerie. La Trésorerie finance les opérations après 2026, y compris la phase d'exposition de 2027.
+
+Ce n'est pas un design de mécanisme révolutionnaire. C'est une réponse pratique à la question que chaque projet crypto évite : que se passe-t-il après le hype ? Nous préférons y répondre maintenant.
 
 ---
 
 ## 5. Le Futur : 2027 et Au-delà
 
-Le projet ne se termine pas quand 2026 se termine. Ce n'est que la pause après le premier mouvement.
-
 ### 2026 : La Phase d'Enregistrement
 
-- **Q1-Q2 :** Lancement du protocole, dessin des blocs Genesis.
-- **Q3-Q4 :** Début des événements "Champ de Gravité", co-création communautaire de toiles thématiques massives.
+- **Q1–Q2 :** Lancement du protocole. Premiers traits dessinés. Blocs genèse établis.
+- **Q3–Q4 :** Événements « Champ de Gravité » — co-création communautaire de grands canevas thématiques.
 
 ### 2027 : La Phase d'Exposition
 
-Le **1er Janvier 2027**, la toile sera scellée.
+Le canevas se ferme le 1er janvier 2027.
 
-- **Tournée Mondiale :** Vos traînées seront projetées dans des galeries immersives à New York, Tokyo et Londres. Ce sera la plus grande "Exposition d'Art Génératif Décentralisé" de l'histoire.
-- **Totems Physiques :** Tout détenteur de preuve sera éligible pour minter une "Capsule Temporelle" physique, contenant une projection holographique de sa traînée.
+Les traînées seront présentées dans des expositions immersives à New York, Tokyo et Londres — la première exposition d'art génératif décentralisé à cette échelle. Chaque détenteur de preuve pourra minter une Capsule Temporelle physique contenant une projection holographique de sa traînée.
 
-### 2028+ : L'Archive Éternelle
+Nous ne savons pas encore exactement à quoi cela ressemblera. Cette incertitude fait partie du concept.
 
-Toutes les données restent sur Arweave, devenant le plus grand enregistrement d'art comportemental de l'histoire humaine.
-Les futures IA et historiens interpréteront les anxiétés, les espoirs et la conscience collective de notre ère à travers ces traînées.
+### 2028 et au-delà : L'Archive Permanente
 
-Rejoignez-nous. Écrivez votre vers dans l'Épopée Moderne.
-**Prouvez que vous avez existé.**
+Toutes les données restent sur Arweave. Les futurs chercheurs — humains ou IA — trouveront dans ces traînées un enregistrement comportemental de 2026 : ce que les gens ont créé, où ils sont allés, combien de temps ils sont restés, quelles formes ils ont laissées.
+
+---
+
+## FAQ
+
+**Combien ça coûte de participer ?**
+
+La Preuve Standard est gratuite. Nous couvrons tous les frais de gas et de stockage Arweave. La Preuve Perpétuelle (NFT immédiat) coûte de 2 à 20 $ selon la durée de la session.
+
+**Qu'advient-il de mes données si POE ferme ?**
+
+Les données de la Preuve Standard sont téléchargées en lot sur Arweave quotidiennement par le protocole. Les données de la Preuve Perpétuelle sont écrites sur Arweave immédiatement lors du mint. Dans les deux cas, les données existent sur Arweave indépendamment des serveurs de POE.
+
+**À quoi sert le Time26 ?**
+
+À payer la Preuve Perpétuelle avec une réduction de 20 % par rapport à l'USD, et comme preuve de participation. Le jeton est conçu pour refléter le temps contribué, pas une position spéculative.
+
+**Quand le canevas ferme-t-il ?**
+
+Le 1er janvier 2027. Tout ce qui a été dessiné avant cette date fait partie de l'enregistrement permanent.
+
+**Ai-je besoin d'un portefeuille crypto ou d'une expérience préalable ?**
+
+Non. Web3Auth prend en charge la connexion via Google, X, Facebook, Apple et Line — un portefeuille est créé automatiquement. Les portefeuilles externes (MetaMask, etc.) fonctionnent également si vous préférez l'auto-garde complète.

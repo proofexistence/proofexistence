@@ -13,21 +13,24 @@ interface WhitepaperPageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: WhitepaperPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.whitepaper' });
+
   return {
-    title: 'Whitepaper | Proof of Existence',
-    description:
-      'Read the full protocol specification and artistic vision behind Proof of Existence. A year-long collective art experiment on the blockchain.',
+    title: t('title'),
+    description: t('description'),
     openGraph: {
-      title: 'Whitepaper | Proof of Existence',
-      description:
-        'Read the full protocol specification and artistic vision behind Proof of Existence. A year-long collective art experiment on the blockchain.',
+      title: t('title'),
+      description: t('description'),
       images: [
         {
           url: '/og-v2.png',
           width: 1200,
           height: 630,
-          alt: 'Proof of Existence Whitepaper',
+          alt: `Whitepaper - ${t('title')}`,
         },
       ],
     },
@@ -55,7 +58,18 @@ export default async function WhitepaperPage({ params }: WhitepaperPageProps) {
         </div>
 
         <article className="prose prose-invert prose-zinc prose-headings:font-light prose-headings:tracking-tight prose-p:text-zinc-400 prose-a:text-purple-400 hover:prose-a:text-purple-300 prose-strong:text-white prose-li:text-zinc-400 max-w-none">
-          <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
+          <Markdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              blockquote: ({ children }) => (
+                <div className="not-prose my-6 rounded-lg border border-purple-500/30 bg-purple-500/10 px-5 py-4 text-sm text-zinc-300 leading-relaxed">
+                  {children}
+                </div>
+              ),
+            }}
+          >
+            {content}
+          </Markdown>
         </article>
 
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col items-center">

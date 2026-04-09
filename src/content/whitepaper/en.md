@@ -1,183 +1,201 @@
-# PROOF OF EXISTENCE: THE MODERN EPIC
+---
+title: 'Proof of Existence: The Modern Epic'
+description: 'Proof of Existence (POE) permanently records your digital presence as a light trail on Polygon blockchain and Arweave. Free daily batch proofs require zero gas. Instant NFT minting costs $2–$20. The native token Time26 (supply: 48,420,000) rewards time spent — not capital invested.'
+lastUpdated: 2026-04-09
+---
 
-## 1. The Philosophy: Why We Are Here
+# Proof of Existence: The Modern Epic
 
-### The Forgotten and The Eternal
-
-In the annals of history, immortality was a privilege reserved for the very few. Kings carved their names into stone; conquerors wrote themselves into epics; poets were immortalized in ink.
-
-But for the rest of us—the billions who lived, loved, and struggled—history is silent. We are ghosts.
-
-In the digital age, this impermanence has accelerated. A server crashes, a platform shuts down, a subscription expires—and our digital footprints vanish into the void. We spend thousands of hours online, creating, interacting, living, but when the power is cut, it all returns to zero.
-
-**Proof of Existence (POE)** is a rebellion against this silence.
-It is a movement from "Digital Nomadism" to "Digital Permanence." It is a cryptographic mechanism to ensure that your presence, your time, and your energy are not ephemeral ghosts, but permanently inscribed history.
-
-### The Modern Epic
-
-We are building the **Modern Epic**.
-Unlike the epics of old, written by one for the glory of one, this is a collective masterpiece written by millions.
-
-- **You are the Hero:** Your every movement is a verse.
-- **The Blockchain is the Stone:** An immutable ledger that cannot be erased.
-- **The Archive is Eternal:** Stored on Arweave, the permaweb, to be witnessed by digital archaeologists centuries from now.
+> POE captures your movement on a shared 3D canvas and records it permanently on Polygon and Arweave. Standard Proof is free — we cover gas and storage. Perpetual Proof costs $2–$20 and mints an NFT immediately. The native token Time26 (total supply: 48,420,000) rewards time spent drawing, distributed at one token per second of the year.
 
 ---
 
-## 2. The Mechanism: How It Works
+## 1. The Philosophy: Why We Built This
 
-This is not just an art project; it is a protocol for capturing "Proof of Life."
+### The Problem with Digital Memory
+
+History remembers kings. It remembers conquerors. Everyone else disappears.
+
+That's not a new pattern — but the internet made it worse. A server goes down. A platform shuts off. A subscription lapses. Thousands of hours of online presence, gone in an afternoon. You were here. You made things. But when the infrastructure stops, the record resets to zero.
+
+**Proof of Existence (POE)** is our answer to that. Not through rhetoric — through cryptographic permanence. Your presence, your time, your movement: recorded on an immutable ledger, stored on Arweave, readable by anyone centuries from now.
+
+We're not sure "rebellion" is the right word for what we're building. It's more like: we got tired of building things on borrowed infrastructure. So we built something that doesn't need to ask permission to survive.
+
+### A Collective Record
+
+The old epics were written by one person, for one person's legacy. That's not what this is.
+
+Every participant writes a verse. Together they form something none of us could produce alone:
+
+- **You are the author.** Your movement generates the data.
+- **The blockchain is the record.** Nothing gets overwritten.
+- **Arweave is the archive.** Pay once, store for 200+ years.
+
+[Create your first Proof](/learn/getting-started/first-proof)
+
+---
+
+## 2. How It Works
+
+POE captures "Proof of Life" — a permanent record of your interaction with a shared canvas.
 
 ### Step 1: Connect
 
-You connect your Soulbound Wallet. This is your digital ID, your unique identifier in this metaverse.
+Connect your wallet. This becomes your unique identifier on the canvas. We support social login (Google, X, Facebook, Apple, Line) and external wallets like MetaMask — no crypto experience required.
 
-### Step 2: Enter the Void
+### Step 2: Enter the Canvas
 
-You enter an infinite, dark 3D space—our "Global Canvas." Here, time is the only metric.
+You enter an infinite dark 3D space: the Global Canvas. Time is the primary dimension here, not pixels.
 
-### Step 3: Inscribe
+### Step 3: Draw Your Trail
 
-When you move your cursor, you are not just drawing lines.
+Move your cursor. The system records:
 
-- The system captures your position vectors `(x, y, z)` and timestamps `(t)` with millisecond precision.
-- Every hesitation, every burst of speed, every circle reflects your subconscious state in that moment.
-- These data points are transformed into a unique "Light Trail."
+- Position vectors `(x, y, z)` with millisecond timestamps `(t)`
+- Every pause, burst of speed, and circle
+- These get compressed into a unique "Light Trail" — your data, your shape
 
-### Step 4: Mint & Immortalize
+Every hesitation is part of the record. That's intentional.
 
-We offer a "Dual-Path" minting mechanism to accommodate both the general public and collectors:
+### Step 4: Choose Your Proof Type
 
-**1. Standard Proof —— [Free]**
-Ideal for general participants.
+**Standard Proof — Free**
 
-- **Mechanism:** Your data is temporarily stored on our servers and batched into a Merkle Tree for daily on-chain submission at UTC 00:00.
-  - **Storage:** The full data batch is uploaded to **Arweave/IPFS** by the protocol, ensuring decentralized backup.
-- **Reward:** You earn **Time26** tokens as "Proof of Time."
-- **Cost:** **0 Gas**. We cover all Gas and storage expenses.
+Your trail is temporarily stored on our servers, then batched with others into a Merkle Tree and submitted on-chain at UTC 00:00 each day. The protocol covers all gas and Arweave storage costs. You earn Time26 tokens as proof of your participation.
 
-**2. Perpetual Proof —— [Paid]**
-Ideal for crypto-natives and collectors.
+**Perpetual Proof — Paid**
 
-- **Mechanism:** Your trail is immediately written to **Arweave** and verified by the **Polygon** smart contract in real-time.
-- **Benefits:**
-  - Instantly mint your personal Trail **NFT**.
-  - Earn the "Instant Minter" badge.
-  - Fully decentralized data ownership, independent of official servers.
-- **Cost:** A small fee is required (see "Pay to Exist" below).
+Your trail is written to Arweave immediately and verified by the Polygon smart contract in real time. You receive an NFT, an "Instant Minter" badge, and full decentralized ownership — independent of our servers.
+
+Cost: $2–$20 depending on session length, or equivalent in Time26 at a 20% discount.
+
+[Why use blockchain proof?](/learn/getting-started/why-blockchain-proof)
 
 ---
 
 ## 3. Technical Architecture
 
-To deliver on the promise of "Lasting for Ages," we chose the most robust decentralized tech stack.
+We chose this stack because permanence isn't a feature you add later. It has to be foundational.
 
-| Layer         | Technology                | Role                                                                                     |
-| :------------ | :------------------------ | :--------------------------------------------------------------------------------------- |
-| **Interface** | **Next.js 16 + Three.js** | Provides immersive 3D interaction using WebGL for high-performance rendering.            |
-| **Consensus** | **Polygon (PoS)**         | Ensures fast confirmation and low costs, acting as the final arbiter of ownership.       |
-| **Storage**   | **Arweave**               | The "Permaweb." Once uploaded, data is stored permanently, theoretically for 200+ years. |
-| **Identity**  | **Clerk**                 | Seamless Web3 login experience, bridging the traditional and decentralized worlds.       |
+| Layer         | Technology            | Role                                                |
+| :------------ | :-------------------- | :-------------------------------------------------- |
+| **Interface** | Next.js 16 + Three.js | WebGL 3D rendering for the canvas                   |
+| **Consensus** | Polygon (PoS)         | Fast confirmation, low cost, final ownership record |
+| **Storage**   | Arweave               | Endowment-based permanent storage                   |
+| **Identity**  | Web3Auth              | Social login + external wallet support              |
 
 **Why Arweave?**
-Traditional cloud storage (AWS, Google Cloud) is "rent-based"—stop paying, and data is deleted. Arweave is "endowment-based"—pay once, store forever. It is the only choice for building a digital legacy.
+
+AWS and Google Cloud are subscription storage. Stop paying, data disappears. Arweave uses an endowment model: one upfront payment funds perpetual storage through investment returns on the principal. For a project about permanence, there's no real alternative. The tradeoff is cost — Arweave isn't cheap per upload. That's why we absorb it for Standard Proof participants.
 
 ---
 
-## 4. The Economy: Time as Currency (Tokenomics)
+## 4. The Economy: Time as Currency
 
-### Time Token (Time26)
+### Time26 ($TIME26)
 
-**Time26** is the ecosystem's native token, representing the "attention time" contributed by the community.
+Time26 is POE's native token. It represents attention — the time you actually spent creating, not capital you invested.
 
 - **Symbol:** $TIME26
 - **Total Supply:** 48,420,000
-  - _Concept:_ 2026 has 31,536,000 seconds. We extended this "year" to account for the collective energy of the community and team committed during the inception (approx. 1.54 years of time).
 
-### Why 48,420,000? (The Time Math)
+### Why 48,420,000?
 
-This number is composed of the "Base Year" plus the "Ecosystem Extension":
+The number maps directly to time. Here's the breakdown:
 
-**1. The Base Year**
+**User Rewards (65%) — 31,536,000 tokens**
 
-- **31,536,000 (65%)** = **User Rewards**
-  - Matches every second of 2026 (365 Days). This is purely for the creators.
+One token per second of 2026. 365 days × 86,400 seconds = 31,536,000. Every second of the year has a corresponding token. This is the supply reserved entirely for creators.
 
-**2. The Ecosystem Extension**
-The "extra time" added to support the project's infrastructure (Total 16,884,000):
+**Ecosystem (35%) — 16,884,000 tokens**
 
-- **10,000,000 (21%)** = **Liquidity Pool**
-  - For Uniswap and markets, ensuring Time26 can be traded.
-- **4,730,400 (10%)** = **Team**
-  - Incentives for builders and long-term maintenance.
-- **2,153,600 (4%)** = **Operations Reserve**
-  - Server costs, event rewards, and emergency funds.
+- 10,000,000 (21%) — Liquidity Pool (Uniswap and markets)
+- 4,730,400 (10%) — Team (long-term builder incentives)
+- 2,153,600 (4%) — Operations Reserve (infrastructure, events, emergencies)
 
-**Total:** 31.5M (Users) + 16.9M (Ecosystem) = **48,420,000**
+Total: 31.5M + 16.9M = **48,420,000**
 
-### How to Earn Time26? (Mining)
+### How You Earn (Existence Mining)
 
-You can earn tokens for free via **"Existence Mining."**
-Your earnings depend on the time you invest and the congestion of the sector you are in.
+Standard Proof participants earn Time26 through Existence Mining:
 
-**Scarcity Formula:**
-`User Reward = Σ (1 Time26 / Number of people in that sector at that second)`
+```
+Reward = Σ (1 TIME26 / number of people in that sector at that second)
+```
 
-- If you draw in a crowded "Times Square" area, you earn very little Time26.
-- If you draw in a desolate wilderness, you earn the full value of that time.
-- This incentivizes the even distribution of light trails across the canvas.
+Draw in a crowded sector: you earn a fraction of the second's value. Draw in an empty area: you earn the full second. This distributes activity across the canvas without forcing anyone anywhere.
 
-### The Cost of Eternity
+### Pricing (Perpetual Proof)
 
-Choosing "Perpetual Proof" requires a fee to cover the real costs of permanent Arweave storage and Polygon verification. This is a **"Time Deposit"** for the future.
+| Session Length   | USDC   | Time26 (20% discount) |
+| :--------------- | :----- | :-------------------- |
+| Under 10 minutes | $2.00  | ~160 $TIME26          |
+| 10–30 minutes    | $5.00  | ~400 $TIME26          |
+| 30–60 minutes    | $10.00 | ~800 $TIME26          |
+| 1 hour+          | $20.00 | ~1,600 $TIME26        |
 
-We have established a duration-based pricing tier:
-
-| Interaction Duration | USDC Price | Time26 Payment (20% Discount) |
-| :------------------- | :--------- | :---------------------------- |
-| **< 10 Minutes**     | $2.00      | ~160 $TIME26                  |
-| **10 - 30 Minutes**  | $5.00      | ~400 $TIME26                  |
-| **30 - 60 Minutes**  | $10.00     | ~800 $TIME26                  |
-| **1 Hour +**         | $20.00     | ~1,600 $TIME26                |
-
-_Note: Time26 prices are adjusted in real-time via oracle to maintain an approx. 20% discount._
+Time26 prices adjust via oracle to maintain the 20% discount relative to USD.
 
 ### The Sustainability Valve
 
-We reject the "Pump and Dump" cycles of traditional crypto. We built a **Dynamic Valve** into the heart of the protocol.
+Protocol revenue from Perpetual Proof fees flows through a dynamic mechanism:
 
-1.  **Deflation Mode (Phase A):**
-    - _When:_ Early stage or stable supply.
-    - _Mechanism:_ 100% of Protocol Revenue (e.g., the $2-$20 fees mentioned above) is used to buy back and **BURN** $TIME26 from the open market.
-    - _Result:_ Scarcity increases. Your "held time" becomes more valuable.
+**Phase A — Deflation**
 
-2.  **Sustainability Mode (Phase B):**
-    - _When:_ Supply drops too low (<30M) or price spikes unsustainably.
-    - _Mechanism:_ 20% Burn / 80% Treasury.
-    - _Result:_ The Treasury gains sufficient funds to prepare for the **2027 Global Exhibitions**, ensuring the project survives beyond the hype cycle.
+When: early stage, or stable supply above 30M tokens.
+
+100% of revenue buys back and burns $TIME26 from the open market. Supply decreases. Held tokens gain scarcity value over time.
+
+**Phase B — Sustainability**
+
+When: supply drops below 30M, or price becomes unsustainable.
+
+20% burn, 80% to Treasury. Treasury funds operations past 2026, including the 2027 exhibition phase.
+
+This isn't novel mechanism design — it's a practical answer to the question every crypto project avoids: what happens after the hype? We'd rather answer it upfront.
 
 ---
 
 ## 5. The Future: 2027 and Beyond
 
-The project does not end when 2026 ends. That is merely the pause after the first movement.
-
 ### 2026: The Recording Phase
 
-- **Q1-Q2:** Protocol launch, Genesis blocks drawn.
-- **Q3-Q4:** "Gravity Field" events begin, community co-creation of massive thematic canvases.
+- **Q1–Q2:** Protocol launch. First trails drawn. Genesis blocks established.
+- **Q3–Q4:** "Gravity Field" events — community co-creation of large thematic canvases.
 
 ### 2027: The Exhibition Phase
 
-On **January 1, 2027**, the canvas will be sealed.
+The canvas closes on January 1, 2027.
 
-- **Global Tour:** Your trails will be projected in immersive galleries in New York, Tokyo, and London. This will be the largest "Decentralized Generative Art Exhibition" in history.
-- **Physical Totems:** Every proof holder will be eligible to mint a physical "Time Capsule," containing a holographic projection of their trail.
+Trails will be shown in immersive exhibitions in New York, Tokyo, and London — the first decentralized generative art show at this scale. Every proof holder is eligible to mint a physical Time Capsule containing a holographic projection of their trail.
 
-### 2028+: The Eternal Archive
+We don't know exactly what these will look like yet. That uncertainty is part of the point.
 
-All data remains on Arweave, becoming the largest record of behavioral art in human history.
-Future AIs and historians will interpret our era's anxieties, hopes, and collective consciousness through these trails.
+### 2028+: The Permanent Archive
 
-Join us. Write your verse in the Modern Epic.
-**Prove you existed.**
+All data remains on Arweave. Future researchers — human or AI — will find in these trails a behavioral record of 2026: what people made, where they went, how long they stayed, what shapes they left behind.
+
+---
+
+## FAQ
+
+**What does it cost to participate?**
+
+Standard Proof is free. We cover all gas and Arweave storage costs. Perpetual Proof (immediate NFT) costs $2–$20 depending on session length.
+
+**What happens to my data if POE shuts down?**
+
+Standard Proof data is batched and uploaded to Arweave by the protocol before each day closes. Perpetual Proof data is written to Arweave immediately at the time of minting. In both cases, the data exists on Arweave independent of POE's servers.
+
+**What is Time26 used for?**
+
+Paying for Perpetual Proof at a 20% discount vs. USD, and as a record of participation. The token is designed to reflect time contributed, not speculative position-taking.
+
+**When does the canvas close?**
+
+January 1, 2027. Everything drawn before that date is part of the permanent record.
+
+**Do I need a crypto wallet or prior blockchain experience?**
+
+No. Web3Auth supports Google, X, Facebook, Apple, and Line login — a wallet is created automatically. External wallets (MetaMask, etc.) also work if you prefer full self-custody.

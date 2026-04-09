@@ -2,10 +2,21 @@ import { getActiveTrails } from '@/lib/db/queries/get-active-trails';
 import { CosmosCanvas } from '@/components/cosmos/cosmos-canvas';
 import { CosmosTrail } from '@/components/cosmos/types';
 
-export const metadata = {
-  title: 'Cosmos | Proof of Existence',
-  description: 'The collective memory of all souls in the void.',
+import { getTranslations } from 'next-intl/server';
+
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.cosmos' });
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export const revalidate = 60; // Refresh every minute
 

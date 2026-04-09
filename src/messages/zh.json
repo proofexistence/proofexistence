@@ -1,7 +1,49 @@
 {
   "metadata": {
     "title": "存在證明 | 為期一年的集體藝術實驗",
-    "description": "加入這場運動。在區塊鏈上留下你不可篡改的痕跡。一個為期一年的集體藝術項目，每位參與者共同創作最終的數字紀念碑。"
+    "description": "加入這場運動。在區塊鏈上留下你不可篡改的痕跡。一個為期一年的集體藝術項目，每位參與者共同創作最終的數字紀念碑。",
+    "explore": {
+      "title": "全球畫廊 | 存在證明",
+      "description": "探索來自全球各地的光跡與存在證明。每一份作品都永久存存在於區塊鏈上。"
+    },
+    "cosmos": {
+      "title": "宇宙畫廊 | 存在證明",
+      "description": "沈浸式的 3D 體驗，探索所有存在證明的光跡。見證集體藝術的發展。"
+    },
+    "brands": {
+      "title": "品牌夥伴 | 存在證明",
+      "description": "支持存在證明的品牌與機構。了解如何成為這場集體藝術實驗的一部分。"
+    },
+    "badges": {
+      "title": "成就徽章 | 存在證明",
+      "description": "解鎖獨特的榮譽，表彰你在存在證明社群中的貢獻與里程碑。"
+    },
+    "learn": {
+      "title": "學習中心 | 存在證明",
+      "description": "了解存在證明的運作原理、教學、指南以及項目背後的故事。"
+    },
+    "whitepaper": {
+      "title": "協議白皮書 | 存在證明",
+      "description": "深入了解存在證明的技術規範、哲學背景與協議機制。"
+    },
+    "supporters": {
+      "title": "支持者名單 | 存在證明",
+      "description": "感謝支持這個集體藝術項目的每一位社區成員。"
+    },
+    "poe": {
+      "lab": {
+        "title": "Walker POE | 存在證明",
+        "description": "基於時間的生成藝術可視化，展示集體光跡的流動。"
+      },
+      "daisy": {
+        "title": "Daisy POE | 存在證明",
+        "description": "每日集體藝術可視化，光跡如時間漣漪般從中心發散。"
+      },
+      "col": {
+        "title": "Orbit POE | 存在證明",
+        "description": "集體光跡隨時間演變的生成藝術可視化。"
+      }
+    }
   },
   "nav": {
     "whitepaper": "白皮書",
@@ -405,6 +447,50 @@
     "social-butterfly": {
       "name": "社交蝴蝶",
       "description": "累計按讚 100 次"
+    },
+    "early-adopter-top-100": {
+      "name": "早期採用者",
+      "description": "前 100 位加入 Proof of Existence 的先驅者"
+    },
+    "marathon-artist": {
+      "name": "馬拉松繪畫者",
+      "description": "單次創作時間最長的藝術家"
+    },
+    "prolific-creator": {
+      "name": "創作狂人",
+      "description": "創作數量最多的活躍用戶"
+    },
+    "streak-master": {
+      "name": "連續創作大師",
+      "description": "保持最長連續創作紀錄"
+    },
+    "most-liked": {
+      "name": "最受歡迎",
+      "description": "獲得最多社群按讚的作品"
+    },
+    "collection-star": {
+      "name": "收藏之星",
+      "description": "作品被收藏次數最多"
+    },
+    "generous-giver": {
+      "name": "慷慨贈與者",
+      "description": "贈送最多 TIME26 代幣"
+    },
+    "reward-collector": {
+      "name": "獎勵收集者",
+      "description": "累積獲得最多 TIME26 獎勵"
+    },
+    "referral-ambassador": {
+      "name": "推薦大使",
+      "description": "成功推薦最多新用戶"
+    },
+    "distance-explorer": {
+      "name": "探索者",
+      "description": "光軌繪製距離最遠"
+    },
+    "speed-demon": {
+      "name": "速度惡魔",
+      "description": "繪畫速度最快的創作者"
     }
   },
   "timeCapsule": {
@@ -452,52 +538,6 @@
     },
     "freeNote": "標準證明完全免費，無需支付任何費用",
     "startButton": "開始創作"
-  },
-  "badges": {
-    "early-adopter-top-100": {
-      "name": "早期採用者",
-      "description": "前 100 位加入 Proof of Existence 的先驅者"
-    },
-    "marathon-artist": {
-      "name": "馬拉松繪畫者",
-      "description": "單次創作時間最長的藝術家"
-    },
-    "prolific-creator": {
-      "name": "創作狂人",
-      "description": "創作數量最多的活躍用戶"
-    },
-    "streak-master": {
-      "name": "連續創作大師",
-      "description": "保持最長連續創作紀錄"
-    },
-    "most-liked": {
-      "name": "最受歡迎",
-      "description": "獲得最多社群按讚的作品"
-    },
-    "collection-star": {
-      "name": "收藏之星",
-      "description": "作品被收藏次數最多"
-    },
-    "generous-giver": {
-      "name": "慷慨贈與者",
-      "description": "贈送最多 TIME26 代幣"
-    },
-    "reward-collector": {
-      "name": "獎勵收集者",
-      "description": "累積獲得最多 TIME26 獎勵"
-    },
-    "referral-ambassador": {
-      "name": "推薦大使",
-      "description": "成功推薦最多新用戶"
-    },
-    "distance-explorer": {
-      "name": "探索者",
-      "description": "光軌繪製距離最遠"
-    },
-    "speed-demon": {
-      "name": "速度惡魔",
-      "description": "繪畫速度最快的創作者"
-    }
   },
   "badgesPage": {
     "title": "成就徽章",

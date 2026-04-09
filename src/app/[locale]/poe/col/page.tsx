@@ -2,10 +2,21 @@ import { getTrailsForCol } from '@/lib/db/queries/get-trails-for-col';
 import { ColCanvas } from '@/components/col/col-canvas';
 import type { TrailPoint } from '@/components/col/types';
 
-export const metadata = {
-  title: 'Collective Art | Proof of Existence',
-  description: 'Generative art visualization of collective light trails.',
+import { getTranslations } from 'next-intl/server';
+
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.poe.col' });
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export const dynamic = 'force-dynamic';
 

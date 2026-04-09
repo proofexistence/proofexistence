@@ -20,21 +20,24 @@ interface LearnPageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: LearnPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.learn' });
+
   return {
-    title: 'Learn | Proof of Existence',
-    description:
-      'Discover how to use Proof of Existence. Tutorials, guides, and stories behind the project.',
+    title: t('title'),
+    description: t('description'),
     openGraph: {
-      title: 'Learn | Proof of Existence',
-      description:
-        'Discover how to use Proof of Existence. Tutorials, guides, and stories behind the project.',
+      title: t('title'),
+      description: t('description'),
       images: [
         {
           url: '/og-v2.png',
           width: 1200,
           height: 630,
-          alt: 'Learn - Proof of Existence',
+          alt: `Learn - ${t('title')}`,
         },
       ],
     },

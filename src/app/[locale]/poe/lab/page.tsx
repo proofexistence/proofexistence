@@ -1,10 +1,21 @@
 import { getAllTrailsForLab } from '@/lib/db/queries/get-all-trails-for-lab';
 import { TrailWalkers } from '@/components/lab/trail-walkers';
 
-export const metadata = {
-  title: 'Lab | Proof of Existence',
-  description: 'Time-based generative art visualization of collective trails.',
+import { getTranslations } from 'next-intl/server';
+
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.poe.lab' });
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export const dynamic = 'force-dynamic';
 

@@ -1,7 +1,49 @@
 {
   "metadata": {
     "title": "Preuve d'Existence | Une Expérience d'Art Collectif d'Un An",
-    "description": "Rejoignez le mouvement. Laissez votre trace immuable sur la blockchain. Un projet d'art collectif d'un an où chaque participant co-crée le monument numérique final."
+    "description": "Rejoignez le mouvement. Laissez votre trace immuable sur la blockchain. Un projet d'art collectif d'un an où chaque participant co-crée le monument numérique final.",
+    "explore": {
+      "title": "Explorer | Preuve d'Existence",
+      "description": "Découvrez les dernières preuves vérifiées du monde entier."
+    },
+    "cosmos": {
+      "title": "Cosmos | Preuve d'Existence",
+      "description": "Explorez la galerie multidimensionnelle de l'existence."
+    },
+    "badges": {
+      "title": "Badges | Preuve d'Existence",
+      "description": "Gagnez des honneurs uniques en participant à la communauté Preuve d'Existence."
+    },
+    "brands": {
+      "title": "Marques | Preuve d'Existence",
+      "description": "Découvrez les thèmes de quêtes parrainés par des marques et les collaborations."
+    },
+    "learn": {
+      "title": "Apprendre | Preuve d'Existence",
+      "description": "Comprenez la philosophie et les mécanismes du projet."
+    },
+    "whitepaper": {
+      "title": "Livre Blanc | Preuve d'Existence",
+      "description": "Lisez le plan technique et philosophique du projet."
+    },
+    "supporters": {
+      "title": "Supporters | Preuve d'Existence",
+      "description": "Les membres de la communauté qui rendent cet art collectif possible."
+    },
+    "poe": {
+      "lab": {
+        "title": "Walker POE | Preuve d'Existence",
+        "description": "Visualisation d'art génératif temporel des traces collectives."
+      },
+      "daisy": {
+        "title": "Daisy POE | Preuve d'Existence",
+        "description": "Visualisation d'art collectif quotidien où les sessions s'étendent comme des ondulations dans le temps."
+      },
+      "col": {
+        "title": "Orbit POE | Preuve d'Existence",
+        "description": "Visualisation d'art génératif des traces lumineuses collectives au fil du temps."
+      }
+    }
   },
   "nav": {
     "whitepaper": "Livre Blanc",
@@ -402,6 +444,50 @@
     "social-butterfly": {
       "name": "Papillon Social",
       "description": "100 j'aime donnés"
+    },
+    "early-adopter-top-100": {
+      "name": "Adopteur Précoce",
+      "description": "L'un des 100 premiers pionniers à rejoindre Proof of Existence"
+    },
+    "marathon-artist": {
+      "name": "Artiste Marathon",
+      "description": "Session de création individuelle la plus longue"
+    },
+    "prolific-creator": {
+      "name": "Créateur Prolifique",
+      "description": "Utilisateur le plus actif avec le plus grand nombre de créations"
+    },
+    "streak-master": {
+      "name": "Maître des Séries",
+      "description": "Plus longue série de créations consécutives"
+    },
+    "most-liked": {
+      "name": "Le Plus Aimé",
+      "description": "Le plus de likes de la communauté reçus"
+    },
+    "collection-star": {
+      "name": "Étoile de Collection",
+      "description": "Œuvre d'art la plus mise en favoris"
+    },
+    "generous-giver": {
+      "name": "Donateur Généreux",
+      "description": "Le plus de jetons TIME26 donnés"
+    },
+    "reward-collector": {
+      "name": "Collectionneur de Récompenses",
+      "description": "Le plus de récompenses TIME26 accumulées"
+    },
+    "referral-ambassador": {
+      "name": "Ambassadeur de Parrainage",
+      "description": "Le plus grand nombre de nouveaux utilisateurs parrainés avec succès"
+    },
+    "distance-explorer": {
+      "name": "Explorateur de Distance",
+      "description": "La plus longue distance de traînée lumineuse dessinée"
+    },
+    "speed-demon": {
+      "name": "Démon de Vitesse",
+      "description": "Créateur avec la vitesse de dessin la plus rapide"
     }
   },
   "timeCapsule": {
@@ -450,52 +536,7 @@
     "freeNote": "La preuve standard est entièrement gratuite, aucun paiement requis",
     "startButton": "Commencer à Créer"
   },
-  "badges": {
-    "early-adopter-top-100": {
-      "name": "Adopteur Précoce",
-      "description": "L'un des 100 premiers pionniers à rejoindre Proof of Existence"
-    },
-    "marathon-artist": {
-      "name": "Artiste Marathon",
-      "description": "Session de création individuelle la plus longue"
-    },
-    "prolific-creator": {
-      "name": "Créateur Prolifique",
-      "description": "Utilisateur le plus actif avec le plus grand nombre de créations"
-    },
-    "streak-master": {
-      "name": "Maître des Séries",
-      "description": "Plus longue série de créations consécutives"
-    },
-    "most-liked": {
-      "name": "Le Plus Aimé",
-      "description": "Le plus de likes de la communauté reçus"
-    },
-    "collection-star": {
-      "name": "Étoile de Collection",
-      "description": "Œuvre d'art la plus mise en favoris"
-    },
-    "generous-giver": {
-      "name": "Donateur Généreux",
-      "description": "Le plus de jetons TIME26 donnés"
-    },
-    "reward-collector": {
-      "name": "Collectionneur de Récompenses",
-      "description": "Le plus de récompenses TIME26 accumulées"
-    },
-    "referral-ambassador": {
-      "name": "Ambassadeur de Parrainage",
-      "description": "Le plus grand nombre de nouveaux utilisateurs parrainés avec succès"
-    },
-    "distance-explorer": {
-      "name": "Explorateur de Distance",
-      "description": "La plus longue distance de traînée lumineuse dessinée"
-    },
-    "speed-demon": {
-      "name": "Démon de Vitesse",
-      "description": "Créateur avec la vitesse de dessin la plus rapide"
-    }
-  },
+
   "badgesPage": {
     "title": "Badges de Réussite",
     "description": "Découvrez tous les badges de réussite disponibles dans Proof of Existence. Débloquez ces honneurs uniques en participant à la communauté, en créant des traînées lumineuses et en atteignant des jalons.",

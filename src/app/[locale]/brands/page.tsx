@@ -3,11 +3,21 @@ import Link from 'next/link';
 import { Sparkles, Palette, Mail } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 
-export const metadata = {
-  title: 'Brand Sponsorship | Proof of Existence',
-  description:
-    'Partner with Proof of Existence 2026. Showcase your brand in the cosmos and be part of digital history.',
+import { getTranslations } from 'next-intl/server';
+
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.brands' });
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export default function BrandsPage() {
   return (

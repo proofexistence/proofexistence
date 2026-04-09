@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
+/** Strip a leading H1 from markdown content to avoid duplicating the page title */
+function stripLeadingH1(content: string): string {
+  return content.replace(/^\s*#\s+[^\n]*\n?/, '');
+}
+
 // Types for Learn articles
 export interface LearnArticleMeta {
   title: string;
@@ -116,7 +121,7 @@ export const getLearnArticle = async (
       slug,
       category,
       meta: data as LearnArticleMeta,
-      content,
+      content: stripLeadingH1(content),
       lang: actualLang,
     };
   } catch (error) {
@@ -176,7 +181,7 @@ export const getWhitepaperContent = async (lang: string = 'en') => {
 
     return {
       meta: data,
-      content,
+      content: stripLeadingH1(content),
       lang: fs.existsSync(filePath) ? lang : 'en',
     };
   } catch (error) {

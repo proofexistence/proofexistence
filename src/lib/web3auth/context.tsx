@@ -149,8 +149,11 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
           // Use redirect mode on mobile to avoid popup blockers
           // Note: redirect mode still won't work for OAuth in in-app browsers (Google blocks it)
           uxMode: isMobile ? 'redirect' : 'popup',
-          // Note: uiConfig and walletServicesConfig removed to avoid 403 on Base plan
-          // (appName triggers whitelabel check, walletServicesConfig triggers wallet services check)
+          uiConfig: {
+            theme: 'dark', // Force dark mode for login modal
+          },
+          // Note: walletServicesConfig removed to avoid 403 on Base plan
+          // (walletServicesConfig triggers wallet services check)
         });
 
         web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async () => {

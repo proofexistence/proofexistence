@@ -129,7 +129,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         {/* Article Content */}
         <article className="prose prose-invert prose-zinc prose-headings:font-light prose-headings:tracking-tight prose-p:text-zinc-400 prose-a:text-purple-400 hover:prose-a:text-purple-300 prose-strong:text-white prose-li:text-zinc-400 prose-code:text-purple-300 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded max-w-none">
-          <Markdown remarkPlugins={[remarkGfm]}>{article.content}</Markdown>
+          <Markdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              blockquote: ({ children }) => (
+                <div className="not-prose my-6 rounded-lg border border-purple-500/30 bg-purple-500/10 px-5 py-4 text-sm text-zinc-300 leading-relaxed">
+                  {children}
+                </div>
+              ),
+            }}
+          >
+            {article.content}
+          </Markdown>
         </article>
 
         {/* Footer */}

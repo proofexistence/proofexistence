@@ -1,7 +1,49 @@
 {
   "metadata": {
     "title": "存在証明 | 1年間の集団アート実験",
-    "description": "ムーブメントに参加しよう。ブロックチェーン上に不変の痕跡を残そう。すべての参加者が最終的なデジタルモニュメントを共同制作する1年間のアートプロジェクト。"
+    "description": "ムーブメントに参加しよう。ブロックチェーン上に不変の痕跡を残そう。すべての参加者が最終的なデジタルモニュメントを共同制作する1年間のアートプロジェクト。",
+    "explore": {
+      "title": "探索 | 存在証明",
+      "description": "世界中から集まった最新の検証済み証明を探索しましょう。"
+    },
+    "cosmos": {
+      "title": "コスモス | 存在証明",
+      "description": "多次元的な存在のギャラリーを探索してください。"
+    },
+    "badges": {
+      "title": "バッジ | 存在証明",
+      "description": "存在証明コミュニティに参加して、独自の称号を獲得しましょう。"
+    },
+    "brands": {
+      "title": "ブランド | 存在証明",
+      "description": "ブランドスポンサーによるクエストテーマやコラボレーションをチェック。"
+    },
+    "learn": {
+      "title": "学ぶ | 存在証明",
+      "description": "プロジェクトの哲学と仕組みを理解しましょう。"
+    },
+    "whitepaper": {
+      "title": "ホワイトペーパー | 存在証明",
+      "description": "プロジェクトの技術的・哲学的ブループリントを読んでください。"
+    },
+    "supporters": {
+      "title": "サポーター | 存在証明",
+      "description": "この集団アートを支えるコミュニティメンバー。"
+    },
+    "poe": {
+      "lab": {
+        "title": "Walker POE | 存在証明",
+        "description": "集団の軌跡を時間軸で可視化したジェネレーティブ・アート。"
+      },
+      "daisy": {
+        "title": "Daisy POE | 存在証明",
+        "description": "セッションが時間の波紋のように広がる、日次集団アートの視覚化。"
+      },
+      "col": {
+        "title": "Orbit POE | 存在証明",
+        "description": "時間の経過とともに変化する集団の光跡を可視化したジェネレーティブ・アート。"
+      }
+    }
   },
   "nav": {
     "whitepaper": "ホワイトペーパー",
@@ -402,6 +444,50 @@
     "social-butterfly": {
       "name": "ソーシャルバタフライ",
       "description": "いいね100回達成"
+    },
+    "early-adopter-top-100": {
+      "name": "アーリーアダプター",
+      "description": "Proof of Existenceに参加した最初の100人のパイオニア"
+    },
+    "marathon-artist": {
+      "name": "マラソンアーティスト",
+      "description": "最長の単一創作セッション"
+    },
+    "prolific-creator": {
+      "name": "多作クリエイター",
+      "description": "最も創作数が多い活発なユーザー"
+    },
+    "streak-master": {
+      "name": "連続創作マスター",
+      "description": "最長の連続創作記録"
+    },
+    "most-liked": {
+      "name": "最も人気",
+      "description": "最も多くのコミュニティいいねを獲得"
+    },
+    "collection-star": {
+      "name": "コレクションスター",
+      "description": "最もブックマークされた作品"
+    },
+    "generous-giver": {
+      "name": "寛大な贈与者",
+      "description": "最も多くのTIME26トークンを寄付"
+    },
+    "reward-collector": {
+      "name": "報酬コレクター",
+      "description": "最も多くのTIME26報酬を獲得"
+    },
+    "referral-ambassador": {
+      "name": "紹介アンバサダー",
+      "description": "最も多くの新規ユーザーを紹介"
+    },
+    "distance-explorer": {
+      "name": "距離探検家",
+      "description": "最も長い光跡距離を描画"
+    },
+    "speed-demon": {
+      "name": "スピードデーモン",
+      "description": "最速の描画速度クリエイター"
     }
   },
   "timeCapsule": {
@@ -450,52 +536,7 @@
     "freeNote": "標準証明は完全無料、支払い不要",
     "startButton": "創作を始める"
   },
-  "badges": {
-    "early-adopter-top-100": {
-      "name": "アーリーアダプター",
-      "description": "Proof of Existenceに参加した最初の100人のパイオニア"
-    },
-    "marathon-artist": {
-      "name": "マラソンアーティスト",
-      "description": "最長の単一創作セッション"
-    },
-    "prolific-creator": {
-      "name": "多作クリエイター",
-      "description": "最も創作数が多い活発なユーザー"
-    },
-    "streak-master": {
-      "name": "連続創作マスター",
-      "description": "最長の連続創作記録"
-    },
-    "most-liked": {
-      "name": "最も人気",
-      "description": "最も多くのコミュニティいいねを獲得"
-    },
-    "collection-star": {
-      "name": "コレクションスター",
-      "description": "最もブックマークされた作品"
-    },
-    "generous-giver": {
-      "name": "寛大な贈与者",
-      "description": "最も多くのTIME26トークンを寄付"
-    },
-    "reward-collector": {
-      "name": "報酬コレクター",
-      "description": "最も多くのTIME26報酬を獲得"
-    },
-    "referral-ambassador": {
-      "name": "紹介アンバサダー",
-      "description": "最も多くの新規ユーザーを紹介"
-    },
-    "distance-explorer": {
-      "name": "距離探検家",
-      "description": "最も長い光跡距離を描画"
-    },
-    "speed-demon": {
-      "name": "スピードデーモン",
-      "description": "最速の描画速度クリエイター"
-    }
-  },
+
   "badgesPage": {
     "title": "実績バッジ",
     "description": "Proof of Existenceで獲得可能なすべての実績バッジを発見しましょう。コミュニティへの参加、光跡の作成、マイルストーンの達成により、これらのユニークな栄誉を解除できます。",

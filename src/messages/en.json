@@ -9,6 +9,40 @@
     "cosmos": {
       "title": "Cosmos | Proof of Existence",
       "description": "Explore the multi-dimensional gallery of existence."
+    },
+    "badges": {
+      "title": "Badges | Proof of Existence",
+      "description": "Earn unique honors by participating in the Proof of Existence community."
+    },
+    "brands": {
+      "title": "Brands | Proof of Existence",
+      "description": "Discover brand-sponsored quest themes and collaborations."
+    },
+    "learn": {
+      "title": "Learn | Proof of Existence",
+      "description": "Understand the philosophy and mechanics of the project."
+    },
+    "whitepaper": {
+      "title": "Whitepaper | Proof of Existence",
+      "description": "Read the technical and philosophical blueprint of the project."
+    },
+    "supporters": {
+      "title": "Supporters | Proof of Existence",
+      "description": "The community members who make this collective art possible."
+    },
+    "poe": {
+      "lab": {
+        "title": "Walker POE | Proof of Existence",
+        "description": "Time-based generative art visualization of collective trails."
+      },
+      "daisy": {
+        "title": "Daisy POE | Proof of Existence",
+        "description": "Daily collective art visualization where sessions expand like ripples in time."
+      },
+      "col": {
+        "title": "Orbit POE | Proof of Existence",
+        "description": "Generative art visualization of collective light trails over time."
+      }
     }
   },
   "nav": {

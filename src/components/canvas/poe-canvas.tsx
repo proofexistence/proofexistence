@@ -815,7 +815,9 @@ export function POECanvas() {
               });
             } catch (uploadErr) {
               console.error('Preview upload failed:', uploadErr);
-              throw new Error('Failed to upload preview image. Please try again.');
+              throw new Error(
+                'Failed to upload preview image. Please try again.'
+              );
             }
           }
 

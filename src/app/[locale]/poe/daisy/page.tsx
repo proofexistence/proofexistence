@@ -6,11 +6,21 @@ import {
 import { DailyArtCanvas } from '@/components/daily-art';
 import type { TrailPoint } from '@/components/daily-art';
 
-export const metadata = {
-  title: 'Daily Art | Proof of Existence',
-  description:
-    'Time Ripples - Daily collective art visualization where sessions expand from center to edge like ripples in time.',
+import { getTranslations } from 'next-intl/server';
+
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.poe.daisy' });
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export const dynamic = 'force-dynamic';
 
